@@ -31,6 +31,16 @@ class Statement extends PDOStatement {
      * @var integer Last insert id right after this statement was executed.
      */
     protected $last_insert_id;
+    
+    /**
+     * @var array Column - variable bindings.
+     */
+    protected $bindings;
+    
+    /**
+     * @var array Column - variable bindings, to be registered after next call to execute.
+     */
+    protected $delayed_bindings = array();    
 
     /**
      * Constructor.
@@ -44,12 +54,37 @@ class Statement extends PDOStatement {
     /**
      * Binds a formatter to a column of the result set.
      *
-     * @param mixed $column The column (name or integer index).
-     * @param mixed $formatter A Formatter instance, or a PHP type as a string.
+     * @param string $column The column (name or integer index).
+     * @param Formatter $formatter A Formatter instance, or a PHP type as a string.
      */
-    public function bindFormatter($column, $formatter) {
-    	// TODO think about this "name or integer index", and don't forget bindColumn
+    public function bindFormatter($column, Formatter $formatter = null) {
+    	if (isset($formatter))
+    		$this->formatters[$column] = $formatter;
+    	else
+    		unset($this->formatters[$column]);
     }
+    
+    /**
+     * PDOStatement::bindColumn() override, to keep track of all columns bindings so that proper formatting
+     * can be applied after each call to fetch with FETCH_BOUND.
+     */
+    public function bindColumn($column, &$param) {
+    	$this->bindings[] = array(
+    		'column' => $column,
+    		'param' => &$param
+    	);
+    	return parent::bindColumn($column, $param);
+    }
+    
+    /**
+     * Bindings delayed after next call to execute().
+     */
+    public function bindColumnDelayed($column, &$param) {
+    	$this->delayed_bindings[] = array(
+    		'column' => $column,
+    		'param' => &$param
+    	);
+    }    
 
     /**
      * Redefined to store the last insert id, so it can be retrieved by calling lastInsertId() on this object.
@@ -57,8 +92,17 @@ class Statement extends PDOStatement {
      * @see PDOStatement::execute()
      */
     public function execute($input_parameters = array()) {
+    	// Execute statement :
     	$return = parent::execute($input_parameters);
+    	
+    	// Register delayed bindings :
+    	foreach($this->delayed_bindings as $binding)
+    		parent::bindColumn($binding['column'], $binding['param']);
+    	$this->delayed_bindings = array();
+    	
+    	// Store last insert id :
     	$this->last_insert_id = $this->db->lastInsertId();
+    	
     	return $return;
     }
 

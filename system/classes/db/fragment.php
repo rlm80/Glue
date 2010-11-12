@@ -2,6 +2,8 @@
 
 namespace Glue\DB;
 
+use Exception;
+
 /**
  * Base fragment class.
  *
@@ -115,7 +117,8 @@ abstract class Fragment {
 	}
 
 	/**
-	 * Helper function that sets the value of a property.
+	 * Helper function that sets the value of a property, taking care of dependencies
+	 * between fragments and invalidation.
 	 *
 	 * @param string $prop
 	 * @param mixed $value
@@ -175,7 +178,7 @@ abstract class Fragment {
 	protected function check_forwarding($function) {
 		$context = $this->context();
 		if ( ! isset($context))
-			throw new Kohana_Exception("Cannot call function '" . $function . "' in this context.");
+			throw new Exception("Cannot call function '" . $function . "' in this context.");
 		else
 			return $context;
 	}

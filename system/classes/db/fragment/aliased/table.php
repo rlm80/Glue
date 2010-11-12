@@ -2,22 +2,30 @@
 
 namespace Glue\DB;
 
+use ArrayAccess;
+
 /**
  * Fragment that represents a table - alias pair and compiles into a "<table> AS <alias>" SQL string.
  *
- * Also provides easy access to column fragments through the use of __get($column).
+ * Also provides easy access to column fragments through the use of $obj->__get($column), and access to the
+ * result of a select query through the use of $obj['<column>'].
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class Fragment_Aliased_Table extends Fragment_Aliased {
+class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 	/**
 	 * @var boolean Prevents setting of table and alias once a column fragment has been generated.
 	 */
-	protected $lock = false; // TODO make sure this works...and think again about necessity of returning NEW column fragment
-
+	protected $lock = false; // TODO make sure this works...
+	
+	/**
+	 * @var array Column fragments cache.
+	 */
+	protected $columns = array();
+	
 	/**
 	 * Constructor.
 	 *
@@ -27,7 +35,7 @@ class Fragment_Aliased_Table extends Fragment_Aliased {
 	public function __construct($table_name, $alias = null) {
 		parent::__construct(new Fragment_Table($table_name), $alias);
 	}
-
+	
 	/**
 	 * Returns children column fragments.
 	 *
@@ -37,6 +45,26 @@ class Fragment_Aliased_Table extends Fragment_Aliased {
 	 */
 	public function __get($column) {
 		$this->lock = true;
-	    return new Fragment_Column($this, $column);
+	    if ( ! isset($this->columns[$column]))
+			$this->columns[$column] = new Fragment_Column($this, $column);
+		return $this->columns[$column];
+	}
+	
+	
+	// ArrayAccess interface implementation :
+	public function offsetExists ($offset) {
+		return true;
+	}
+	
+	public function offsetGet ($offset) {
+		return $this->__get($offset)->value();
+	}
+	
+	public function offsetSet ($offset, $value) {
+		throw new Exception("Cannot set row values.");
+	}
+	
+	public function offsetUnset ($offset) {
+		throw new Exception("Cannot set row values.");
 	}
 }

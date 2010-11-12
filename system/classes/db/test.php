@@ -2,7 +2,7 @@
 
 namespace Glue\DB;
 
-use PDOException;
+use Exception, PDO;
 
 /**
  * Test class.
@@ -23,10 +23,10 @@ class Test {
 			self::test_queries();
 		}
 		catch (Exception $e) {
-			self::drop_test_tables();
+			//self::drop_test_tables();
 			throw $e;
 		}
-		self::drop_test_tables();
+		//self::drop_test_tables();
 	}
 
 	static private function create_test_tables() {
@@ -37,9 +37,9 @@ class Test {
 	}
 
 	static private function drop_test_tables() {
-		try { db::db()->exec("drop table glusers");		} catch (PDOException $e) {};
-		try { db::db()->exec("drop table glprofiles");	} catch (PDOException $e) {};
-		try { db::db()->exec("drop table glposts");		} catch (PDOException $e) {};
+		try { db::db()->exec("drop table glusers");		} catch (Exception $e) {};
+		try { db::db()->exec("drop table glprofiles");	} catch (Exception $e) {};
+		try { db::db()->exec("drop table glposts");		} catch (Exception $e) {};
 	}
 
 	static private function test_fragments() {
@@ -94,7 +94,7 @@ class Test {
 				),
 		);
 
-		$get = new Fragment_Builder_Get(null);
+		$get = new Fragment_Builder_SelectList(null);
 		$get
 			->and($t->login)
 			->and($t->password)
@@ -167,7 +167,7 @@ class Test {
 			"SELECT * FROM `glusers` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = db::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->get($a->login)->and($a->password)->root();
+		$select5 = db::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->columns($a->login)->and($a->password)->root();
 		$tests['query select group by having'] = array(
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `glusers` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
@@ -214,5 +214,18 @@ class Test {
 							->and('test3', 'test3')
 						->prepare();
 		$statement->execute();
+		
+		$statement = db::select('glusers', $u)
+						->columns($u->login, $u->password)
+						->prepare();
+		$statement->execute();
+		
+		while($statement->fetch(/*PDO::FETCH_BOUND*/))
+			echo $u['password'];
+		
+		
+		//$arr = $statement->fetchAll();
+		//print_r($arr);
+		
 	}
 }

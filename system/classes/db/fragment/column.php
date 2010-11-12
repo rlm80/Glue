@@ -26,6 +26,11 @@ class Fragment_Column extends Fragment {
 	 * @var Column
 	 */
 	protected $column;
+	
+	/**
+	 * @var array Value of column in current row of data.
+	 */
+	protected $value;
 
 	/**
 	 * Constructor.
@@ -46,6 +51,15 @@ class Fragment_Column extends Fragment {
 	public function column() {
 		return $this->column;
 	}
+	
+	/**
+	 * Value getter.
+	 *
+	 * @return mixed
+	 */
+	public function value() {
+		return $this->value;
+	}
 
 	/**
 	 * Table alias getter.
@@ -58,6 +72,26 @@ class Fragment_Column extends Fragment {
 
 	public function __toString() {
 		return $this->sql($this->column()->table()->db());
+	}
+	
+	/**
+	 * Binds $this->value to column $alias of statement $stmt.
+	 * 
+	 * @param Statement $stmt
+	 * @param string $alias
+	 * @param boolean $delayed
+	 */
+	public function bind(Statement $stmt, $alias, $delayed) {
+		// Bind column :
+		if ($delayed)
+			$stmt->bindColumnDelayed($alias, $this->value);
+		else
+			$stmt->bindColumn($alias, $this->value);
+			
+		// Bind formatter :
+		$stmt->bindFormatter($alias, $this->column()->formatter());
+		
+		return $this;
 	}
 	
 	/**

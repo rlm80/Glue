@@ -7,9 +7,9 @@ use PDO;
 /**
  * Base database class.
  *
- * A database object is a PDO instance connected to a specific database. This
- * class extends PDO and adds to it a unified interface for database introspection
- * and functions to generate RDBMS specific SQL.
+ * A database object is a PDO instance connected to a specific database, with a unified interface
+ * for database introspection and functions to generate RDBMS specific SQL from data structures
+ * representing pieces of SQL queries.
  *
  * @package    GlueDB
  * @author     Régis Lemaigre
@@ -299,13 +299,13 @@ abstract class Database extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Get fragments into an SQL string.
+	 * Compiles Fragment_Builder_SelectList fragments into an SQL string.
 	 *
-	 * @param Fragment_Builder_Get $fragment
+	 * @param Fragment_Builder_SelectList $fragment
 	 *
 	 * @return string
 	 */
-	public function compile_builder_get(Fragment_Builder_Get $fragment) {
+	public function compile_builder_selectlist(Fragment_Builder_SelectList $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -548,7 +548,7 @@ abstract class Database extends PDO {
 	 */
 	public function compile_query_select(Fragment_Query_Select $fragment) {
 		// Get data from fragment :
-		$selectsql	= $fragment->get()->sql($this);
+		$selectsql	= $fragment->columns()->sql($this);
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
 		$groupbysql	= $fragment->groupby()->sql($this);
@@ -582,12 +582,16 @@ abstract class Database extends PDO {
 		// Get data from fragment :
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
+		$limit		= $fragment->limit();
+		$offset		= $fragment->offset();		
 
 		// Mandatory :
 		$sql = 'DELETE FROM ' . $fromsql;
 
 		// Optional :
-		if ( ! empty($wheresql)) $sql .= ' WHERE ' . $wheresql;
+		if ( ! empty($wheresql))	$sql .= ' WHERE '	. $wheresql;
+		if (   isset($limit))		$sql .= ' LIMIT '	. $limit;
+		if (   isset($offset))		$sql .= ' OFFSET '	. $offset;
 
 		return $sql;
 	}
@@ -605,6 +609,8 @@ abstract class Database extends PDO {
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
 		$orderbysql	= $fragment->orderby()->sql($this);
+		$limit		= $fragment->limit();
+		$offset		= $fragment->offset();			
 
 		// Mandatory :
 		$sql = 'UPDATE ' . $fromsql . ' SET ' . $setlistsql;
@@ -612,6 +618,8 @@ abstract class Database extends PDO {
 		// Optional :
 		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;
 		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
+		if (   isset($limit))		$sql .= ' LIMIT '		. $limit;
+		if (   isset($offset))		$sql .= ' OFFSET '		. $offset;	
 
 		return $sql;
 	}

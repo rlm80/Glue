@@ -20,6 +20,16 @@ class Fragment_Query_Delete extends Fragment_Query {
 	 * @var Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
+	
+	/**
+	 * @var Integer Limit.
+	 */
+	protected $limit;
+
+	/**
+	 * @var Integer Offset.
+	 */
+	protected $offset;	
 
 	/**
 	 * Constructor.
@@ -70,13 +80,41 @@ class Fragment_Query_Delete extends Fragment_Query {
 		else
 			return $this->where;
 	}
+	
+	/**
+	 * Limit getter/setter.
+	 *
+	 * @param integer $limit
+	 *
+	 * @return integer
+	 */
+	public function limit($limit = null) {
+		if (func_num_args() === 0)
+			return $this->limit;
+		else
+			return $this->set_property('limit', $limit);
+	}
+
+	/**
+	 * Offset getter/setter.
+	 *
+	 * @param integer $offset
+	 *
+	 * @return integer
+	 */
+	public function offset($offset = null) {
+		if (func_num_args() === 0)
+			return $this->offset;
+		else
+			return $this->set_property('offset', $offset);
+	}
 
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
 	 * @return Database
 	 */
-	protected function find_db() {
+	public function db() {
 		return $this->from()->aliased()->table()->db();
 	}
 

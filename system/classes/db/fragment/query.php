@@ -12,11 +12,6 @@ namespace Glue\DB;
 
 abstract class Fragment_Query extends Fragment {
 	/**
-	 * @var Database The database object this query is meant to be used against.
-	 */
-	protected $db;
-
-	/**
 	 * @var integer Number of rows affected by the last call to execute().
 	 */
 	protected $row_count;
@@ -35,18 +30,7 @@ abstract class Fragment_Query extends Fragment {
 	 *
 	 *  @return Database
 	 */
-	public function db() {
-		if ( ! isset($this->db))
-			$this->db = $this->find_db();
-		return $this->db;
-	}
-
-	/**
-	 * Determines database from the tables this query manipulates.
-	 *
-	 * @return Database
-	 */
-	abstract protected function find_db();
+	abstract public function db();
 
 	/**
 	 * Return current object. Example usage :

@@ -2,6 +2,8 @@
 
 namespace Glue\DB;
 
+use PDO;
+
 /**
  * Fragment that represents a get query.
  *
@@ -12,9 +14,9 @@ namespace Glue\DB;
 
 class Fragment_Query_Select extends Fragment_Query {
 	/**
-	 * @var Fragment_Builder_Get Select list.
+	 * @var Fragment_Builder_SelectList Select list.
 	 */
-	protected $get;
+	protected $columns;
 
 	/**
 	 * @var Fragment_Builder_Join_From From clause.
@@ -56,7 +58,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 */
 	public function __construct() {
 		// Init children fragments :
-		$this->get		= new Fragment_Builder_Get();
+		$this->columns	= new Fragment_Builder_SelectList();
 		$this->from		= new Fragment_Builder_Join_From();
 		$this->where	= new Fragment_Builder_Bool_Where();
 		$this->groupby	= new Fragment_Builder_Groupby();
@@ -64,7 +66,7 @@ class Fragment_Query_Select extends Fragment_Query {
 		$this->orderby	= new Fragment_Builder_Orderby();
 
 		// Set up dependecies :
-		$this->get->register_user($this);
+		$this->columns->register_user($this);
 		$this->from->register_user($this);
 		$this->where->register_user($this);
 		$this->groupby->register_user($this);
@@ -75,18 +77,18 @@ class Fragment_Query_Select extends Fragment_Query {
 	/**
 	 * Returns the select list, initializing it with given parameters if any.
 	 *
-	 * I.e. "$query->get(...)" is the same as "$query->get()->and(...)".
+	 * I.e. "$query->columns(...)" is the same as "$query->columns()->and(...)".
 	 *
-	 * @return Fragment_Builder_Get
+	 * @return Fragment_Builder_SelectList
 	 */
-	public function get() {
+	public function columns() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->get->reset();
-			return call_user_func_array(array($this->get, 'and'), $args);
+			$this->columns->reset();
+			return call_user_func_array(array($this->columns, 'and'), $args);
 		}
 		else
-			return $this->get;
+			return $this->columns;
 	}
 
 	/**
@@ -185,11 +187,8 @@ class Fragment_Query_Select extends Fragment_Query {
 	public function limit($limit = null) {
 		if (func_num_args() === 0)
 			return $this->limit;
-		else {
-			$this->limit = $limit;
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('limit', $limit);
 	}
 
 	/**
@@ -202,11 +201,8 @@ class Fragment_Query_Select extends Fragment_Query {
 	public function offset($offset = null) {
 		if (func_num_args() === 0)
 			return $this->offset;
-		else {
-			$this->offset = $offset;
-			$this->invalidate();
-			return $this;
-		}
+		else
+			return $this->set_property('offset', $offset);
 	}
 
 	/**
@@ -214,20 +210,63 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * @return Database
 	 */
-	protected function find_db() {
+	public function db() {
 		$op = $this->from();
 		while ($op instanceof Fragment_Builder_Join)
 			$op = $op->first()->operand();
 		return $op->aliased()->table()->db();
 	}
 
-	/*
-	 * Executes current query and returns a result set.
+	/**
+	 * Compiles this query into an SQL string and asks PDO to prepare it for execution. Returns
+	 * a PDOStatement object that can be executed multiple times. If you need to execute a statement
+	 * more than once, or if you need query parameters, this is the method of choice for security
+	 * and performance.
 	 *
-	 * @see PDO::query()
+	 * @return Statement
 	 */
-	public function execute($arg1 = null, $arg2 = null, $arg3 = null) {
-		return $this->db->query($this->compile(), $arg1, $arg2, $arg3);
+	public function prepare(array $driver_options = array()) {
+		// Prepare statement :
+		$stmt = parent::prepare($driver_options);
+		$stmt->setFetchMode(PDO::FETCH_BOUND);
+		
+		// Bind columns :
+		$this->bind($stmt, true);
+		
+		// Return statement :
+		return $stmt;
+	}
+
+	/**
+	 * Executes current query.
+	 *
+	 * @return Statement
+	 */
+	public function execute() {
+		// Execute query and get statement :
+		$db = $this->db();
+		$sql = $this->sql($db);
+		$stmt = $db->query($sql);
+		$stmt->setFetchMode(PDO::FETCH_BOUND);
+		
+		// Bind columns :
+		$this->bind($stmt, false);
+		
+		// Return statement :
+		return $stmt;
+	}
+	
+	/**
+	 * Set up bindings between columns fetched by given statement and table alias objects
+	 * of this query.
+	 * 
+	 * @param Statement $stmt
+	 */
+	protected function bind(Statement $stmt, $delayed) {
+		foreach($this->columns()->children() as $child) {
+			if ($child instanceof Fragment_Aliased_Column)
+				$child->bind($stmt, $delayed);
+		}
 	}
 
 	/**

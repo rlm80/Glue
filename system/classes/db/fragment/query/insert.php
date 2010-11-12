@@ -112,7 +112,7 @@ class Fragment_Query_Insert extends Fragment_Query {
 	 *
 	 * @return Database
 	 */
-	protected function find_db() {
+	public function db() {
 		return $this->into()->aliased()->table()->db();
 	}
 

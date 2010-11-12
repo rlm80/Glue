@@ -10,7 +10,7 @@ namespace Glue\DB;
  * @license    MIT
  */
 
-class Fragment_Builder_Get extends Fragment_Builder {
+class Fragment_Builder_SelectList extends Fragment_Builder {
 	/**
 	 * Adds an element at the end of the select list. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.
@@ -31,7 +31,9 @@ class Fragment_Builder_Get extends Fragment_Builder {
 			$alias = $this->compute_alias_computed();
 
 		// Build fragment :
-		if ($first instanceof Fragment)
+		if ($first instanceof Fragment_Column)
+			$fragment = new Fragment_Aliased_Column($first, $alias);
+		elseif ($first instanceof Fragment)
 			$fragment = new Fragment_Aliased($first, $alias);
 		else
 			$fragment = new Fragment_Aliased(
@@ -95,6 +97,6 @@ class Fragment_Builder_Get extends Fragment_Builder {
 	 */
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
-		return $db->compile_builder_get($this, $style);
+		return $db->compile_builder_selectlist($this, $style);
 	}
 }

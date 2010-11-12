@@ -30,6 +30,16 @@ class Fragment_Query_Update extends Fragment_Query {
 	 * @var Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
+	
+	/**
+	 * @var Integer Limit.
+	 */
+	protected $limit;
+
+	/**
+	 * @var Integer Offset.
+	 */
+	protected $offset;	
 
 	/**
 	 * Constructor.
@@ -117,13 +127,41 @@ class Fragment_Query_Update extends Fragment_Query {
 		else
 			return $this->orderby;
 	}
+	
+	/**
+	 * Limit getter/setter.
+	 *
+	 * @param integer $limit
+	 *
+	 * @return integer
+	 */
+	public function limit($limit = null) {
+		if (func_num_args() === 0)
+			return $this->limit;
+		else
+			return $this->set_property('limit', $limit);
+	}
+
+	/**
+	 * Offset getter/setter.
+	 *
+	 * @param integer $offset
+	 *
+	 * @return integer
+	 */
+	public function offset($offset = null) {
+		if (func_num_args() === 0)
+			return $this->offset;
+		else
+			return $this->set_property('offset', $offset);
+	}	
 
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
 	 * @return Database
 	 */
-	protected function find_db() {
+	public function db() {
 		$op = $this->from();
 		while ($op instanceof Fragment_Builder_Join)
 			$op = $op->first()->operand();
