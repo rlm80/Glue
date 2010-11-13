@@ -75,21 +75,24 @@ class Fragment_Column extends Fragment {
 	}
 	
 	/**
-	 * Binds $this->value to column $alias of statement $stmt.
+	 * Binds $this->value to column $alias at index $index of statement $stmt.
 	 * 
 	 * @param Statement $stmt
 	 * @param string $alias
+	 * @param integer $index 
 	 * @param boolean $delayed
 	 */
-	public function bind(Statement $stmt, $alias, $delayed) {
+	public function bind(Statement $stmt, $alias, $index, $delayed) {
 		// Bind column :
 		if ($delayed)
-			$stmt->bindColumnDelayed($alias, $this->value);
+			$stmt->bindColumnDelayed($index, $this->value);
 		else
-			$stmt->bindColumn($alias, $this->value);
+			$stmt->bindColumn($index, $this->value);
 			
-		// Bind formatter :
-		$stmt->bindFormatter($alias, $this->column()->formatter());
+		// Bind formatters :
+		$formatter = $this->column()->formatter();
+		$stmt->bindFormatter($alias, $formatter);
+		$stmt->bindFormatter($index, $formatter);
 		
 		return $this;
 	}

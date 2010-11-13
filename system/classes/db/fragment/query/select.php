@@ -263,9 +263,11 @@ class Fragment_Query_Select extends Fragment_Query {
 	 * @param Statement $stmt
 	 */
 	protected function bind(Statement $stmt, $delayed) {
+		$index = 0;
 		foreach($this->columns()->children() as $child) {
+			$index ++;
 			if ($child instanceof Fragment_Aliased_Column)
-				$child->bind($stmt, $delayed);
+				$child->bind($stmt, $index, $delayed);
 		}
 	}
 

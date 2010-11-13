@@ -215,13 +215,30 @@ class Test {
 						->prepare();
 		$statement->execute();
 		
+		//print_r($statement); die;
+		
 		$statement = db::select('glusers', $u)
-						->columns($u->login, $u->password)
+						->columns($u->id)->and($u->login)->and($u->password)
 						->prepare();
 		$statement->execute();
 		
-		while($statement->fetch(/*PDO::FETCH_BOUND*/))
-			echo $u['password'];
+		$statement->bindColumn(1, $test);
+		
+		while($res = $statement->fetch(PDO::FETCH_BOTH)) {
+			//var_dump($u['login']);
+			var_dump($res);
+			echo $test;
+		}
+		
+		/*
+		$stmt = db::db()->query("select login as login from glusers");
+		//$stmt->bindColumn('login', $test);
+		$stmt->setFetchMode(PDO::FETCH_BOTH);
+		while($res = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			print_r($res);
+			//echo $test;
+		}
+		*/
 		
 		
 		//$arr = $statement->fetchAll();

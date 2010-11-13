@@ -32,7 +32,7 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 
 		// Build fragment :
 		if ($first instanceof Fragment_Column)
-			$fragment = new Fragment_Aliased_Column($first, $alias);
+			$fragment = new Fragment_Aliased_Column($first, $alias, count($this->children()));
 		elseif ($first instanceof Fragment)
 			$fragment = new Fragment_Aliased($first, $alias);
 		else
