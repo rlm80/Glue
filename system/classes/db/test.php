@@ -26,7 +26,7 @@ class Test {
 			//self::drop_test_tables();
 			throw $e;
 		}
-		//self::drop_test_tables();
+		self::drop_test_tables();
 	}
 
 	static private function create_test_tables() {

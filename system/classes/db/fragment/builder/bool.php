@@ -87,9 +87,13 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 			$fragment = $first;
 		else
 			$fragment = new Fragment_Template($first, $values);
+		$operand = new Fragment_Operand_Bool($fragment, $operator);
+		
+		// Give fragment a context :
+		$operand->context($this);		
 
 		// Add operand :
-		$this->push(new Fragment_Operand_Bool($fragment, $operator));
+		$this->push($operand);
 	}
 	
 	/**

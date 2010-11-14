@@ -34,6 +34,11 @@ abstract class Fragment {
 	 * @var array List of fragments that make direct use of this fragment to create their own SQL representation.
 	 */
 	protected $users;
+	
+	/**
+	 * @var Fragment Parent of this fragment in the query tree.
+	 */
+	protected $context;
 
 	/**
 	 * @var array Cached compiled SQL strings. One entry for each database.
@@ -145,15 +150,17 @@ abstract class Fragment {
 	}
 
 	/**
-	 * Returns the context, that is, the last parent fragment this fragment was attached to.
+	 * Context getter / setter.
 	 *
 	 * @return Fragment
 	 */
-	public function context() {
-		if (count($this->users) > 0)
-			return end($this->users);
+	public function context(Fragment $context = null) {
+		if (func_num_args() > 0) {
+			$this->context = $context;
+			return $this;
+		}
 		else
-			return null;
+			return $this->context;
 	}
 
 	/**
@@ -178,7 +185,7 @@ abstract class Fragment {
 	protected function check_forwarding($function) {
 		$context = $this->context();
 		if ( ! isset($context))
-			throw new Exception("Cannot call function '" . $function . "' in this context.");
+			throw new Exception("Cannot call function '" . $function . "' in such a context.");
 		else
 			return $context;
 	}

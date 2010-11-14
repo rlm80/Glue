@@ -142,9 +142,10 @@ class DB {
 		$f = new Fragment_Builder_Bool();
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($f, 'init'), $args);
+			return call_user_func_array(array($f, 'init'), $args);
 		}
-		return $f;
+		else
+			return $f;
 	}
 
 	/**

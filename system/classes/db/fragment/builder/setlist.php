@@ -22,6 +22,9 @@ class Fragment_Builder_Setlist extends Fragment_Builder {
 	public function _and($column, $to = null) {
 		// Build fragment :
 		$fragment = new Fragment_Assignment($column, $to);
+		
+		// Give fragment a context :
+		$fragment->context($this);	
 
 		// Add fragment :
 		$this->push($fragment);

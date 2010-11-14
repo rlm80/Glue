@@ -29,6 +29,9 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 			$fragment = new Fragment_Ordered($first);
 		else
 			$fragment = new Fragment_Ordered(new Fragment_Template($first, $params));
+			
+		// Give fragment a context :
+		$fragment->context($this);
 
 		// Add fragment :
 		$this->push($fragment);

@@ -31,6 +31,7 @@ class Fragment_Operand_Join extends Fragment_Operand {
 		parent::__construct($operand, $operator);
 		$this->on = new Fragment_Builder_Bool();
 		$this->on->register_user($this);
+		$this->on->context($this);
 	}
 
 	/**
@@ -38,13 +39,24 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	 *
 	 * @return Fragment_Builder_Bool
 	 */
-	public function on() { // TODO think about this function
+	public function on() { // TODO think more about this function
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->on, 'init'), $args);
+			return call_user_func_array(array($this->on, 'init'), $args);
 		}
-		return $this->on;
+		else
+			return $this->on;
 	}
+	
+	/**
+	 * Forwards call to operand.
+	 *
+	 * @return Fragment_Operand_Join
+	 */
+	public function _as($alias) {
+		$this->operand()->_as($alias);
+		return $this;
+	}	
 	
 	/**
 	 * Forwards call to given database.

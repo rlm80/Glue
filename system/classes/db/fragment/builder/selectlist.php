@@ -40,6 +40,9 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 				new Fragment_Template($first, $params),
 				$alias
 			);
+			
+		// Give fragment context :
+		$fragment->context($this);			
 
 		// Push fragment :
 		$this->push($fragment);

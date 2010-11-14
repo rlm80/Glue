@@ -47,6 +47,11 @@ class Fragment_Query_Insert extends Fragment_Query {
 		$this->into->register_user($this);
 		$this->values->register_user($this);
 		$this->columns->register_user($this);
+		
+		// Set up dependecies :
+		$this->into->context($this);
+		$this->values->context($this);
+		$this->columns->context($this);		
 
 		// Initialize alias parameter :
 		$alias = $this->into;

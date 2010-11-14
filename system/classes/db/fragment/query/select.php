@@ -72,6 +72,14 @@ class Fragment_Query_Select extends Fragment_Query {
 		$this->groupby->register_user($this);
 		$this->having->register_user($this);
 		$this->orderby->register_user($this);
+		
+		// Set up contexts :
+		$this->columns->context($this);
+		$this->from->context($this);
+		$this->where->context($this);
+		$this->groupby->context($this);
+		$this->having->context($this);
+		$this->orderby->context($this);		
 	}
 
 	/**

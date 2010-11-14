@@ -56,6 +56,12 @@ class Fragment_Query_Update extends Fragment_Query {
 		$this->from->register_user($this);
 		$this->where->register_user($this);
 		$this->orderby->register_user($this);
+		
+		// Set up contexts :
+		$this->set->context($this);
+		$this->from->context($this);
+		$this->where->context($this);
+		$this->orderby->context($this);		
 	}
 
 	/**

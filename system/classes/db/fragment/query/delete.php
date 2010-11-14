@@ -45,6 +45,10 @@ class Fragment_Query_Delete extends Fragment_Query {
 		// Set up dependecies :
 		$this->where->register_user($this);
 		$this->from->register_user($this);
+		
+		// Set up contexts :
+		$this->where->context($this);
+		$this->from->context($this);
 
 		// Initialize alias parameter :
 		$alias = $this->from;

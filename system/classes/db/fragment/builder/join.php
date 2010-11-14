@@ -77,12 +77,18 @@ class Fragment_Builder_Join extends Fragment_Builder {
 		// Assign operand to $alias parameter :
 		if ($operand instanceof Fragment_Aliased_Table)
 			$alias = $operand;
+			
+		// Build fragment :
+		$fragment = new Fragment_Operand_Join($operand, $operator);
+		
+		// Give fragment context :
+		$fragment->context($this);	
 
 		// Add operand :
-		$this->push(new Fragment_Operand_Join($operand, $operator));
+		$this->push($fragment);
 
-		// Return operand :
-		return $operand;
+		// Return fragment :
+		return $fragment;
 	}
 	
 	/**

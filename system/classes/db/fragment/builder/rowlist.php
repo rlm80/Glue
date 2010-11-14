@@ -27,6 +27,9 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 
 		// Build fragment :
 		$fragment = new Fragment_Row($values);
+		
+		// Give fragment context :
+		$fragment->context($this);			
 
 		// Add fragment :
 		$this->push($fragment);
