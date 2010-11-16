@@ -1,0 +1,142 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: Verdana, sans-serif;
+	background-color: rgb(245,245,255);
+}
+
+body {
+	padding: 20px;
+}
+
+a, a:link, a:visited, a:hover {
+	color: black;
+	text-decoration: none;
+	border-bottom : 1px dashed #a03f50;
+	display: inline-block;
+	height: 1.4em;
+}
+
+p {
+	margin-top: 0;
+}
+
+h1 {
+	text-align: right;
+	font-size: 32px;
+	margin: 0 20px 30px 0;
+	font-weight: normal;
+	letter-spacing: 4px;
+}
+
+h2 {
+	padding: 4px 30px 5px 0;
+	margin: 10px;
+	font-size: 18px;
+	letter-spacing: 4px;
+	font-weight: normal;
+	line-height: normal;
+	border-bottom : 1px solid black;
+}
+
+div#content, div#header {
+	padding: 0 20px;
+	margin: 0 auto;
+	width: 900px;
+	background-color: white;
+}
+
+div#header {
+	height: 115px;
+	border-bottom: 1px solid black;
+	border-top: 3px solid rgb(240,240,240);
+	border-right: 3px solid rgb(240,240,240);
+	border-left: 3px solid rgb(240,240,240);
+	z-index: 1;
+	position: relative;
+}
+
+div#content {
+	overflow: auto;
+	padding-top: 30px;
+	font-size: 14px;
+	
+	line-height: 1.5em;
+	border: 3px solid rgb(240,240,240);	
+	border-top: 0;
+}
+
+div#col1 {
+	float: left;
+	width: 50%;
+	min-height: 200px;
+}
+
+div#col2 {
+	float: right;
+	width: 50%;
+	min-height: 200px;
+	padding: 0 0 20px 0;
+}
+
+
+ul#menu {
+	margin: 0;
+	padding: 13px 10px 0 0;
+	text-align: right;
+}
+
+ul#menu li {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+
+ul#menu a, ul#menu a:link, ul#menu a:visited, ul#menu a:hover {
+	display: inline-block;
+	border-bottom: 4px solid #a03f50;
+	font-size: 18px;
+	/*font-weight: bold;*/
+	letter-spacing: 4px;
+	height: 1.5em;
+	margin: 0 12px;
+}
+
+p#description {
+	position: absolute;
+	right: 0;
+	bottom: 6px;
+	margin: 0;
+	padding: 0;
+	font-size: 13px;
+	font-style: italic;
+	letter-spacing: 4px;
+}
+
+p#brand {
+	margin: 0;
+	padding: 0;
+	width: 362px;
+	height: 175px;
+	position: absolute;
+	left: -60px;
+	top: 6px;
+	background-image: url("images/logo.png");
+	background-repeat: no-repeat;
+	background-position: 0 0;
+}
+
+p#brand span {
+	display: none;
+}
+
+
+p.copyright {
+	font-size: 12px;
+	color: rgb(150,150,150);
+	text-align: center;
+	border-top: 1px solid rgb(150,150,150);
+	clear: both;
+	padding: 6px 0;
+	margin: 0 50px;
+}
