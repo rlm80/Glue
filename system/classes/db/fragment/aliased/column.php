@@ -12,8 +12,8 @@ namespace Glue\DB;
 
 class Fragment_Aliased_Column extends Fragment_Aliased {
 	/**
-	 * Sets up binding between statement data and this column.
-	 * 
+	 * Sets up binding between statement data and the column.
+	 *
 	 * @param Statement $stmt
 	 * @param integer $index
 	 * @param boolean $delayed
@@ -23,10 +23,4 @@ class Fragment_Aliased_Column extends Fragment_Aliased {
 		$alias	= $this->as();
 		$column->bind($stmt, $alias, $index, $delayed);
 	}
-	
-	// ArrayAccess interface implementation :
-	public function offsetExists ($offset)		{ return array_key_exists($this->row[$offset]); }
-	public function offsetGet ($offset)			{ return $this->row[$offset]; }
-	public function offsetSet ($offset, $value) { throw new Exception("Cannot set row values."); }
-	public function offsetUnset ($offset)		{ throw new Exception("Cannot set row values."); }
 }
