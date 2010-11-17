@@ -5,7 +5,9 @@ title: Guide
 
 <h2>File system and classes auto-loading</h2>
 
-<p>At the root of the installation directory, along with the bootstrap.php file, you'll find two directories : <b>user</b> and <b>system</b>.</p>
+<p>The file system is a simplified version of <a class="external" href="http://kohanaframework.org/guide/about.filesystem">Kohana's Cascading File System</a>.</p>
+
+<p>At the root of the installation directory, along with the bootstrap.php file, you'll find two directories : <span class="inline_code">user</span>and <span class="inline_code">system</span>.</p>
 
 <pre>
 +--glue/
@@ -20,7 +22,7 @@ title: Guide
      +--bootstrap.php	 
 </pre>
 
-<p>The system directory contains the files of the library. The user directory is where you may put your own files. Each time the library needs a file located at <span class="inline_code">some/path/file.php</span> (for example to auto-load a class - see below) it will first look for <span class="inline_code">some/path/file.php</span> in the user directory. If the file cannot be found there, it will then look for <span class="inline_code">some/path/file.php</span> in the system directory. This means that you can override any system file by creating a file of the same name at the same location in the user directory. This is a simplified version of <a class="external" href="http://kohanaframework.org/guide/about.filesystem">Kohana's Cascading File System</a>.</p>
+<p>The system directory contains the files of the library. The user directory is where you may put your own files. Each time the library needs a file located at <span class="inline_code">some/path/file.php</span> (for example to auto-load a class - see below) it will first look for <span class="inline_code">some/path/file.php</span> in the user directory. If the file cannot be found there, it will then look for <span class="inline_code">some/path/file.php</span> in the system directory. This means that you can override any system file by creating a file of the same name at the same location in the user directory.</p>
 
 <p>The library comes with its own <b>class auto-loader</b>. It will attempt to load any classes in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM namespaces</span>. A class named <span class="inline_code">\Glue\DB\My_Class</span> is expected to be located in the path <span class="inline_code">db/classes/my/class.php</span>. Classes are first looked for into the user directory, and only after that in the system directory, allowing you to override any system class with your own copy, as explained above.</p>
 
