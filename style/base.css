@@ -142,6 +142,11 @@ pre {
 	word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 
+span.inline_code {
+	background-color: rgb(245,245,245);
+	border: 1px solid rgb(235,235,235);
+}
+
 h1 {
 	text-align: right;
 	font-size: 32px;
