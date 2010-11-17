@@ -6,11 +6,13 @@ title: Home
 
 <p>The <b>query builder</b> makes it possible to compose queries with PHP function calls, rather than actually writing SQL code :</p>
 {% highlight php %}
+<?php
 $stmt = db::select('users', $u)
                    ->columns($u->login, $u->password)
                    ->where("$u->login like ?", 'Abc%')
                    ->orderby($u->login)
                    ->execute();
+?>
 {% endhighlight %}
 <p>There are two benefits in writing SQL queries this way :</p>
 <ul>
