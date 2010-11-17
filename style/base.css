@@ -1,7 +1,7 @@
 html, body {
 	margin: 0;
 	padding: 0;
-	font-family: Verdana, sans-serif;
+	font-family: Georgia, "New Century Schoolbook", "Nimbus Roman No9 L", serif;
 	background-color: rgb(245,245,255);
 }
 
@@ -30,12 +30,13 @@ div#header {
 	border-bottom: 1px solid black;
 	z-index: 1;
 	position: relative;
+	font-family: Verdana,Geneva,sans-serif;
 }
 
 div#content {
 	overflow: auto;
 	padding-top: 30px;
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 1.5em;
 	border-top: 0;
 }
@@ -156,4 +157,8 @@ h2 {
 	font-weight: normal;
 	line-height: normal;
 	border-bottom : 1px solid black;
+}
+
+h1, h2, h3, h4 {
+	font-family: Verdana,Geneva,sans-serif;
 }
