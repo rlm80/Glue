@@ -9,80 +9,25 @@ body {
 	padding: 20px;
 }
 
-a, a:link, a:visited, a:hover {
-	color: rgb(207, 9, 9);
-	text-decoration: none;
+div#wrapper1 {
+	margin: 0 auto;
+	width: 900px;
+	background-color: white;
+	border: 3px solid rgb(241,241,241);
 }
 
-a:hover {
-	text-decoration: underline;
-}
-
-a.external {
-	background-image: url("images/external_link.png");
-	background-repeat: no-repeat;
-	background-position: 100% 50%;
-	padding-right: 14px;
-}
-
-div {
-	padding: 0;
-	margin: 0;
-}
-
-p {
-	margin-top: 0;
-}
-
-pre {
-	background-color: black; /*rgb(240,240,240);*/
-	color: white;
-	padding: 5px;
-	font-family: "consolas","lucida console","courrier new",courrier,monospace;
-	font-size: 12px;
-	font-weight: bold;
-	line-height: 1.4em;
-	background-image: url("images/code.png");
-	background-repeat: no-repeat;
-	background-position: 100% 0;
-	white-space: pre-wrap;       /* css-3 */
-	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-	white-space: -pre-wrap;      /* Opera 4-6 */
-	white-space: -o-pre-wrap;    /* Opera 7 */
-	word-wrap: break-word;       /* Internet Explorer 5.5+ */
-}
-
-h1 {
-	text-align: right;
-	font-size: 32px;
-	margin: 0 20px 30px 0;
-	font-weight: normal;
-	letter-spacing: 4px;
-}
-
-h2 {
-	padding: 4px 30px 5px 0;
-	margin: 10px;
-	font-size: 18px;
-	letter-spacing: 4px;
-	font-weight: normal;
-	line-height: normal;
-	border-bottom : 1px solid black;
+div#wrapper2 {
+	border: 1px solid rgb(230,230,230);	
 }
 
 div#content, div#header {
 	padding: 0 20px;
-	margin: 0 auto;
-	width: 900px;
 	background-color: white;
 }
 
 div#header {
 	height: 115px;
 	border-bottom: 1px solid black;
-	border-top: 3px solid rgb(240,240,240);
-	border-right: 3px solid rgb(240,240,240);
-	border-left: 3px solid rgb(240,240,240);
 	z-index: 1;
 	position: relative;
 }
@@ -91,25 +36,9 @@ div#content {
 	overflow: auto;
 	padding-top: 30px;
 	font-size: 14px;
-	
 	line-height: 1.5em;
-	border: 3px solid rgb(240,240,240);	
 	border-top: 0;
 }
-
-div#col1 {
-	float: left;
-	width: 50%;
-	min-height: 200px;
-}
-
-div#col2 {
-	float: right;
-	width: 50%;
-	min-height: 200px;
-	padding: 0 0 20px 0;
-}
-
 
 ul#menu {
 	margin: 0;
@@ -131,6 +60,8 @@ ul#menu a, ul#menu a:link, ul#menu a:visited, ul#menu a:hover {
 	letter-spacing: 4px;
 	height: 1.5em;
 	margin: 0 12px;
+	text-decoration: none;
+	color: black;
 }
 
 p#description {
@@ -170,4 +101,60 @@ p.copyright {
 	clear: both;
 	padding: 6px 0;
 	margin: 0 50px;
+}
+
+a, a:link, a:visited, a:hover {
+
+}
+
+a.external {
+	background-image: url("images/link_external.png");
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+	padding-right: 14px;
+}
+
+div {
+	padding: 0;
+	margin: 0;
+}
+
+p {
+	margin-top: 0;
+}
+
+pre {
+	background-color: rgb(0,0,60);
+	color: white;
+	padding: 5px;
+	font-family: "consolas","lucida console","courrier new",courrier,monospace;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 1.4em;
+	background-image: url("images/code.png");
+	background-repeat: no-repeat;
+	background-position: 100% 0;
+	white-space: pre-wrap;       /* css-3 */
+	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+h1 {
+	text-align: right;
+	font-size: 32px;
+	margin: 0 20px 30px 0;
+	font-weight: normal;
+	letter-spacing: 4px;
+}
+
+h2 {
+	padding: 4px 30px 5px 0;
+	margin: 10px;
+	font-size: 18px;
+	letter-spacing: 4px;
+	font-weight: normal;
+	line-height: normal;
+	border-bottom : 1px solid black;
 }

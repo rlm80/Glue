@@ -2,22 +2,24 @@
 layout: base
 title: Home
 ---
-<p>Glue is a combination of two projects : an SQL query builder and an <a  class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> library.</p>
+<p>Glue is a combination of two projects : a database abstraction library and an <a  class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> (ORM) library.</p>
 
-<p>The <b>query builder</b> makes it possible to compose queries with PHP function calls, rather than actually writing SQL code :</p>
+<h2>Database abstraction library</h2>
+<p>For the most part this is an expressive <b>SQL query builder</b> that makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
 {% highlight php %}
 <?php
 $stmt = db::select('users', $u)
-                   ->columns($u->login, $u->password)
-                   ->where("$u->login like ?", 'Abc%')
-                   ->orderby($u->login)
-                   ->execute();
+              ->columns($u->login, $u->password)
+              ->where("$u->login like ?", 'Abc%')
+              ->orderby($u->login)
+              ->execute();
 ?>
 {% endhighlight %}
 <p>There are two benefits in writing SQL queries this way :</p>
 <ul>
   <li>queries are portable accross various database backends,</li>
-  <li>queries can be composed bits by bits, in no particular order, making it easy for more than one object to contribute to them.</li>
+  <li>queries can be composed bits by bits, in no particular order, making it easy for more than one object to contribute something to them.</li>
 </ul>
 
-<p>The <b>ORM</b> is built on top of the query builder. It makes it possible to deal with model objects only, never having to worry about the way they are stored into, and retrieved from, the database.</p>
+<h2>ORM</h2>
+<p>The <b>ORM</b> is built on top of the DBAL. It makes it possible to deal with model objects only, never having to worry about the way they are stored into, and retrieved from, the database.</p>
