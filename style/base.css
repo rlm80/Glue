@@ -143,8 +143,10 @@ pre {
 }
 
 span.inline_code {
-	background-color: rgb(245,245,245);
-	border: 1px solid rgb(235,235,235);
+	background-color:#F5F5F5;
+	border:1px solid #BEBEBE;
+	font-family:"consolas","lucida console","courrier new",courrier,monospace;
+	font-size:0.9em;
 }
 
 h1 {
