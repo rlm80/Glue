@@ -131,7 +131,7 @@ pre {
 	font-size: 12px;
 	font-weight: bold;
 	line-height: 1.4em;
-	background-image: url("images/code.png");
+	/*background-image: url("images/code.png");*/
 	background-repeat: no-repeat;
 	background-position: 100% 0;
 	white-space: pre-wrap;       /* css-3 */
