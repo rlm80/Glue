@@ -1,0 +1,25 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>File system and classes auto-loading</h2>
+
+<p>At the root of the installation directory, along with the bootstrap.php file, you'll find two directories : <b>user</b> and <b>system</b> :</p>
+
+<pre>
++--glue/
+     +--system/
+     |    +--db/
+     |	  +--orm/
+     +--user/
+     |    +--db/
+     |    +--orm/
+     +--bootstrap.php	 
+</pre>
+
+<p>The system directory contains the files of the library. The user directory is where you may put your own files. Each time the library needs a file located at some/path/file.php (for example to auto-load a class - see below) it will first look for some/path/file.php in the user directory. If the file cannot be found there, it will then look for some/path/file.php in the system directory. This means that you can override any system file by creating a file of the same name at the same location in the user directory. This is a simplified version of <a class="external" href="http://kohanaframework.org/guide/about.filesystem">Kohana's Cascading File System</a>.</p>
+
+<p>The library comes with its own <b>class auto-loader</b>. It will attempt to load any classes in the '\Glue\DB' and '\Glue\ORM' namespaces. A class named '\Glue\DB\My_Class' is expected to be located in the path db/my/class.php. Classes are first looked for into the user directory, and only after that in the system directory, allowing you to override any system class with your own copy, as explained above.</p>
+
+<p>The convention regarding inheritance is to always call 'A_B' a class B that inherits from a class A. Thus the class 'Fragment_Aliased_Table' inherits from the class 'Fragment_Aliased' that itself inherits from the class 'Fragment'. This doesn't have any particular importance but it helps making the code more readable.</p>

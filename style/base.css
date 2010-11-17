@@ -36,7 +36,7 @@ div#header {
 div#content {
 	overflow: auto;
 	padding-top: 30px;
-	font-size: 16px;
+	font-size: 17px;
 	line-height: 1.5em;
 	border-top: 0;
 }
@@ -129,7 +129,7 @@ pre {
 	color: white;
 	padding: 5px;
 	font-family: "consolas","lucida console","courrier new",courrier,monospace;
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: bold;
 	line-height: 1.4em;
 	/*background-image: url("images/code.png");*/
