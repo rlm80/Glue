@@ -1,5 +1,21 @@
 ---
 layout: base
-title: test
+title: Home
 ---
-test
+<p>Glue is a combination of two projects : an SQL query builder and an <a  class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> library.</p>
+
+<p>The <b>query builder</b> makes it possible to compose queries with PHP function calls, rather than actually writing SQL code :</p>
+{% highlight php %}
+$stmt = db::select('users', $u)
+                   ->columns($u->login, $u->password)
+                   ->where("$u->login like ?", 'Abc%')
+                   ->orderby($u->login)
+                   ->execute();
+{% endhighlight %}
+<p>There are two benefits in writing SQL queries this way :</p>
+<ul>
+  <li>queries are portable accross various database backends,</li>
+  <li>queries can be composed bits by bits, in no particular order, making it easy for more than one object to contribute to them.</li>
+</ul>
+
+<p>The <b>ORM</b> is built on top of the query builder. It makes it possible to deal with model objects only, never having to worry about the way they are stored into, and retrieved from, the database.</p>
