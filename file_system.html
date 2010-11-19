@@ -3,27 +3,56 @@ layout: base
 title: Guide
 ---
 
-<h2>File system and classes auto-loading</h2>
+Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5.autoload.php">class autoloading</a>, <a class="external" href="http://php.net/manual/en/language.namespaces.php">namespaces</a>, <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">class_alias</a>.
 
-<p>The file system is a simplified version of <a class="external" href="http://kohanaframework.org/guide/about.filesystem">Kohana's Cascading File System</a>.</p>
+<h2>File system structure</h2>
 
-<p>At the root of the installation directory, along with the bootstrap.php file, you'll find two directories : <span class="inline_code">user</span> and <span class="inline_code">system</span>.</p>
+<p>The <span class="inline_code">bootstrap.php</span> file is the one that must be included in order to use the library. It will register the class auto-loader and setup some path constants. The classes are located in the <span class="inline_code">classes</span> directory, one class per file, according to the naming conventions explained below.</p>
 
 <pre>
 +--glue/
-     +--system/
-     |    +--classes/
+     +--classes/
+     |    +--db/
+     | 	  +--orm/
+     |    +--system/
      |         +--db/
-     |	       +--orm/
-     +--user/
-     |    +--classes/
-     |         +--db/
-     |	       +--orm/
-     +--bootstrap.php	 
+     |         +--orm/
+     +--bootstrap.php
 </pre>
 
-<p>The <span class="inline_code">system</span> directory contains the files of the library. The <span class="inline_code">user</span> directory is where you may put your own files. Each time the library needs a file located at <span class="inline_code">some/path/file.php</span> (for example to auto-load a class - see below) it will first look for <span class="inline_code">some/path/file.php</span> in the user directory. If the file cannot be found there, it will then look for <span class="inline_code">some/path/file.php</span> in the system directory. This means that you can override any system file by creating a file of the same name at the same location in the user directory.</p>
+<h2>Namespaces and class naming convention</h2>
 
-<p>The library comes with its own <b>class auto-loader</b>. It will attempt to load any classes in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM namespaces</span>. A class named <span class="inline_code">\Glue\DB\My_Class</span> is expected to be located in the path <span class="inline_code">db/classes/my/class.php</span>. Classes are first looked for into the user directory, and only after that in the system directory, allowing you to override any system class with your own copy, as explained above.</p>
+<p>System classes live in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces. For those classes, the auto-loader will expect a class called :</p>
 
-<p>The convention regarding inheritance is to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span>. Thus the class <span class="inline_code">Fragment_Aliased_Table</span> inherits from the class <span class="inline_code">Fragment_Aliased</span> that itself inherits from the class <span class="inline_code">Fragment</span>. This doesn't have any particular importance but it helps making the code more readable.</p>
+<ul>
+	<li><span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span></li>
+	<li><span class="inline_code">\Glue\System\ORM\Some_Class</span> to be located in the file <span class="inline_code">system/orm/some/class.php</span></li>
+</ul>
+
+<p>User defined classes live in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. For those classes, the auto-loader will expect a class called :</p>
+
+<ul>
+	<li><span class="inline_code">\Glue\DB\Some_Class</span> to be located in the file <span class="inline_code">db/some/class.php</span></li>
+	<li><span class="inline_code">\Glue\ORM\Some_Class</span> to be located in the file <span class="inline_code">orm/some/class.php</span></li>
+</ul>
+
+<p>If you attempt to use a class called <span class="inline_code">\Glue\DB\Some_Class</span> but no user defined class can be found, the auto-loader will load the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> as a fall-back. An <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">alias</a> will be set up, so that in the future <span class="inline_code">\Glue\DB\Some_Class</span> will refer to the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> . Thus, you can picture yourself the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces where system classes have been replaced by user defined ones when those exist.</p>
+
+<p>These "merged" <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces are the real ones that will see their classes instanciated. Classes in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces will never be instanciated directly. They are fall backs that exist for the sole purpose of being imported into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces when no user defined class is found.</p>
+
+<h2>Inheritance and class naming convention</h2>
+
+<p>Although this is not required, it is a good idea to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span> so that class names (and thus the file structure since one is bound to the other) reflect the inheritance hierarchy.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
