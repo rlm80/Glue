@@ -30,7 +30,9 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h2>Namespaces cascade</h2>
 
-<p>If you attempt to use a class called <span class="inline_code">\Glue\DB\Some_Class</span> but no user defined class can be found, the auto-loader will load the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> instead. An <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">alias</a> will be created at runtime, so that <span class="inline_code">\Glue\DB\Some_Class</span> will refer to the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> . Thus, you can picture yourself the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces where system classes have been replaced by user defined ones when those exist.</p>
+<p>If you attempt to use a class called <span class="inline_code">\Glue\DB\Some_Class</span> but no user defined class can be found, the auto-loader will load the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> instead. An <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">alias</a> will be created at runtime, so that <span class="inline_code">\Glue\DB\Some_Class</span> will refer to the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> .
+
+<p>Thus, you can picture yourself the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces where system classes have been replaced by user defined ones when those exist.</p>
 
 <p>These "merged" <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces are the only ones that will see their classes instanciated. Classes in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces are fall backs that exist for the sole purpose of being imported into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces when no user defined class is found.</p>
 
@@ -44,11 +46,11 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 	<li>Overriding a system class with an extension of itself</li>
 </ul>
 
-<p>The following examples assume the existence of a ~\Glue\System\DB\Foo system class.</p>
+<p>The following examples assume the existence of a <span class="inline_code">\Glue\System\DB\Foo</span> system class.</p>
 
 <h3>Creating a new class</h3>
 
-<p>This is how you would create a ~\Glue\DB\Foo_Bar class that extends the ~\Glue\DB\Foo class : </p>
+<p>This is how you would create a <span class="inline_code">\Glue\DB\Foo_Bar</span> class that extends the <span class="inline_code">\Glue\DB\Foo</span> class : </p>
 
 {% highlight php %}
 <?php
@@ -64,7 +66,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h3>Overriding a system class with your own version</h3>
 
-<p>This is how you would override the ~\Glue\System\DB\Foo class with a new class : </p>
+<p>This is how you would override the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class : </p>
 
 {% highlight php %}
 <?php
@@ -80,7 +82,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h3>Overriding a system class with an extension of itself</h3>
 
-<p>This is how you would override the ~\Glue\System\DB\Foo class with an extension of the existing system class : </p>
+<p>This is how you would override the <span class="inline_code">\Glue\System\DB\Foo</span> class with an extension of the existing system class : </p>
 
 {% highlight php %}
 <?php
