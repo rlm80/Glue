@@ -109,4 +109,77 @@ class Glue {
 			throw new Exception("Glue option " . $key . " is not defined.");
 		return self::$config[$key];
 	}	
+	
+
+	
+	static public function gendoc() {
+		// Init doc file with new namespace :
+		//$doc = "<?php\n\nnamespace $namespace;\n\n";		
+	}
+	
+	/**
+	 * Returns classes skeletons for all class files found in given path.
+	 *
+	 * @param string $path
+	 * 
+	 * @return string
+	 */
+	static protected function get_doc($path) {
+		// Get all php files in path (including subdirectories) :
+		$files = self::globr($path, '*.php');
+		
+		// Loop on each file and generate classes skeletons :
+		$doc = '';
+		foreach($files as $file) {
+			// Get file content :
+			$content = file_get_contents($file);
+			
+			// Get namespace :
+			if(preg_match('/^\s*namespace\s+([^;]+);/', $content, $matches))
+				$ns = $matches[1];
+			else
+				$ns = '';
+
+			// Get class name :
+			if(preg_match('/\sclass\s+(\w+)/', $content, $matches))
+				$class = $matches[1];
+			else
+				$class = '';				
+			
+			// Remove opening php tags :
+			$content = preg_replace('/^\s*<\?php\s*/', '', $content);
+			
+			// Remove namespace declaration :
+			$content = preg_replace('/^\s*namespace\s+[^;]+;/', '', $content);
+
+			// Remove functions bodies :
+			$content = preg_replace('/(function\s+\w+\s*\([^)]*\))\s*({((?>[^{}]+)|(?2))*})/sm', '\1 {}', $content);
+			
+			// Adds @see to phpdoc that links to the original function in the original namespace :
+			$content = preg_replace('`/\*\*([^{};]*?\*/[^{};]*?\sfunction\s+(\w+))`sm', '/** @see \\' . $ns . '\\' . $class . '::\2()' . "\n" . ' \1', $content);
+			
+			// Append class skeleton to doc :
+			$doc .= "\n\n" . $content;
+		}
+		
+		return $doc;
+	}
+	
+	/**
+	 * Recursive version of glob.
+	 * 
+	 * @param string $dir      Directory to start with.
+	 * @param string $pattern  Pattern to glob for.
+	 * @param int $flags       Flags sent to glob.
+	 * 
+	 * @return array containing all pattern-matched files.
+	 */
+	static protected function globr($dir, $pattern, $flags = null) {
+	  $files = glob("$dir/$pattern", $flags);
+	  foreach (glob("$dir/*", GLOB_ONLYDIR) as $subDir) {
+		$subFiles = self::globr($subDir, $pattern, $flags);
+		$files = array_merge($files, $subFiles);
+	  }
+	  return $files;
+	} 	
 }
