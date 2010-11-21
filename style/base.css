@@ -145,9 +145,12 @@ pre {
 
 span.inline_code {
 	background-color:#F5F5F5;
-	border:1px solid #BEBEBE;
+	border:1px solid #DDDDDD;
+	display:inline-block;
 	font-family:"consolas","lucida console","courrier new",courrier,monospace;
 	font-size:0.9em;
+	height:1.1em;
+	line-height:1.1em;
 }
 
 h1 {

@@ -25,29 +25,29 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h2>Namespaces and class naming conventions</h2>
 
-<p><b>System classes</b> live in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span> and a class called <span class="inline_code">\Glue\System\ORM\Some_Class</span> to be located in the file <span class="inline_code">system/orm/some/class.php</span>.</p>
+<p><b>System classes</b> live in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span>.</p>
 
-<p><b>User defined</b> classes live in the <span class="inline_code">\Glue\User\DB</span> and <span class="inline_code">\Glue\User\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\User\DB\Some_Class</span> to be located in the file <span class="inline_code">user/db/some/class.php</span> and a class called <span class="inline_code">\Glue\User\ORM\Some_Class</span> to be located in the file <span class="inline_code">user/orm/some/class.php</span>.
+<p><b>User classes</b> live in the <span class="inline_code">\Glue\User\DB</span> and <span class="inline_code">\Glue\User\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\User\DB\Some_Class</span> to be located in the file <span class="inline_code">user/db/some/class.php</span>.</p>
 
 <p>Additionally, it is a good idea to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span> so that class names (and thus the file system structure) reflect the inheritance hierarchy.</p>
 
 <h2>Namespaces cascade</h2>
 
-<p><b>Merged classes</b> live in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. These classes exist nowhere on disk. The autoloader creates them at runtime by <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">class aliasing</a> user and system classes into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. In this process, user classes take priority over system classes of the same name. Thus the class <span class="inline_code">\Glue\DB\Some_Class</span> is an alias of <span class="inline_code">\Glue\User\DB\Some_Class</span> if that class is defined, otherwise it's an alias of <span class="inline_code">\Glue\System\DB\Some_Class</span>.</p>
+<p><b>Merged classes</b> live in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. These classes exist nowhere on disk. The autoloader creates them at runtime by <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">class aliasing</a> user or system classes into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. In this process, user classes take priority over system classes that have the same names. Thus the merged class <span class="inline_code">\Glue\DB\Some_Class</span> is an alias of the user class <span class="inline_code">\Glue\User\DB\Some_Class</span> if that class is defined, otherwise it's an alias of the system class <span class="inline_code">\Glue\System\DB\Some_Class</span>.</p>
 
-<p>You can picture yourself the merged <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the system namespaces where system classes have been replaced by user defined ones when these exist in the user namespace :</p>
+<p>You can picture yourself the merged <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the system namespaces where system classes have been replaced by user defined ones when they exist in the user namespace :</p>
 
-<div style="overflow: auto; text-indent: 20px; font-weight: bold">System classes
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">System classes (\Glue\System\DB)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px; visibility:hidden;">C</div>
 </div>
-<div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes (\Glue\User\DB)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;  visibility:hidden;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
 </div>
-<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin: 20px 0;">Merged classes
+<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin: 20px 0;">Merged classes (\Glue\DB)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
@@ -55,7 +55,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p>The merged classes are the only ones that will ever be instanciated and used. There is no direct reference anywhere in the code to system or user classes, only merged classes. Despite the fact that they don't exist on disk, the merged classes are the real ones that make up the library.</p>
 
-<p>This layered system of classes allows you to replace a system class with your own version everywhere (or even with an extension of the system class that overrides a few methods). Simply by creating a new class file in the user directory, without ever touching the system directory. So you can upgrade to the next version of the library with no fear of losing your customizations.</p>
+<p>This layered system of classes allows you to replace a system class with your own version (or even with an extension of the system class that overrides a few methods). Simply by creating a new class file in the user directory, without ever touching the system directory. So you can upgrade to the next version of the library with no fear of losing your customizations, if you made some.</p>
 
 <h2>Creating user classes</h2>
 
