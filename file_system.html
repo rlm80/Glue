@@ -55,7 +55,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p>The merged classes are the only ones that will ever be instanciated and used. There is no direct reference anywhere in the code to system or user classes, only merged classes. Despite the fact that they don't exist on disk, the merged classes are the real ones that make up the library.</p>
 
-<p>This layered system of classes allows you to replace a system class with your own version (or even with an extension of the system class that overrides a few methods). Simply by creating a new class file in the user directory, without ever touching the system directory. So you can upgrade to the next version of the library with no fear of losing your customizations, if you made some.</p>
+<p>This layered system of classes allows you to replace a system class with your own version (or even with an extension of the system class that overrides a few methods), simply by creating a new class file in the user directory. <b>Without ever touching anyting in the system directory.</b> So you can upgrade to the next version of the library with no fear of losing your customizations, if you made some.</p>
 
 <h2>Creating user classes</h2>
 
@@ -67,11 +67,11 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 	<li>Overriding a system class with an extension of itself.</li>
 </ul>
 
-<p>The following examples assume the existence of a <span class="inline_code">\Glue\System\DB\Foo</span> class.</p>
+<p>The following examples assume the existence of a system class <span class="inline_code">\Glue\System\DB\Foo</span>.</p>
 
 <h3>Creating a new class</h3>
 
-<p>This is how you would create a <span class="inline_code">\Glue\DB\Foo_Bar</span> class that extends the <span class="inline_code">\Glue\DB\Foo</span> class. It covers 99% of use cases.</p>
+<p>This is how you would create a <span class="inline_code">\Glue\User\DB\Foo_Bar</span> user class (and thus a <span class="inline_code">\Glue\DB\Foo_Bar</span> merged class) that extends the <span class="inline_code">\Glue\DB\Foo</span> class. This is what you do when you want to add something to the library, rather than modifying it. It covers 99% of use cases.</p>
 
 {% highlight php %}
 <?php
@@ -89,7 +89,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h3>Overriding a system class with your own version</h3>
 
-<p>This is how you would completly replace the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class of your own.</p>
+<p>This is how you would completly replace the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class of your own. The merged class <span class="inline_code">\Glue\DB\Foo</span> will now point to your own class instead of the system one.</p>
 
 {% highlight php %}
 <?php
@@ -103,7 +103,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 ?>
 {% endhighlight %}
 
-<p>You normally wouldn't want to do this. Instead, you'd rather build the new class upon the existing system class :</p>
+<p>You normally wouldn't want to do this. Instead, you'd rather build your new class upon the existing system class, possibly overriding a few methods :</p>
 
 <h3>Overriding a system class with an extension of itself</h3>
 
