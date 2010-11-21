@@ -7,14 +7,17 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h2>File system structure</h2>
 
-<p><span class="inline_code">bootstrap.php</span> is the file is that must be included in order to use the library. The classes are located in the <span class="inline_code">classes</span> directory, one class per file.</p>
+<p><span class="inline_code">bootstrap.php</span> is the file is that must be included in order to use the library.</p>
+
+<p>The classes are located in the <span class="inline_code">classes</span> directory, one class per file.</p>
 
 <pre>
 +--glue/
      +--classes/
-     |    +--db/
-     | 	  +--orm/
      |    +--system/
+     |    |    +--db/
+     | 	  |    +--orm/
+     |    +--user/
      |         +--db/
      |         +--orm/
      +--bootstrap.php
@@ -24,39 +27,57 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p><b>System classes</b> live in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span> and a class called <span class="inline_code">\Glue\System\ORM\Some_Class</span> to be located in the file <span class="inline_code">system/orm/some/class.php</span>.</p>
 
-<p><b>User defined</b> classes live in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\DB\Some_Class</span> to be located in the file <span class="inline_code">db/some/class.php</span> and a class called <span class="inline_code">\Glue\ORM\Some_Class</span> to be located in the file <span class="inline_code">orm/some/class.php</span>.
+<p><b>User defined</b> classes live in the <span class="inline_code">\Glue\User\DB</span> and <span class="inline_code">\Glue\User\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\User\DB\Some_Class</span> to be located in the file <span class="inline_code">user/db/some/class.php</span> and a class called <span class="inline_code">\Glue\User\ORM\Some_Class</span> to be located in the file <span class="inline_code">user/orm/some/class.php</span>.
 
-<p>Additionally, although this is not required, it is a good idea to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span> so that class names (and thus the file structure since one is bound to the other) reflect the inheritance hierarchy.</p>
+<p>Additionally, it is a good idea to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span> so that class names (and thus the file system structure) reflect the inheritance hierarchy.</p>
 
 <h2>Namespaces cascade</h2>
 
-<p>If you attempt to use a class called <span class="inline_code">\Glue\DB\Some_Class</span> but no user defined class can be found, the auto-loader will load the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> instead. An <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">alias</a> will be created at runtime, so that <span class="inline_code">\Glue\DB\Some_Class</span> will refer to the system class <span class="inline_code">\Glue\System\DB\Some_Class</span> .
+<p><b>Merged classes</b> live in the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. These classes exist nowhere on disk. The autoloader creates them at runtime by <a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">class aliasing</a> user and system classes into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces. In this process, user classes take priority over system classes of the same name. Thus the class ~\Glue\DB\Some_Class is an alias of ~\Glue\User\DB\Some_Class if that class is defined, otherwise it's an alias of ~\Glue\System\DB\Some_Class . You can picture yourself the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces where system classes have been replaced by user defined ones when those exist :</p>
 
-<p>Thus, you can picture yourself the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces as copies of the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces where system classes have been replaced by user defined ones when those exist.</p>
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">System classes
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">B</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px; visibility:hidden;">C</div>
+</div>
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;  visibility:hidden;">A</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
+</div>
+<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin-top: 20px;">Merged classes
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
+	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
+</div>
 
-<p>These "merged" <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces are the only ones that will see their classes instanciated. Classes in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces are fall backs that exist for the sole purpose of being imported into the <span class="inline_code">\Glue\DB</span> and <span class="inline_code">\Glue\ORM</span> namespaces when no user defined class is found.</p>
+<p>The merged classes are the only ones that will ever be instanciated and used. There is no direct reference anywhere in the code to system or user classes, only merged classes. Despite the fact that they don't exist on disk, the merged classes are the real ones that make up the library.</p>
 
-<h2>User classes creation</h2>
+<p>This system allows you to replace a system class with your own version (or even with an extension of itself that override a few methods), everywhere. Without ever touching the system directory. So you can upgrade to the next version of the library with no fear of losing your customizations.</p>
+
+<h2>Creating user classes</h2>
 
 <p>You may want to do three things :</p>
 
 <ul>
-	<li>Creating a new class that extend a system class</li>
-	<li>Overriding a system class with your own version</li>
-	<li>Overriding a system class with an extension of itself</li>
+	<li>Creating a new class, possibly extending a system class,</li>
+	<li>Overriding a system class with your own version,</li>
+	<li>Overriding a system class with an extension of itself.</li>
 </ul>
 
-<p>The following examples assume the existence of a <span class="inline_code">\Glue\System\DB\Foo</span> system class.</p>
+<p>The following examples assume the existence of a <span class="inline_code">\Glue\System\DB\Foo</span> class.</p>
 
 <h3>Creating a new class</h3>
 
-<p>This is how you would create a <span class="inline_code">\Glue\DB\Foo_Bar</span> class that extends the <span class="inline_code">\Glue\DB\Foo</span> class : </p>
+<p>This is how you would create a <span class="inline_code">\Glue\DB\Foo_Bar</span> class that extends the <span class="inline_code">\Glue\DB\Foo</span> class. It covers 99% of use cases.</p>
 
 {% highlight php %}
 <?php
-  // File classes/db/foo/bar.php
+  // File classes/user/db/foo/bar.php
   
-  namespace \Glue\DB;
+  namespace \Glue\User\DB;
+  
+  use \Glue\DB\Foo; // NOT use \Glue\System\DB\Foo; !
   
   class Foo_Bar extends Foo {
   
@@ -66,13 +87,13 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h3>Overriding a system class with your own version</h3>
 
-<p>This is how you would override the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class : </p>
+<p>This is how you would completly replace the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class of your own.</p>
 
 {% highlight php %}
 <?php
-  // File classes/db/foo.php
+  // File classes/user/db/foo.php
   
-  namespace \Glue\DB;
+  namespace \Glue\User\DB;
   
   class Foo {
   
@@ -80,15 +101,17 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 ?>
 {% endhighlight %}
 
+<p>You normally wouldn't want to do this. Instead, you'd rather build the new class upon the existing system class :</p>
+
 <h3>Overriding a system class with an extension of itself</h3>
 
 <p>This is how you would override the <span class="inline_code">\Glue\System\DB\Foo</span> class with an extension of the existing system class : </p>
 
 {% highlight php %}
 <?php
-  // File classes/db/foo.php
+  // File classes/user/db/foo.php
   
-  namespace \Glue\DB;
+  namespace \Glue\User\DB;
   
   class Foo extends \Glue\System\DB\Foo {
   
