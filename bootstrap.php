@@ -3,21 +3,30 @@
 namespace Glue;
 
 /**
- * Glue bootstrap file. 
- * 
+ * Glue bootstrap file.
+ *
  * This file must be included by the application before any attempt to use the library. It sets up
- * the auto-loader, path constants and default options values.
+ * the auto-loader and some path constants.
  *
  * @package Glue
  * @author Régis Lemaigre
  * @license MIT
  */
 
-// Define constant ROOTPATH holding absolute path to the glue folder (included) :
-define(__NAMESPACE__ . '\ROOTPATH', __DIR__ . '/');
+	// Define path constants :
+	define('\Glue\ROOTPATH', __DIR__ . '/');
+	define('\Glue\CLASSPATH_SYSTEM', ROOTPATH . 'classes/system/');
+	define('\Glue\CLASSPATH_USER', ROOTPATH . 'classes/user/');
 
-// Register Glue autoload function :
-spl_autoload_register( __NAMESPACE__ . '\Glue::auto_load');
+	// Require Core class :
+	if (is_file(CLASSPATH_USER . 'core.php')) {
+		require CLASSPATH_USER . 'core.php';
+		class_alias('\Glue\User\Core', '\Glue\Core');
+	}
+	else {
+		require CLASSPATH_SYSTEM . 'core.php';
+		class_alias('\Glue\System\Core', '\Glue\Core');
+	}
 
-// Require main Glue class :
-require ROOTPATH . 'system/classes/glue.php';
+	// Bootstrap library :
+	Core::bootstrap();
