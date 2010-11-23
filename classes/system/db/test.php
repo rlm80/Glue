@@ -1,6 +1,6 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
 
 use Exception, PDO;
 

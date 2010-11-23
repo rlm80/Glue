@@ -19,53 +19,52 @@ class Core {
 	 */
 	static public function bootstrap() {
 		// Register autoloader :
-		spl_autoload_register('\Glue\Core::auto_load');
+		spl_autoload_register('\Glue\Core::load_class');
 	}
 
 	/**
-	 * Auto-loader for classes under the Glue namespace.
+	 * For given unknown class identifier, does what's necessary to make it known to PHP. Returns true if we
+	 * found a way to do that, false otherwise.
 	 *
-	 * @link http://rlm80.github.com/Glue/file_system.html
+	 * @see http://rlm80.github.com/Glue/file_system.html
 	 *
 	 * @param string $class
+	 * 
+	 * @return boolean
 	 */
-	static public function auto_load($class) {
+	static public function load_class($class) {
 		// Uncapitalize class name :
 		$class = strtolower($class);
 
-		// Only load classes in the Glue namespace :
-		if (substr($class, 0, 5) !== 'glue\\') return;
+		// Only deal with class names in the Glue namespace :
+		if (substr($class, 0, 5) !== 'glue\\') return FALSE;
 
 		// Load user and system classes :
-		if (substr($class, 0, 12) === 'glue\\system\\' || substr($class, 0, 10) === 'glue\\user\\') {
-			// Init variables :
-			list($ns, $sns, $rest) = explode('\\', $class, 3);
-
-			// Build file path :
-			if ($sns === 'system')
-				$path = \Glue\CLASSPATH_SYSTEM;
+		if (preg_match('`^glue\\\\(system|user)\\\\(db|orm)\\\\([^\\\\]*)$`', $class, $matches)) {
+			// Build path where the class is supposed to be located :
+			$path = ($matches[1] === 'system' ? \Glue\CLASSPATH_SYSTEM : \Glue\CLASSPATH_USER) . $matches[2] . '/' . str_replace('_', '/', $matches[3]) . '.php';
+			
+			// Check if such a file exists and include it :
+			if (is_file($path)) {
+				include $path;
+				return TRUE;	
+			}
 			else
-				$path = \Glue\CLASSPATH_USER;
-			$path .= str_replace(array('_','\\'), '/', $rest) . '.php';
-
-			// Include class file if it exists :
-			if (is_file($path)) include $path;
-
-			// Return :
-			return;
+				return FALSE;  
 		}
 
-		// Set up alias :
-		$rest			= substr($class, 5);
-		$class_user		= '\\Glue\\User\\'   . $rest;
-		$class_system	= '\\Glue\\System\\' . $rest;
-		if (class_exists($class_user, true))
-			class_alias($class_user, $class);
-		elseif (class_exists($class_system, true))
-			class_alias($class_system, $class);
-
-		// Return :
-		return;
+		// Load alias :
+		if (preg_match('`^glue\\\\((db|orm)\\\\[^\\\\]*)$`', $class, $matches)) {
+			// Attempt alias to user class :
+			if (class_exists($original = 'Glue\\User\\' . $matches[1], true))
+				return class_alias($original, $class);
+			
+			// Attempt alias to system class :
+			if (class_exists($original = 'Glue\\System\\' . $matches[1], true))
+				return class_alias($original, $class);
+		}
+		
+		return FALSE;
 	}
 
 	static public function gendoc() {
