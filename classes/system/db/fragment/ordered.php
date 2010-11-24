@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Fragment that represents anything that compiles into "... ASC" or "... DESC".
@@ -81,7 +83,7 @@ class Fragment_Ordered extends Fragment {
 		else
 			return $this->set_property('ordered', $ordered);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -93,5 +95,5 @@ class Fragment_Ordered extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_ordered($this, $style);
-	}	
+	}
 }

@@ -1,6 +1,11 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Aliased_Column,
+	\Glue\DB\Fragment_Aliased,
+	\Glue\DB\Fragment_Template,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build a select list.
@@ -40,9 +45,9 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 				new Fragment_Template($first, $params),
 				$alias
 			);
-			
+
 		// Give fragment context :
-		$fragment->context($this);			
+		$fragment->context($this);
 
 		// Push fragment :
 		$this->push($fragment);

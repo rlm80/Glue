@@ -1,6 +1,12 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder_Setlist,
+	\Glue\DB\Fragment_Builder_Join_From,
+	\Glue\DB\Fragment_Builder_Where,
+	\Glue\DB\Fragment_Builder_Orderby,
+	\Glue\DB\Fragment_Query;
 
 /**
  * Update query data structure.
@@ -30,7 +36,7 @@ class Fragment_Query_Update extends Fragment_Query {
 	 * @var Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
-	
+
 	/**
 	 * @var Integer Limit.
 	 */
@@ -39,7 +45,7 @@ class Fragment_Query_Update extends Fragment_Query {
 	/**
 	 * @var Integer Offset.
 	 */
-	protected $offset;	
+	protected $offset;
 
 	/**
 	 * Constructor.
@@ -56,12 +62,12 @@ class Fragment_Query_Update extends Fragment_Query {
 		$this->from->register_user($this);
 		$this->where->register_user($this);
 		$this->orderby->register_user($this);
-		
+
 		// Set up contexts :
 		$this->set->context($this);
 		$this->from->context($this);
 		$this->where->context($this);
-		$this->orderby->context($this);		
+		$this->orderby->context($this);
 	}
 
 	/**
@@ -133,7 +139,7 @@ class Fragment_Query_Update extends Fragment_Query {
 		else
 			return $this->orderby;
 	}
-	
+
 	/**
 	 * Limit getter/setter.
 	 *
@@ -160,7 +166,7 @@ class Fragment_Query_Update extends Fragment_Query {
 			return $this->offset;
 		else
 			return $this->set_property('offset', $offset);
-	}	
+	}
 
 	/**
 	 * Returns database inferred from tables used in the query.

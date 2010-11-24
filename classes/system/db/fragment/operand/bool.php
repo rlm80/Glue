@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Operand;
 
 /**
  * Fragment that represents an operand in a boolean expression.
@@ -16,7 +18,7 @@ class Fragment_Operand_Bool extends Fragment_Operand {
 	const _OR		= 1;
 	const ANDNOT	= 2;
 	const ORNOT		= 3;
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -28,5 +30,5 @@ class Fragment_Operand_Bool extends Fragment_Operand {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_operand_bool($this, $style);
-	}		
+	}
 }

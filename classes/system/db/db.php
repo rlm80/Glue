@@ -1,6 +1,16 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Query_Select,
+	\Glue\DB\Fragment_Query_Update,
+	\Glue\DB\Fragment_Query_Insert,
+	\Glue\DB\Fragment_Query_Delete,
+	\Glue\DB\Fragment_Value,
+	\Glue\DB\Fragment_Aliased_Table,
+	\Glue\DB\Fragment_Template,
+	\Glue\DB\Fragment_Builder_Bool,
+	\Glue\DB\Fragment_Builder_Join;
 
 /**
  * Main GlueDB class.
@@ -23,7 +33,7 @@ class DB {
 	 *
 	 * @return Database
 	 */
-	public static function db($db_name = Database::DEFAULTDB) {
+	public static function database($db_name = Database::DEFAULTDB) {
 		return Database::get($db_name);
 	}
 

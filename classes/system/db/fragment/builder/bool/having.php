@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder_Bool;
 
 /**
  * Fragment that provides a fluent interface to build a having clause.
@@ -22,5 +24,5 @@ class Fragment_Builder_Bool_Having extends Fragment_Builder_Bool {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_bool_having($this, $style);
-	}	
+	}
 }

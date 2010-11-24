@@ -1,8 +1,11 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
 
-use ArrayAccess;
+use \ArrayAccess,
+	\Glue\DB\Fragment_Table,
+	\Glue\DB\Fragment_Column,
+	\Glue\DB\Fragment_Aliased;
 
 /**
  * Fragment that represents a table - alias pair and compiles into a "<table> AS <alias>" SQL string.
@@ -20,12 +23,12 @@ class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 	 * @var boolean Prevents setting of table and alias once a column fragment has been generated.
 	 */
 	protected $lock = false; // TODO make sure this works...
-	
+
 	/**
 	 * @var array Column fragments cache.
 	 */
 	protected $columns = array();
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -35,7 +38,7 @@ class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 	public function __construct($table_name, $alias = null) {
 		parent::__construct(new Fragment_Table($table_name), $alias);
 	}
-	
+
 	/**
 	 * Returns children column fragments.
 	 *
@@ -49,21 +52,21 @@ class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 			$this->columns[$column] = new Fragment_Column($this, $column);
 		return $this->columns[$column];
 	}
-	
-	
+
+
 	// ArrayAccess interface implementation :
 	public function offsetExists ($offset) {
 		return true;
 	}
-	
+
 	public function offsetGet ($offset) {
 		return $this->__get($offset)->value();
 	}
-	
+
 	public function offsetSet ($offset, $value) {
 		throw new Exception("Cannot set row values.");
 	}
-	
+
 	public function offsetUnset ($offset) {
 		throw new Exception("Cannot set row values.");
 	}

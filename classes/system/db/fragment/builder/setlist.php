@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Assignment,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build the set list in an update query.
@@ -22,9 +25,9 @@ class Fragment_Builder_Setlist extends Fragment_Builder {
 	public function _and($column, $to = null) {
 		// Build fragment :
 		$fragment = new Fragment_Assignment($column, $to);
-		
+
 		// Give fragment a context :
-		$fragment->context($this);	
+		$fragment->context($this);
 
 		// Add fragment :
 		$this->push($fragment);
@@ -32,7 +35,7 @@ class Fragment_Builder_Setlist extends Fragment_Builder {
 		// Return fragment :
 		return $fragment;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -44,5 +47,5 @@ class Fragment_Builder_Setlist extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_setlist($this, $style);
-	}		
+	}
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Ordered,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build an order by clause.
@@ -29,7 +32,7 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 			$fragment = new Fragment_Ordered($first);
 		else
 			$fragment = new Fragment_Ordered(new Fragment_Template($first, $params));
-			
+
 		// Give fragment a context :
 		$fragment->context($this);
 
@@ -39,7 +42,7 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 		// Return fragment :
 		return $fragment;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -51,5 +54,5 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_orderby($this, $style);
-	}	
+	}
 }

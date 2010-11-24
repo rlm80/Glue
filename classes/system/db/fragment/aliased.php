@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Fragment that represents anything that compiles into "... AS ...".
@@ -59,7 +61,7 @@ class Fragment_Aliased extends Fragment {
 		else
 			return $this->set_property('as', $as);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -71,5 +73,5 @@ class Fragment_Aliased extends Fragment {
 	function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_aliased($this, $style);
-	}	
+	}
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Template,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build a group by clause.
@@ -32,7 +35,7 @@ class Fragment_Builder_Groupby extends Fragment_Builder {
 
 		return $this;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -44,5 +47,5 @@ class Fragment_Builder_Groupby extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_groupby($this, $style);
-	}	
+	}
 }

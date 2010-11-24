@@ -1,8 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
 
-use Exception;
+use \Glue\DB\Exception;
 
 /**
  * Base fragment class.
@@ -29,12 +29,12 @@ abstract class Fragment {
 	 * @var integer Default SQL style.
 	 */
 	const STYLE_DEFAULT = -1;
-	
+
 	/**
 	 * @var array List of fragments that make direct use of this fragment to create their own SQL representation.
 	 */
 	protected $users;
-	
+
 	/**
 	 * @var Fragment Parent of this fragment in the query tree.
 	 */
@@ -49,7 +49,7 @@ abstract class Fragment {
 	 * Returns compiled SQL string according to given database SQL dialect.
 	 *
 	 * @param Database $db Database that defines what SQL dialect must be used to compile the fragment.
-	 * @param integer $style 
+	 * @param integer $style
 	 *
 	 * @return string
 	 */

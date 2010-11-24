@@ -1,8 +1,15 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
 
-use PDO;
+use \PDO,
+	\Glue\DB\Fragment_Builder_SelectList,
+	\Glue\DB\Fragment_Builder_Join_From,
+	\Glue\DB\Fragment_Builder_Bool_Where,
+	\Glue\DB\Fragment_Builder_Groupby,
+	\Glue\DB\Fragment_Builder_Bool_Having,
+	\Glue\DB\Fragment_Builder_Orderby,
+	\Glue\DB\Fragment_Query;
 
 /**
  * Fragment that represents a get query.
@@ -72,14 +79,14 @@ class Fragment_Query_Select extends Fragment_Query {
 		$this->groupby->register_user($this);
 		$this->having->register_user($this);
 		$this->orderby->register_user($this);
-		
+
 		// Set up contexts :
 		$this->columns->context($this);
 		$this->from->context($this);
 		$this->where->context($this);
 		$this->groupby->context($this);
 		$this->having->context($this);
-		$this->orderby->context($this);		
+		$this->orderby->context($this);
 	}
 
 	/**
@@ -237,10 +244,10 @@ class Fragment_Query_Select extends Fragment_Query {
 		// Prepare statement :
 		$stmt = parent::prepare($driver_options);
 		$stmt->setFetchMode(PDO::FETCH_BOUND);
-		
+
 		// Bind columns :
 		$this->bind($stmt, true);
-		
+
 		// Return statement :
 		return $stmt;
 	}
@@ -256,18 +263,18 @@ class Fragment_Query_Select extends Fragment_Query {
 		$sql = $this->sql($db);
 		$stmt = $db->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_BOUND);
-		
+
 		// Bind columns :
 		$this->bind($stmt, false);
-		
+
 		// Return statement :
 		return $stmt;
 	}
-	
+
 	/**
 	 * Set up bindings between columns fetched by given statement and table alias objects
 	 * of this query.
-	 * 
+	 *
 	 * @param Statement $stmt
 	 */
 	protected function bind(Statement $stmt, $delayed) {

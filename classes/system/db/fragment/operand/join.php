@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder_Bool,
+	\Glue\DB\Fragment_Operand;
 
 /**
  * Fragment that represents an operand in a join expression.
@@ -47,7 +50,7 @@ class Fragment_Operand_Join extends Fragment_Operand {
 		else
 			return $this->on;
 	}
-	
+
 	/**
 	 * Forwards call to operand.
 	 *
@@ -56,8 +59,8 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	public function _as($alias) {
 		$this->operand()->_as($alias);
 		return $this;
-	}	
-	
+	}
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -69,5 +72,5 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_operand_join($this, $style);
-	}		
+	}
 }

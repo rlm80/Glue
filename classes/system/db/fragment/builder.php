@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Builders are fragments that provide a fluent API to build an assembly of children fragments.

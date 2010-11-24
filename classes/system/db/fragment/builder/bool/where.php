@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder_Bool;
 
 /**
  * Fragment that provides a fluent interface to build a where clause.
@@ -22,5 +24,5 @@ class Fragment_Builder_Bool_Where extends Fragment_Builder_Bool {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_bool_where($this, $style);
-	}	
+	}
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Fragment that represents a column of a specific table - alias pair and compiles into
@@ -14,9 +16,9 @@ namespace Glue\DB;
 class Fragment_Column extends Fragment {
 	/**
 	 * @var integer Return SQL without table qualifier.
-	 */	
+	 */
 	const STYLE_UNQUALIFIED	= 1;
-	
+
 	/**
 	 * @var Fragment_Aliased_Table
 	 */
@@ -26,7 +28,7 @@ class Fragment_Column extends Fragment {
 	 * @var Column
 	 */
 	protected $column;
-	
+
 	/**
 	 * @var array Value of column in current row of data.
 	 */
@@ -36,7 +38,7 @@ class Fragment_Column extends Fragment {
 	 * Constructor.
 	 *
 	 * @param Fragment_Aliased_Table $table_alias
-	 * @param string $column 
+	 * @param string $column
 	 */
 	public function __construct(Fragment_Aliased_Table $table_alias, $column) {
 		$this->table_alias	= $table_alias;
@@ -51,7 +53,7 @@ class Fragment_Column extends Fragment {
 	public function column() {
 		return $this->column;
 	}
-	
+
 	/**
 	 * Value getter.
 	 *
@@ -73,13 +75,13 @@ class Fragment_Column extends Fragment {
 	public function __toString() {
 		return $this->sql($this->column()->table()->db());
 	}
-	
+
 	/**
 	 * Binds $this->value to column $alias at index $index of statement $stmt.
-	 * 
+	 *
 	 * @param Statement $stmt
 	 * @param string $alias
-	 * @param integer $index 
+	 * @param integer $index
 	 * @param boolean $delayed
 	 */
 	public function bind(Statement $stmt, $alias, $index, $delayed) {
@@ -88,15 +90,15 @@ class Fragment_Column extends Fragment {
 			$stmt->bindColumnDelayed($index, $this->value);
 		else
 			$stmt->bindColumn($index, $this->value);
-			
+
 		// Bind formatters :
 		$formatter = $this->column()->formatter();
 		$stmt->bindFormatter($alias, $formatter);
 		$stmt->bindFormatter($index, $formatter);
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -108,5 +110,5 @@ class Fragment_Column extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_column($this, $style);
-	}	
+	}
 }

@@ -1,6 +1,12 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Aliased_Table,
+	\Glue\DB\Fragment_Builder_Rowlist,
+	\Glue\DB\Fragment_Builder_Columns,
+	\Glue\DB\Fragment_Table,
+	\Glue\DB\Fragment_Query;
 
 /**
  * Fragment that represents an insert query.
@@ -47,11 +53,11 @@ class Fragment_Query_Insert extends Fragment_Query {
 		$this->into->register_user($this);
 		$this->values->register_user($this);
 		$this->columns->register_user($this);
-		
+
 		// Set up dependecies :
 		$this->into->context($this);
 		$this->values->context($this);
-		$this->columns->context($this);		
+		$this->columns->context($this);
 
 		// Initialize alias parameter :
 		$alias = $this->into;

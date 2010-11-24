@@ -1,12 +1,14 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Database;
 
 /**
  * Base Sqlite database class.
  *
  * @package    GlueDB
- * @author     R�gis Lemaigre
+ * @author     Régis Lemaigre
  * @license    MIT
  */
 

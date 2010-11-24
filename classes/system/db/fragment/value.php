@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Fragment that holds a value that must be quoted.
@@ -38,7 +40,7 @@ class Fragment_Value extends Fragment {
 		else
 			return $this->set_property('value', $value);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *

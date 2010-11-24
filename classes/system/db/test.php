@@ -2,13 +2,13 @@
 
 namespace Glue\System\DB;
 
-use Exception, PDO;
+use \PDO;
 
 /**
  * Test class.
- * 
+ *
  * You may call the functions of this class to ensure everything is working properly.
- * 
+ *
  * @package Glue
  * @author Régis Lemaigre
  * @license MIT
@@ -31,15 +31,15 @@ class Test {
 
 	static private function create_test_tables() {
 		self::drop_test_tables();
-		db::db()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
-		db::db()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
-		db::db()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
+		db::database()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
+		db::database()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
+		db::database()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
 	}
 
 	static private function drop_test_tables() {
-		try { db::db()->exec("drop table glusers");		} catch (Exception $e) {};
-		try { db::db()->exec("drop table glprofiles");	} catch (Exception $e) {};
-		try { db::db()->exec("drop table glposts");		} catch (Exception $e) {};
+		try { db::database()->exec("drop table glusers");		} catch (Exception $e) {};
+		try { db::database()->exec("drop table glprofiles");	} catch (Exception $e) {};
+		try { db::database()->exec("drop table glposts");		} catch (Exception $e) {};
 	}
 
 	static private function test_fragments() {
@@ -214,24 +214,24 @@ class Test {
 							->and('test3', 'test3')
 						->prepare();
 		$statement->execute();
-		
+
 		//print_r($statement); die;
-		
+
 		$statement = db::select('glusers', $u)
 						->columns($u->id)->and($u->login)->and($u->password)
 						->prepare();
 		$statement->execute();
-		
+
 		$statement->bindColumn(1, $test);
-		
+
 		while($res = $statement->fetch(PDO::FETCH_BOTH)) {
 			//var_dump($u['login']);
 			var_dump($res);
 			echo $test;
 		}
-		
+
 		/*
-		$stmt = db::db()->query("select login as login from glusers");
+		$stmt = db::database()->query("select login as login from glusers");
 		//$stmt->bindColumn('login', $test);
 		$stmt->setFetchMode(PDO::FETCH_BOTH);
 		while($res = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -239,10 +239,10 @@ class Test {
 			//echo $test;
 		}
 		*/
-		
-		
+
+
 		//$arr = $statement->fetchAll();
 		//print_r($arr);
-		
+
 	}
 }

@@ -1,6 +1,11 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder_Bool_Where,
+	\Glue\DB\Fragment_Aliased_Table,
+	\Glue\DB\Fragment_Table,
+	\Glue\DB\Fragment_Query;
 
 /**
  * Fragment that represents a delete query.
@@ -20,7 +25,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 	 * @var Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
-	
+
 	/**
 	 * @var Integer Limit.
 	 */
@@ -29,7 +34,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 	/**
 	 * @var Integer Offset.
 	 */
-	protected $offset;	
+	protected $offset;
 
 	/**
 	 * Constructor.
@@ -45,7 +50,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 		// Set up dependecies :
 		$this->where->register_user($this);
 		$this->from->register_user($this);
-		
+
 		// Set up contexts :
 		$this->where->context($this);
 		$this->from->context($this);
@@ -84,7 +89,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 		else
 			return $this->where;
 	}
-	
+
 	/**
 	 * Limit getter/setter.
 	 *

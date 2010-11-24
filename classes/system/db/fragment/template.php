@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Value,
+	\Glue\DB\Fragment;
 
 /**
  * Fragment that is made of an SQL template with placeholders and an array of replacement fragments.
@@ -84,7 +87,7 @@ class Fragment_Template extends Fragment {
 			return $this;
 		}
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -96,5 +99,5 @@ class Fragment_Template extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_template($this, $style);
-	}	
+	}
 }

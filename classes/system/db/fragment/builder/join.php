@@ -1,6 +1,10 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Aliased_Table,
+	\Glue\DB\Fragment_Operand_Join,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that represents a join expression.
@@ -77,12 +81,12 @@ class Fragment_Builder_Join extends Fragment_Builder {
 		// Assign operand to $alias parameter :
 		if ($operand instanceof Fragment_Aliased_Table)
 			$alias = $operand;
-			
+
 		// Build fragment :
 		$fragment = new Fragment_Operand_Join($operand, $operator);
-		
+
 		// Give fragment context :
-		$fragment->context($this);	
+		$fragment->context($this);
 
 		// Add operand :
 		$this->push($fragment);
@@ -90,7 +94,7 @@ class Fragment_Builder_Join extends Fragment_Builder {
 		// Return fragment :
 		return $fragment;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -102,5 +106,5 @@ class Fragment_Builder_Join extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_join($this, $style);
-	}	
+	}
 }

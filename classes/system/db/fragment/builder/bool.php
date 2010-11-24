@@ -1,6 +1,10 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Template,
+	\Glue\DB\Fragment_Operand_Bool,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that represents a boolean expression.
@@ -88,14 +92,14 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 		else
 			$fragment = new Fragment_Template($first, $values);
 		$operand = new Fragment_Operand_Bool($fragment, $operator);
-		
+
 		// Give fragment a context :
-		$operand->context($this);		
+		$operand->context($this);
 
 		// Add operand :
 		$this->push($operand);
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -107,5 +111,5 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_bool($this, $style);
-	}	
+	}
 }

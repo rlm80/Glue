@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Value,
+	\Glue\DB\Fragment;
 
 /**
  * Fragment that represents a row of values in an insert query.
@@ -61,7 +64,7 @@ class Fragment_Row extends Fragment {
 			return $this;
 		}
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -73,5 +76,5 @@ class Fragment_Row extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_row($this, $style);
-	}	
+	}
 }

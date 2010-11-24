@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment;
 
 /**
  * Fragment that represents a table.
@@ -38,7 +40,7 @@ class Fragment_Table extends Fragment {
 			return $this->set_property('table', $table);
 		}
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -50,5 +52,5 @@ class Fragment_Table extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_table($this, $style);
-	}	
+	}
 }

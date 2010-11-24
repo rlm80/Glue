@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Row,
+	\Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build a list of rows in an insert query.
@@ -27,9 +30,9 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 
 		// Build fragment :
 		$fragment = new Fragment_Row($values);
-		
+
 		// Give fragment context :
-		$fragment->context($this);			
+		$fragment->context($this);
 
 		// Add fragment :
 		$this->push($fragment);
@@ -37,7 +40,7 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 		// Return fragment :
 		return $fragment;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -49,5 +52,5 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_rowlist($this, $style);
-	}	
+	}
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Column,
+	\Glue\DB\Exception;
 
 /**
  * Base virtual table class.
@@ -212,18 +215,6 @@ class Table {
 	}
 
 	/**
-	 * Returns a table helper for this table.
-	 *
-	 * @param Query	$query	Query in the context of which the table helper is required.
-	 * @param string		$alias	Alias of current table in that query.
-	 *
-	 * @return Helper_Table
-	 */
-	public function helper() {
-		return new Fragment_Helper_Table($this);
-	}
-
-	/**
 	 * Returns the columns of this table.
 	 *
 	 * @return array
@@ -241,7 +232,7 @@ class Table {
 	 */
 	public function column($name) {
 		if ( ! isset($this->columns[$name]))
-			throw new Kohana_Exception("There is no column " . $name . " in table " . $this->name . ".");
+			throw new Exception("There is no column " . $name . " in table " . $this->name . ".");
 		return $this->columns[$name];
 	}
 
@@ -269,7 +260,7 @@ class Table {
 			self::$instances[$name] = self::create_from_cache($name);
 		return self::$instances[$name];
 	}
-	
+
 	/**
 	 * Loads a virtual table from the disk cache. If it isn't there already, creates
 	 * a new cache entry for it.
@@ -278,18 +269,18 @@ class Table {
 	 *
 	 * @return Table
 	 */
-	static protected function create_from_cache($name) {	
+	static protected function create_from_cache($name) {
 		// Look up object into cache directory :
 		$dir	= \Glue\ROOTPATH . "cache/db/tables/";
-		$path	= $dir . $name . ".tmp";		
-		
+		$path	= $dir . $name . ".tmp";
+
 		// Check cache availability :
 		if ( ! file_exists($path)) {
 			$table = self::create_from_class($name);
 			if ( ! is_dir($dir)) mkdir($dir, 777, true);
 			file_put_contents($path, serialize($table));
 		}
-		
+
 		// Return table from cache :
 		return unserialize(file_get_contents($path));
 	}
@@ -303,10 +294,10 @@ class Table {
 	 * @return Table
 	 */
 	static protected function create_from_class($name) {
-		$class = 'Table_' . ucfirst($name);
+		$class = '\\Glue\\DB\\Table_' . ucfirst($name);
 		if (class_exists($class))
 			return new $class($name);
 		else
-			return new Table($name);
+			return \Glue\DB\Table($name);
 	}
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Builder;
 
 /**
  * Fragment that provides a fluent interface to build a list of columns.
@@ -22,7 +24,7 @@ class Fragment_Builder_Columns extends Fragment_Builder {
 		$this->push($column);
 		return $this;
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -34,5 +36,5 @@ class Fragment_Builder_Columns extends Fragment_Builder {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_columns($this, $style);
-	}	
+	}
 }

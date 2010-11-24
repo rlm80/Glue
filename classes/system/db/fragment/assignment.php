@@ -1,6 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Value,
+	\Glue\DB\Fragment;
 
 /**
  * Fragment that represents an assignment in an update query.
@@ -65,7 +68,7 @@ class Fragment_Assignment extends Fragment {
 			return $this->set_property('to', $to);
 		}
 	}
-	
+
 	/**
 	 * Forwards call to given database.
 	 *
@@ -77,5 +80,5 @@ class Fragment_Assignment extends Fragment {
 	protected function compile(Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_assignment($this, $style);
-	}	
+	}
 }

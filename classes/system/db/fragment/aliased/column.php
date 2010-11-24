@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use \Glue\DB\Fragment_Aliased;
 
 /**
  * Fragment that represents an aliased column in a select list.

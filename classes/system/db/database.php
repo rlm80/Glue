@@ -1,8 +1,9 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
 
-use PDO;
+use \PDO,
+	\Glue\DB\Exception;
 
 /**
  * Base database class.
@@ -170,7 +171,7 @@ abstract class Database extends PDO {
 	 */
 	static protected function create($name) {
 		// Class name :
-		$class = '\\Glue\\DB\\Database_'.ucfirst($name);
+		$class = 'Glue\\DB\\Database_' . ucfirst($name);
 
 		// Unlock constructor, create instance and relock constructor :
 		self::$constuctor_locked = false;
@@ -511,7 +512,7 @@ abstract class Database extends PDO {
 		// Break appart template :
 		$parts = explode('?', $template);
 		if (count($parts) !== count($replacements) + 1)
-			throw new Kohana_Exception("Number of placeholders different from number of replacements for " . $template);
+			throw new Exception("Number of placeholders different from number of replacements for " . $template);
 
 		// Make replacements :
 		$max = count($replacements);
@@ -583,7 +584,7 @@ abstract class Database extends PDO {
 		$fromsql	= $fragment->from()->sql($this);
 		$wheresql	= $fragment->where()->sql($this);
 		$limit		= $fragment->limit();
-		$offset		= $fragment->offset();		
+		$offset		= $fragment->offset();
 
 		// Mandatory :
 		$sql = 'DELETE FROM ' . $fromsql;
@@ -610,7 +611,7 @@ abstract class Database extends PDO {
 		$wheresql	= $fragment->where()->sql($this);
 		$orderbysql	= $fragment->orderby()->sql($this);
 		$limit		= $fragment->limit();
-		$offset		= $fragment->offset();			
+		$offset		= $fragment->offset();
 
 		// Mandatory :
 		$sql = 'UPDATE ' . $fromsql . ' SET ' . $setlistsql;
@@ -619,7 +620,7 @@ abstract class Database extends PDO {
 		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;
 		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '	. $orderbysql;
 		if (   isset($limit))		$sql .= ' LIMIT '		. $limit;
-		if (   isset($offset))		$sql .= ' OFFSET '		. $offset;	
+		if (   isset($offset))		$sql .= ' OFFSET '		. $offset;
 
 		return $sql;
 	}
@@ -712,7 +713,7 @@ abstract class Database extends PDO {
 		elseif (is_null($value))
 			return $this->quote_null($value);
 		else
-			throw new Kohana_Exception("Cannot quote objects.");
+			throw new Exception("Cannot quote objects.");
 	}
 
 	/**

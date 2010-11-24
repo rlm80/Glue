@@ -1,6 +1,8 @@
 <?php
 
-namespace Glue\DB;
+namespace Glue\System\DB;
+
+use Glue\DB\Database as Database;
 
 /**
  * Base MySQL database class.
