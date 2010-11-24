@@ -33,7 +33,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h2>Class aliases</h2>
 
-<p><b>Class aliases</b> live in the <span class="inline_code">\Glue</span> namespace. By default, the alias <span class="inline_code">\Glue\A</span> points to the system class <span class="inline_code">\Glue\System\A</span> . However, if you define a user class <span class="inline_code">\Glue\User\A</span> , then the alias <span class="inline_code">\Glue\A</span> will start pointing to your <span class="inline_code">\Glue\User\A</span> class instead. In other words, a user class takes precedence over a system class of the same name.</p>
+<p><b>Class aliases</b> live in the <span class="inline_code">\Glue</span> namespace. By default, the alias <span class="inline_code">\Glue\A</span> points to the system class <span class="inline_code">\Glue\System\A</span>. However, if you define a user class <span class="inline_code">\Glue\User\A</span>, then the alias <span class="inline_code">\Glue\A</span> will start pointing to your <span class="inline_code">\Glue\User\A</span> class instead. In other words, a user class takes precedence over a system class of the same name.</p>
 
 <p>You can picture yourself the aliasing process that populates the <span class="inline_code">\Glue</span> namespace this way :</p>
 
@@ -71,7 +71,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h3>Creating a new class</h3>
 
-<p>This is how you would create a <span class="inline_code">\Glue\User\DB\Foo_Bar</span> user class that extends the <span class="inline_code">\Glue\DB\Foo</span> class. This is what you do when you want to add something to the library, rather than modifying it. It covers 99% of use cases.</p>
+<p>This is how you would create a <span class="inline_code">\Glue\User\DB\Foo_Bar</span> user class that extends the <span class="inline_code">\Glue\DB\Foo</span> class. This is what you do when you want to add something to the library, rather than modifying it.</p>
 
 {% highlight php %}
 <?php
@@ -79,17 +79,17 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
   
   namespace \Glue\User\DB;
   
-  use \Glue\DB\Foo; // NOT use \Glue\System\DB\Foo; ! ALWAYS you aliases rather than direct references to system classes.
-  
-  class Foo_Bar extends Foo {
+  class Foo_Bar extends \Glue\DB\Foo {
   
   }
 ?>
 {% endhighlight %}
 
+<p>In the code above, notice the use of the <span class="inline_code">\Glue\DB\Foo</span> alias. This way, if the system class <span class="inline_code">\Glue\System\DB\Foo</span> is ever overriden by the user class <span class="inline_code">\Glue\User\DB\Foo</span>, or code, like the rest of the library, will automatically benefit from the change.</p>
+
 <h3>Overriding a system class with your own version</h3>
 
-<p>This is how you would completly replace the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class of your own. The alias <span class="inline_code">\Glue\DB\Foo</span> will now point to your own class instead of the system one.</p>
+<p>This is how you would completly replace the <span class="inline_code">\Glue\System\DB\Foo</span> class with a new class of your own. The alias <span class="inline_code">\Glue\DB\Foo</span> will now point to your own class instead of the system one and your class will be used everywhere in its stead.</p>
 
 {% highlight php %}
 <?php
@@ -103,7 +103,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 ?>
 {% endhighlight %}
 
-<p>You normally wouldn't want to do this. Instead, you'd rather build your new class upon the existing system class, possibly overriding a few methods :</p>
+<p>You normally wouldn't want to do this. Instead, you'd rather build your new class upon the existing system class, possibly overriding a few methods. See below.</p>
 
 <h3>Overriding a system class with an extension of itself</h3>
 
