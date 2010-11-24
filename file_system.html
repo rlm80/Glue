@@ -43,11 +43,16 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px; visibility:hidden;">C</div>
 </div>
 <div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes (\Glue\User)
-	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;  visibility:hidden;">A</div>
+	<div style="text-indent: 0px; height: 54px; float: left; width: 54px; line-height: 54px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
 </div>
-<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin: 20px 0;">Class aliases (\Glue)
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">
+	<div style="text-indent: 0px; height: 25px; float: left; width: 54px; line-height: 25px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
+	<div style="text-indent: 0px; height: 25px; float: left; width: 54px; line-height: 25px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
+	<div style="text-indent: 0px; height: 25px; float: left; width: 54px; line-height: 25px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
+</div>
+<div style="overflow: auto; text-indent: 20px; font-weight: bold;">Class aliases (\Glue)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
@@ -55,7 +60,9 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p>All over the library, only class aliases are used. There is no direct reference anywhere in the code to system classes. This means that if you want to replace every use of a system class with a use of your own class, you can do so by defining a user class with the same name as the system class. The alias will automatically point to the user class instead of the system class, and your own class will then be used throughout the library in place of the system class. You may even replace a system class with an extension of itself that overrides a few methods.</p>
 
-<p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. You only define classes in the user directory. This way you can upgrade to the next version of the library with no fear of losing your changes, if you made some. To provide the ability to change the behavior of the library without actually touching its code is the whole point of the aliasing system.</p>
+<p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. You only define classes in the user directory. This way you can upgrade to the next version of the library with no fear of losing your changes, if you made some.</p>
+
+<p>To provide the ability to change the behavior of the library without actually touching its code is the whole point of the aliasing system.</p>
 
 <h2>Creating user classes</h2>
 
