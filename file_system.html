@@ -25,15 +25,15 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <h2>Namespaces and class naming conventions</h2>
 
-<p><b>System classes</b> live in the <span class="inline_code">\Glue\System\DB</span> and <span class="inline_code">\Glue\System\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span>.</p>
+<p><b>System classes</b> live in the <span class="inline_code">\Glue\System</span> namespace. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> (or <span class="inline_code">\Glue\System\ORM\Some_Class</span>) to be located in the file <span class="inline_code">system/db/some/class.php</span> (or <span class="inline_code">system/orm/some/class.php</span>).</p>
 
-<p><b>User classes</b> live in the <span class="inline_code">\Glue\User\DB</span> and <span class="inline_code">\Glue\User\ORM</span> namespaces. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\User\DB\Some_Class</span> to be located in the file <span class="inline_code">user/db/some/class.php</span>.</p>
+<p><b>User classes</b> live in the <span class="inline_code">\Glue\User</span> namespace. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\User\DB\Some_Class</span> (or <span class="inline_code">\Glue\User\ORM\Some_Class</span>) to be located in the file <span class="inline_code">user/db/some/class.php</span> (or <span class="inline_code">user/orm/some/class.php</span>).</p>
 
 <p>Additionally, it is a good idea to always call <span class="inline_code">A_B</span> a class <span class="inline_code">B</span> that inherits from a class <span class="inline_code">A</span> so that class names (and thus the file system structure) reflect the inheritance hierarchy.</p>
 
 <h2>Class aliases</h2>
 
-<p>For each class in the <span class="inline_code">\Glue\System</span> and the <span class="inline_code">\Glue\User</span> namespaces, an <b><a class="external" href="http://be2.php.net/manual/en/function.class-alias.php">alias</a></b> is created at runtime in the <span class="inline_code">\Glue</span> namespace. If the class exists both in the system and in the user namespaces, the alias points to the version of the class in the user namespace, so that user defined classes have priority over system classes. Thus the alias <span class="inline_code">\Glue\DB\Some_Class</span> points to the user class <span class="inline_code">\Glue\User\DB\Some_Class</span> if that class is defined, otherwise it points to the system class <span class="inline_code">\Glue\System\DB\Some_Class</span>.</p>
+<p><b>Class aliases</b> live in the <span class="inline_code">\Glue</span> namespace. By default, the alias ~\Glue\A points to the system class ~\Glue\System\A . However, if you define a user class ~\Glue\User\A , then the alias ~\Glue\A will start pointing to your ~\Glue\User\A class instead. In other words, a user class takes priority over a system class.</p>
 
 <p>You can picture yourself the aliasing process that populates the <span class="inline_code">\Glue</span> namespace this way :</p>
 
@@ -53,9 +53,9 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
 </div>
 
-<p>All over the library, class aliases are always used. There is no direct reference anywhere in the code to system or user classes, only to aliases in the <span class="inline_code">\Glue</span> namespace. This means that if you want to replace a system class with your own version, you may do so by defining a new user class with the same name. The alias will automatically point to the user class instead of the system class, and your own class will then be used throughout the library in place of the system class. You may even replace a system class with an extension of itself that overrides a few methods.</p>
+<p>All over the library, only class aliases are used. There is no direct reference anywhere in the code to system classes. This means that if you want to replace every use of a system class with a use of your own class, you can do so by defining a user class with the same name as the system class. The alias will automatically point to the user class instead of the system class, and your own class will then be used throughout the library in place of the system class. You may even replace a system class with an extension of itself that overrides a few methods.</p>
 
-<p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. So you can upgrade to the next version of the library with no fear of losing your changes, if you made some.</p>
+<p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. You only define classes in the user directory. This way you can upgrade to the next version of the library with no fear of losing your changes, if you made some. To provide the ability to change the behavior of the library without actually touching its code is the whole point of the aliasing system.</p>
 
 <h2>Creating user classes</h2>
 
