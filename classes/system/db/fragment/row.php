@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Value,
-	\Glue\DB\Fragment;
-
 /**
  * Fragment that represents a row of values in an insert query.
  *
@@ -13,7 +10,7 @@ use \Glue\DB\Fragment_Value,
  * @license    MIT
  */
 
-class Fragment_Row extends Fragment {
+class Fragment_Row extends \Glue\DB\Fragment {
 	/**
 	 * @var array Value fragments.
 	 */
@@ -48,8 +45,8 @@ class Fragment_Row extends Fragment {
 			$this->values = array();
 			foreach($values as $value) {
 				// Turn values that aren't fragments into value fragments (SQL = quoted value) :
-				if ( ! $value instanceof Fragment)
-					$value = new Fragment_Value($value);
+				if ( ! $value instanceof \Glue\DB\Fragment)
+					$value = new \Glue\DB\Fragment_Value($value);
 
 				// Set up dependency :
 				$value->register_user($this);
@@ -68,12 +65,12 @@ class Fragment_Row extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_row($this, $style);
 	}

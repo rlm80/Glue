@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Formatter;
-
 /**
  * Float formatter class.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Formatter;
  * @license    MIT
  */
 
-class Formatter_Float extends Formatter {
+class Formatter_Float extends \Glue\DB\Formatter {
 
 	/**
 	 * Formats data coming from the database into a format suitable for PHP.

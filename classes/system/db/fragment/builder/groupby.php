@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Template,
-	\Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that provides a fluent interface to build a group by clause.
  *
@@ -13,12 +10,12 @@ use \Glue\DB\Fragment_Template,
  * @license    MIT
  */
 
-class Fragment_Builder_Groupby extends Fragment_Builder {
+class Fragment_Builder_Groupby extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds an element at the end of the group by. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.
 	 *
-	 * @return Fragment_Builder_Groupby
+	 * @return \Glue\DB\Fragment_Builder_Groupby
 	 */
 	public function _and() {
 		// Get params :
@@ -28,10 +25,10 @@ class Fragment_Builder_Groupby extends Fragment_Builder {
 		$first = array_shift($params);
 
 		// Add fragment :
-		if ($first instanceof Fragment)
+		if ($first instanceof \Glue\DB\Fragment)
 			$this->push($first);
 		else
-			$this->push(new Fragment_Template($first, $params));
+			$this->push(new \Glue\DB\Fragment_Template($first, $params));
 
 		return $this;
 	}
@@ -44,7 +41,7 @@ class Fragment_Builder_Groupby extends Fragment_Builder {
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_groupby($this, $style);
 	}

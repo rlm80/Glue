@@ -2,14 +2,7 @@
 
 namespace Glue\System\DB;
 
-use \PDO,
-	\Glue\DB\Fragment_Builder_SelectList,
-	\Glue\DB\Fragment_Builder_Join_From,
-	\Glue\DB\Fragment_Builder_Bool_Where,
-	\Glue\DB\Fragment_Builder_Groupby,
-	\Glue\DB\Fragment_Builder_Bool_Having,
-	\Glue\DB\Fragment_Builder_Orderby,
-	\Glue\DB\Fragment_Query;
+use \PDO;
 
 /**
  * Fragment that represents a get query.
@@ -19,34 +12,34 @@ use \PDO,
  * @license MIT
  */
 
-class Fragment_Query_Select extends Fragment_Query {
+class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var Fragment_Builder_SelectList Select list.
+	 * @var \Glue\DB\Fragment_Builder_SelectList Select list.
 	 */
 	protected $columns;
 
 	/**
-	 * @var Fragment_Builder_Join_From From clause.
+	 * @var \Glue\DB\Fragment_Builder_Join_From From clause.
 	 */
 	protected $from;
 
 	/**
-	 * @var Fragment_Builder_Bool_Where Where clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
 
 	/**
-	 * @var Fragment_Builder_Groupby Group by list.
+	 * @var \Glue\DB\Fragment_Builder_Groupby Group by list.
 	 */
 	protected $groupby;
 
 	/**
-	 * @var Fragment_Builder_Bool_Having Having clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool_Having Having clause.
 	 */
 	protected $having;
 
 	/**
-	 * @var Fragment_Builder_Orderby Order by list.
+	 * @var \Glue\DB\Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
 
@@ -65,12 +58,12 @@ class Fragment_Query_Select extends Fragment_Query {
 	 */
 	public function __construct() {
 		// Init children fragments :
-		$this->columns	= new Fragment_Builder_SelectList();
-		$this->from		= new Fragment_Builder_Join_From();
-		$this->where	= new Fragment_Builder_Bool_Where();
-		$this->groupby	= new Fragment_Builder_Groupby();
-		$this->having	= new Fragment_Builder_Bool_Having();
-		$this->orderby	= new Fragment_Builder_Orderby();
+		$this->columns	= new \Glue\DB\Fragment_Builder_SelectList();
+		$this->from		= new \Glue\DB\Fragment_Builder_Join_From();
+		$this->where	= new \Glue\DB\Fragment_Builder_Bool_Where();
+		$this->groupby	= new \Glue\DB\Fragment_Builder_Groupby();
+		$this->having	= new \Glue\DB\Fragment_Builder_Bool_Having();
+		$this->orderby	= new \Glue\DB\Fragment_Builder_Orderby();
 
 		// Set up dependecies :
 		$this->columns->register_user($this);
@@ -94,7 +87,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * I.e. "$query->columns(...)" is the same as "$query->columns()->and(...)".
 	 *
-	 * @return Fragment_Builder_SelectList
+	 * @return \Glue\DB\Fragment_Builder_SelectList
 	 */
 	public function columns() {
 		if (func_num_args() > 0) {
@@ -112,9 +105,9 @@ class Fragment_Query_Select extends Fragment_Query {
 	 * I.e. "$query->from(...)" is the same as "$query->from()->init(...)".
 	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
-	 * @param Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
+	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return Fragment_Builder_Join
+	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
 	public function from($operand = null, &$alias = null) {
 		if (func_num_args() > 0) {
@@ -129,7 +122,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * I.e. "$query->where(...)" is the same as "$query->where()->init(...)".
 	 *
-	 * @return Fragment_Builder_Bool_Where
+	 * @return \Glue\DB\Fragment_Builder_Bool_Where
 	 */
 	public function where() {
 		if (func_num_args() > 0) {
@@ -146,7 +139,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * I.e. "$query->groupby(...)" is the same as "$query->groupby()->and(...)".
 	 *
-	 * @return Fragment_Builder_List_Groupby
+	 * @return \Glue\DB\Fragment_Builder_List_Groupby
 	 */
 	public function groupby() {
 		if (func_num_args() > 0) {
@@ -163,7 +156,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * I.e. "$query->having(...)" is the same as "$query->having()->init(...)".
 	 *
-	 * @return Fragment_Builder_Bool_Having
+	 * @return \Glue\DB\Fragment_Builder_Bool_Having
 	 */
 	public function having() {
 		if (func_num_args() > 0) {
@@ -180,7 +173,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 *
 	 * I.e. "$query->orderby(...)" is the same as "$query->orderby()->and(...)".
 	 *
-	 * @return Fragment_Builder_List_Orderby
+	 * @return \Glue\DB\Fragment_Builder_List_Orderby
 	 */
 	public function orderby() {
 		if (func_num_args() > 0) {
@@ -223,11 +216,11 @@ class Fragment_Query_Select extends Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return Database
+	 * @return \Glue\DB\Database
 	 */
 	public function db() {
 		$op = $this->from();
-		while ($op instanceof Fragment_Builder_Join)
+		while ($op instanceof \Glue\DB\Fragment_Builder_Join)
 			$op = $op->first()->operand();
 		return $op->aliased()->table()->db();
 	}
@@ -238,7 +231,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	 * more than once, or if you need query parameters, this is the method of choice for security
 	 * and performance.
 	 *
-	 * @return Statement
+	 * @return \Glue\DB\Statement
 	 */
 	public function prepare(array $driver_options = array()) {
 		// Prepare statement :
@@ -255,7 +248,7 @@ class Fragment_Query_Select extends Fragment_Query {
 	/**
 	 * Executes current query.
 	 *
-	 * @return Statement
+	 * @return \Glue\DB\Statement
 	 */
 	public function execute() {
 		// Execute query and get statement :
@@ -275,13 +268,13 @@ class Fragment_Query_Select extends Fragment_Query {
 	 * Set up bindings between columns fetched by given statement and table alias objects
 	 * of this query.
 	 *
-	 * @param Statement $stmt
+	 * @param \Glue\DB\Statement $stmt
 	 */
-	protected function bind(Statement $stmt, $delayed) {
+	protected function bind(\Glue\DB\Statement $stmt, $delayed) {
 		$index = 0;
 		foreach($this->columns()->children() as $child) {
 			$index ++;
-			if ($child instanceof Fragment_Aliased_Column)
+			if ($child instanceof \Glue\DB\Fragment_Aliased_Column)
 				$child->bind($stmt, $index, $delayed);
 		}
 	}
@@ -289,12 +282,12 @@ class Fragment_Query_Select extends Fragment_Query {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_select($this, $style);
 	}

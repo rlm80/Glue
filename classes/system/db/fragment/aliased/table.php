@@ -2,10 +2,7 @@
 
 namespace Glue\System\DB;
 
-use \ArrayAccess,
-	\Glue\DB\Fragment_Table,
-	\Glue\DB\Fragment_Column,
-	\Glue\DB\Fragment_Aliased;
+use \ArrayAccess;
 
 /**
  * Fragment that represents a table - alias pair and compiles into a "<table> AS <alias>" SQL string.
@@ -18,7 +15,7 @@ use \ArrayAccess,
  * @license    MIT
  */
 
-class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
+class Fragment_Aliased_Table extends \Glue\DB\Fragment_Aliased implements ArrayAccess {
 	/**
 	 * @var boolean Prevents setting of table and alias once a column fragment has been generated.
 	 */
@@ -36,7 +33,7 @@ class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 	 * @param string $alias
 	 */
 	public function __construct($table_name, $alias = null) {
-		parent::__construct(new Fragment_Table($table_name), $alias);
+		parent::__construct(new \Glue\DB\Fragment_Table($table_name), $alias);
 	}
 
 	/**
@@ -44,12 +41,12 @@ class Fragment_Aliased_Table extends Fragment_Aliased implements ArrayAccess {
 	 *
 	 * @param string $column
 	 *
-	 * @return Fragment_Column
+	 * @return \Glue\DB\Fragment_Column
 	 */
 	public function __get($column) {
 		$this->lock = true;
 	    if ( ! isset($this->columns[$column]))
-			$this->columns[$column] = new Fragment_Column($this, $column);
+			$this->columns[$column] = new \Glue\DB\Fragment_Column($this, $column);
 		return $this->columns[$column];
 	}
 

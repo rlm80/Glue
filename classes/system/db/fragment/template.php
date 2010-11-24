@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Value,
-	\Glue\DB\Fragment;
-
 /**
  * Fragment that is made of an SQL template with placeholders and an array of replacement fragments.
  *
@@ -15,7 +12,7 @@ use \Glue\DB\Fragment_Value,
  * @license    MIT
  */
 
-class Fragment_Template extends Fragment {
+class Fragment_Template extends \Glue\DB\Fragment {
 	/**
 	 * @var string SQL template with placeholders for values that need to be quoted.
 	 */
@@ -71,8 +68,8 @@ class Fragment_Template extends Fragment {
 			$this->replacements = array();
 			foreach($replacements as $replacement) {
 				// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
-				if ( ! $replacement instanceof Fragment)
-					$replacement = new Fragment_Value($replacement);
+				if ( ! $replacement instanceof \Glue\DB\Fragment)
+					$replacement = new \Glue\DB\Fragment_Value($replacement);
 
 				// Set up dependency :
 				$replacement->register_user($this);
@@ -91,12 +88,12 @@ class Fragment_Template extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_template($this, $style);
 	}

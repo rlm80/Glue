@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Database;
-
 /**
  * Base Sqlite database class.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Database;
  * @license    MIT
  */
 
-class Database_Sqlite extends Database {
+class Database_Sqlite extends \Glue\DB\Database {
 	/**
 	 * @var string Absolute path to the database file on disk.
 	 */
@@ -65,7 +63,7 @@ class Database_Sqlite extends Database {
 	 * @return array
 	 */
 	public function real_table($name) {
-		throw new Kohana_Exception("The Database::real_table function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+		throw new \Glue\DB\Exception("The Database::real_table function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**
@@ -77,17 +75,17 @@ class Database_Sqlite extends Database {
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */
 	public function real_tables() {
-		throw new Kohana_Exception("The Database::real_tables function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+		throw new \Glue\DB\Exception("The Database::real_tables function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**
 	 * Returns the appropriate formatter for given column.
 	 *
-	 * @param Column $column
+	 * @param \Glue\DB\Column $column
 	 *
-	 * @return Formatter
+	 * @return \Glue\DB\Formatter
 	 */
-	public function get_formatter(Column $column)  {
-		throw new Kohana_Exception("The Database::get_phptype function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it.");
+	public function get_formatter(\Glue\DB\Column $column)  {
+		throw new \Glue\DB\Exception("The Database::get_phptype function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it.");
 	}
 }

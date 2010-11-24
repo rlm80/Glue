@@ -2,11 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Aliased_Column,
-	\Glue\DB\Fragment_Aliased,
-	\Glue\DB\Fragment_Template,
-	\Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that provides a fluent interface to build a select list.
  *
@@ -15,12 +10,12 @@ use \Glue\DB\Fragment_Aliased_Column,
  * @license    MIT
  */
 
-class Fragment_Builder_SelectList extends Fragment_Builder {
+class Fragment_Builder_SelectList extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds an element at the end of the select list. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.
 	 *
-	 * @return Fragment_Aliased
+	 * @return \Glue\DB\Fragment_Aliased
 	 */
 	public function _and() {
 		// Get params :
@@ -30,19 +25,19 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 		$first = array_shift($params);
 
 		// Compute default alias :
-		if ($first instanceof Fragment_Column)
+		if ($first instanceof \Glue\DB\Fragment_Column)
 			$alias = $this->compute_alias_column($first->column()->name());
 		else
 			$alias = $this->compute_alias_computed();
 
 		// Build fragment :
-		if ($first instanceof Fragment_Column)
-			$fragment = new Fragment_Aliased_Column($first, $alias, count($this->children()));
+		if ($first instanceof \Glue\DB\Fragment_Column)
+			$fragment = new \Glue\DB\Fragment_Aliased_Column($first, $alias, count($this->children()));
 		elseif ($first instanceof Fragment)
-			$fragment = new Fragment_Aliased($first, $alias);
+			$fragment = new \Glue\DB\Fragment_Aliased($first, $alias);
 		else
-			$fragment = new Fragment_Aliased(
-				new Fragment_Template($first, $params),
+			$fragment = new \Glue\DB\Fragment_Aliased(
+				new \Glue\DB\Fragment_Template($first, $params),
 				$alias
 			);
 
@@ -65,7 +60,7 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 		// Count number of computed columns so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ( ! $child->aliased() instanceof Fragment_Column)
+			if ( ! $child->aliased() instanceof \Glue\DB\Fragment_Column)
 				$i++;
 
 		// Compute alias :
@@ -84,7 +79,7 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 		// Count number of columns with such a name so far :
 		$i = 0;
 		foreach ($this->children as $child)
-			if ($child->aliased() instanceof Fragment_Column)
+			if ($child->aliased() instanceof \Glue\DB\Fragment_Column)
 				if ($child->aliased()->column()->name() === $column_name)
 					$i++;
 
@@ -98,12 +93,12 @@ class Fragment_Builder_SelectList extends Fragment_Builder {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_selectlist($this, $style);
 	}

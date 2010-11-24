@@ -2,12 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder_Setlist,
-	\Glue\DB\Fragment_Builder_Join_From,
-	\Glue\DB\Fragment_Builder_Where,
-	\Glue\DB\Fragment_Builder_Orderby,
-	\Glue\DB\Fragment_Query;
-
 /**
  * Update query data structure.
  *
@@ -16,24 +10,24 @@ use \Glue\DB\Fragment_Builder_Setlist,
  * @license MIT
  */
 
-class Fragment_Query_Update extends Fragment_Query {
+class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var Fragment_Builder_Setlist Set list.
+	 * @var \Glue\DB\Fragment_Builder_Setlist Set list.
 	 */
 	protected $set;
 
 	/**
-	 * @var Fragment_Builder_Join_From From clause.
+	 * @var \Glue\DB\Fragment_Builder_Join_From From clause.
 	 */
 	protected $from;
 
 	/**
-	 * @var Fragment_Builder_Bool_Where Where clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
 
 	/**
-	 * @var Fragment_Builder_Orderby Order by list.
+	 * @var \Glue\DB\Fragment_Builder_Orderby Order by list.
 	 */
 	protected $orderby;
 
@@ -52,10 +46,10 @@ class Fragment_Query_Update extends Fragment_Query {
 	 */
 	public function __construct() {
 		// Init children fragments :
-		$this->set		= new Fragment_Builder_Setlist();
-		$this->from		= new Fragment_Builder_Join_From();
-		$this->where	= new Fragment_Builder_Bool_Where();
-		$this->orderby	= new Fragment_Builder_Orderby();
+		$this->set		= new \Glue\DB\Fragment_Builder_Setlist();
+		$this->from		= new \Glue\DB\Fragment_Builder_Join_From();
+		$this->where	= new \Glue\DB\Fragment_Builder_Bool_Where();
+		$this->orderby	= new \Glue\DB\Fragment_Builder_Orderby();
 
 		// Set up dependecies :
 		$this->set->register_user($this);
@@ -75,10 +69,10 @@ class Fragment_Query_Update extends Fragment_Query {
 	 *
 	 * I.e. "$query->set(...)" is the same as "$query->set()->and(...)".
 	 *
-	 * @param Fragment_Column $column
+	 * @param \Glue\DB\Fragment_Column $column
 	 * @param mixed $to
 	 *
-	 * @return Fragment_Builder_List_Set
+	 * @return \Glue\DB\Fragment_Builder_List_Set
 	 */
 	public function set($column = null, $to = null) {
 		if (func_num_args() > 0) {
@@ -94,9 +88,9 @@ class Fragment_Query_Update extends Fragment_Query {
 	 * I.e. "$query->from(...)" is the same as "$query->from()->init(...)".
 	 *
 	 * @param mixed $operand Table name, aliased table fragment or join fragment.
-	 * @param Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
+	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
 	 *
-	 * @return Fragment_Builder_Join
+	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
 	public function from($operand = null, &$alias = null) {
 		if (func_num_args() > 0) {
@@ -111,7 +105,7 @@ class Fragment_Query_Update extends Fragment_Query {
 	 *
 	 * I.e. "$query->where(...)" is the same as "$query->where()->init(...)".
 	 *
-	 * @return Fragment_Builder_Bool_Where
+	 * @return \Glue\DB\Fragment_Builder_Bool_Where
 	 */
 	public function where() {
 		if (func_num_args() > 0) {
@@ -128,7 +122,7 @@ class Fragment_Query_Update extends Fragment_Query {
 	 *
 	 * I.e. "$query->orderby(...)" is the same as "$query->orderby()->and(...)".
 	 *
-	 * @return Fragment_Builder_List_Orderby
+	 * @return \Glue\DB\Fragment_Builder_List_Orderby
 	 */
 	public function orderby() {
 		if (func_num_args() > 0) {
@@ -171,11 +165,11 @@ class Fragment_Query_Update extends Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return Database
+	 * @return \Glue\DB\Database
 	 */
 	public function db() {
 		$op = $this->from();
-		while ($op instanceof Fragment_Builder_Join)
+		while ($op instanceof \Glue\DB\Fragment_Builder_Join)
 			$op = $op->first()->operand();
 		return $op->aliased()->table()->db();
 	}
@@ -183,12 +177,12 @@ class Fragment_Query_Update extends Fragment_Query {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_update($this, $style);
 	}

@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Exception;
-
 /**
  * Base fragment class.
  *
@@ -36,7 +34,7 @@ abstract class Fragment {
 	protected $users;
 
 	/**
-	 * @var Fragment Parent of this fragment in the query tree.
+	 * @var \Glue\DB\Fragment Parent of this fragment in the query tree.
 	 */
 	protected $context;
 
@@ -48,15 +46,15 @@ abstract class Fragment {
 	/**
 	 * Returns compiled SQL string according to given database SQL dialect.
 	 *
-	 * @param Database $db Database that defines what SQL dialect must be used to compile the fragment.
+	 * @param \Glue\DB\Database $db Database that defines what SQL dialect must be used to compile the fragment.
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	public function sql(Database $db = null, $style = self::STYLE_DEFAULT) {
+	public function sql(\Glue\DB\Database $db = null, $style = self::STYLE_DEFAULT) {
 		// No database given ? Means default database :
 		if ( ! isset($db))
-			$db = DB::db(Database::DEFAULTDB);
+			$db = \Glue\DB\DB::database(Database::DEFAULTDB);
 
 		// Get name of given database instance :
 		$dbname = $db->name();
@@ -73,20 +71,20 @@ abstract class Fragment {
 	 * Returns freshly compiled (i.e. not retrieved from cache) SQL string, according
 	 * to given database SQL dialect.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	abstract protected function compile(Database $db, $style);
+	abstract protected function compile(\Glue\DB\Database $db, $style);
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this
 	 * fragment to create their own SQL representation.
 	 *
-	 * @param Fragment $user
+	 * @param \Glue\DB\Fragment $user
 	 */
-	protected function register_user(Fragment $user) {
+	protected function register_user(\Glue\DB\Fragment $user) {
 		$this->users[] = $user;
 	}
 
@@ -94,9 +92,9 @@ abstract class Fragment {
 	 * Removes a fragment from the list of fragments that make direct use of this
 	 * fragment to create their own SQL representation.
 	 *
-	 * @param Fragment $user
+	 * @param \Glue\DB\Fragment $user
 	 */
-	protected function unregister_user(Fragment $user) {
+	protected function unregister_user(\Glue\DB\Fragment $user) {
 		foreach (array_reverse($this->users, true) as $i => $u) {
 			if ($u === $user) {
 				unset($this->users[$i]);
@@ -128,16 +126,16 @@ abstract class Fragment {
 	 * @param string $prop
 	 * @param mixed $value
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
 	protected function set_property($prop, $value) {
 		if ($this->$prop !== $value) {
 			// If old value of property is a fragment, we must remove the dependency :
-			if (isset($this->$prop) && $this->$prop instanceof Fragment)
+			if (isset($this->$prop) && $this->$prop instanceof \Glue\DB\Fragment)
 				$this->$prop->unregister_user($this);
 
 			// If new value of property is a fragment, we must set up the dependency :
-			if (isset($value) && $value instanceof Fragment)
+			if (isset($value) && $value instanceof \Glue\DB\Fragment)
 				$value->register_user($this);
 
 			// Set new value of property :
@@ -152,9 +150,9 @@ abstract class Fragment {
 	/**
 	 * Context getter / setter.
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
-	public function context(Fragment $context = null) {
+	public function context(\Glue\DB\Fragment $context = null) {
 		if (func_num_args() > 0) {
 			$this->context = $context;
 			return $this;
@@ -166,7 +164,7 @@ abstract class Fragment {
 	/**
 	 * Returns the top-level context.
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
 	public function root() {
 		$context = $this->context();
@@ -180,12 +178,12 @@ abstract class Fragment {
 	 * Throws an exception if there is no context to forward a function call, returns
 	 * current context otherwise.
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
 	protected function check_forwarding($function) {
 		$context = $this->context();
 		if ( ! isset($context))
-			throw new Exception("Cannot call function '" . $function . "' in such a context.");
+			throw new \Glue\DB\Exception("Cannot call function '" . $function . "' in such a context.");
 		else
 			return $context;
 	}

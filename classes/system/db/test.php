@@ -22,7 +22,7 @@ class Test {
 			self::test_fragments();
 			self::test_queries();
 		}
-		catch (Exception $e) {
+		catch (\Exception $e) {
 			//self::drop_test_tables();
 			throw $e;
 		}
@@ -37,9 +37,9 @@ class Test {
 	}
 
 	static private function drop_test_tables() {
-		try { db::database()->exec("drop table glusers");		} catch (Exception $e) {};
-		try { db::database()->exec("drop table glprofiles");	} catch (Exception $e) {};
-		try { db::database()->exec("drop table glposts");		} catch (Exception $e) {};
+		try { db::database()->exec("drop table glusers");		} catch (\Exception $e) {};
+		try { db::database()->exec("drop table glprofiles");	} catch (\Exception $e) {};
+		try { db::database()->exec("drop table glposts");		} catch (\Exception $e) {};
 	}
 
 	static private function test_fragments() {

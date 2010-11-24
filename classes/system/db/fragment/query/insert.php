@@ -2,12 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Aliased_Table,
-	\Glue\DB\Fragment_Builder_Rowlist,
-	\Glue\DB\Fragment_Builder_Columns,
-	\Glue\DB\Fragment_Table,
-	\Glue\DB\Fragment_Query;
-
 /**
  * Fragment that represents an insert query.
  *
@@ -16,19 +10,19 @@ use \Glue\DB\Fragment_Aliased_Table,
  * @license MIT
  */
 
-class Fragment_Query_Insert extends Fragment_Query {
+class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var Fragment_Aliased_Table Table to insert rows into.
+	 * @var \Glue\DB\Fragment_Aliased_Table Table to insert rows into.
 	 */
 	protected $into;
 
 	/**
-	 * @var Fragment_Builder_Rowlist Row list.
+	 * @var \Glue\DB\Fragment_Builder_Rowlist Row list.
 	 */
 	protected $values;
 
 	/**
-	 * @var Fragment_Builder_Columns Columns list.
+	 * @var \Glue\DB\Fragment_Builder_Columns Columns list.
 	 */
 	protected $columns;
 
@@ -41,13 +35,13 @@ class Fragment_Query_Insert extends Fragment_Query {
 	 * Constructor.
 	 *
 	 * @param string $table_name Name of the table you're inserting rows into.
-	 * @param Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 */
 	public function __construct($table_name = null, &$alias = null) { // TODO think...why is this constructor different into the one of select query ?
 		// Init children fragments :
-		$this->into		= new Fragment_Aliased_Table($table_name);
-		$this->values	= new Fragment_Builder_Rowlist();
-		$this->columns	= new Fragment_Builder_Columns();
+		$this->into		= new \Glue\DB\Fragment_Aliased_Table($table_name);
+		$this->values	= new \Glue\DB\Fragment_Builder_Rowlist();
+		$this->columns	= new \Glue\DB\Fragment_Builder_Columns();
 
 		// Set up dependecies :
 		$this->into->register_user($this);
@@ -72,7 +66,7 @@ class Fragment_Query_Insert extends Fragment_Query {
 	 */
 	public function into($table_name = null) {
 		if (func_num_args() > 0) {
-			$this->into->aliased(new Fragment_Table($table_name));
+			$this->into->aliased(new \Glue\DB\Fragment_Table($table_name));
 			return $this;
 		}
 		else
@@ -83,7 +77,7 @@ class Fragment_Query_Insert extends Fragment_Query {
 	 * Returns the values fragment, initializing it with given parameters if any.
 	 * You may pass an array of values or an unlimited number of parameters.
 	 *
-	 * @return Fragment_Builder_Rowlist
+	 * @return \Glue\DB\Fragment_Builder_Rowlist
 	 */
 	public function values() {
 		if (func_num_args() > 0) {
@@ -99,7 +93,7 @@ class Fragment_Query_Insert extends Fragment_Query {
 	 * Returns the columns fragment, initializing it with given parameters if any.
 	 * You may pass an array of columns or an unlimited number of parameters.
 	 *
-	 * @return Fragment_Builder_Columns
+	 * @return \Glue\DB\Fragment_Builder_Columns
 	 */
 	public function columns() {
 		if (func_num_args() > 0) {
@@ -130,7 +124,7 @@ class Fragment_Query_Insert extends Fragment_Query {
 	/**
 	 * Executes current query.
 	 *
-	 * @return Fragment_Query_Insert
+	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
 	public function execute() {
 		$return = parent::execute();
@@ -150,12 +144,12 @@ class Fragment_Query_Insert extends Fragment_Query {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_insert($this, $style);
 	}

@@ -2,11 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder_Bool_Where,
-	\Glue\DB\Fragment_Aliased_Table,
-	\Glue\DB\Fragment_Table,
-	\Glue\DB\Fragment_Query;
-
 /**
  * Fragment that represents a delete query.
  *
@@ -15,14 +10,14 @@ use \Glue\DB\Fragment_Builder_Bool_Where,
  * @license MIT
  */
 
-class Fragment_Query_Delete extends Fragment_Query {
+class Fragment_Query_Delete extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var Fragment_Aliased_Table Table to delete rows from.
+	 * @var \Glue\DB\Fragment_Aliased_Table Table to delete rows from.
 	 */
 	protected $from;
 
 	/**
-	 * @var Fragment_Builder_Bool_Where Where clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool_Where Where clause.
 	 */
 	protected $where;
 
@@ -40,12 +35,12 @@ class Fragment_Query_Delete extends Fragment_Query {
 	 * Constructor.
 	 *
 	 * @param string $table_name Name of the main table you're deleting from.
-	 * @param Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 */
 	public function __construct($table_name = null, &$alias = null) { // TODO think...why is this constructor different from the one of select query ?
 		// Init children fragments :
-		$this->where	= new Fragment_Builder_Bool_Where();
-		$this->from		= new Fragment_Aliased_Table($table_name);
+		$this->where	= new \Glue\DB\Fragment_Builder_Bool_Where();
+		$this->from		= new \Glue\DB\Fragment_Aliased_Table($table_name);
 
 		// Set up dependecies :
 		$this->where->register_user($this);
@@ -68,7 +63,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 	 */
 	public function from($table_name = null) {
 		if (func_num_args() > 0) {
-			$this->from->aliased(new Fragment_Table($table_name));
+			$this->from->aliased(new \Glue\DB\Fragment_Table($table_name));
 			return $this;
 		}
 		else
@@ -78,7 +73,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 	/**
 	 * Returns the where clause, initializing it with given parameters if any.
 	 *
-	 * @return Fragment_Builder_Bool_Where
+	 * @return \Glue\DB\Fragment_Builder_Bool_Where
 	 */
 	public function where() {
 		if (func_num_args() > 0) {
@@ -121,7 +116,7 @@ class Fragment_Query_Delete extends Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return Database
+	 * @return \Glue\DB\Database
 	 */
 	public function db() {
 		return $this->from()->aliased()->table()->db();
@@ -130,12 +125,12 @@ class Fragment_Query_Delete extends Fragment_Query {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_query_delete($this, $style);
 	}

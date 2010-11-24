@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Fragment that holds a value that must be quoted.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-class Fragment_Value extends Fragment {
+class Fragment_Value extends \Glue\DB\Fragment {
 	/**
 	 * @var mixed Value.
 	 */
@@ -44,12 +42,12 @@ class Fragment_Value extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_value($this, $style);
 	}

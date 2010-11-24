@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Fragment that represents a table.
  *
@@ -12,9 +10,9 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-class Fragment_Table extends Fragment {
+class Fragment_Table extends \Glue\DB\Fragment {
 	/**
-	 * @var Table Table.
+	 * @var \Glue\DB\Table Table.
 	 */
 	protected $table;
 
@@ -24,7 +22,7 @@ class Fragment_Table extends Fragment {
 	 * @param string $table_name
 	 */
 	public function __construct($table_name) {
-		$this->table = DB::table($table_name);
+		$this->table = \Glue\DB\DB::table($table_name);
 	}
 
 	/**
@@ -36,7 +34,7 @@ class Fragment_Table extends Fragment {
 		if (func_num_args() === 0)
 			return $this->table;
 		else {
-			$table = DB::table($table_name);
+			$table = \Glue\DB\DB::table($table_name);
 			return $this->set_property('table', $table);
 		}
 	}
@@ -44,12 +42,12 @@ class Fragment_Table extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_table($this, $style);
 	}

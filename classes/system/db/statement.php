@@ -2,7 +2,7 @@
 
 namespace Glue\System\DB;
 
-use PDOStatement, PDO;
+use \PDOStatement, \PDO;
 
 /**
  * Statement class.
@@ -16,7 +16,7 @@ use PDOStatement, PDO;
 
 class Statement extends PDOStatement {
     /**
-     * @var Database PDO instance that spawned this statement. Automatically
+     * @var \Glue\DB\Database PDO instance that spawned this statement. Automatically
      * 						passed by PDO to the constructor of this class when a new
      * 						statement is created.
      */
@@ -50,7 +50,7 @@ class Statement extends PDOStatement {
     /**
      * Constructor.
      *
-     * @param Database $db
+     * @param \Glue\DB\Database $db
      */
     protected function __construct($db) {
         $this->db = $db;
@@ -79,9 +79,9 @@ class Statement extends PDOStatement {
      * Binds a formatter to a column of the result set.
      *
      * @param string $column The column (name or integer index).
-     * @param Formatter $formatter A Formatter instance, or a PHP type as a string.
+     * @param \Glue\DB\Formatter $formatter A Formatter instance, or a PHP type as a string.
      */
-    public function bindFormatter($column, Formatter $formatter = null) {
+    public function bindFormatter($column, \Glue\DB\Formatter $formatter = null) {
     	if (isset($formatter))
     		$this->formatters[$column] = $formatter;
     	else

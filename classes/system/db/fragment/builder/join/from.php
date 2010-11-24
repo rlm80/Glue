@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder_Join;
-
 /**
  * Fragment that provides a fluent interface to build a from clause.
  *
@@ -12,16 +10,16 @@ use \Glue\DB\Fragment_Builder_Join;
  * @license    MIT
  */
 
-class Fragment_Builder_Join_From extends Fragment_Builder_Join {
+class Fragment_Builder_Join_From extends \Glue\DB\Fragment_Builder_Join {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_join_from($this, $style);
 	}

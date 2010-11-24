@@ -2,10 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Template,
-	\Glue\DB\Fragment_Operand_Bool,
-	\Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that represents a boolean expression.
  *
@@ -14,11 +10,11 @@ use \Glue\DB\Fragment_Template,
  * @license    MIT
  */
 
-class Fragment_Builder_Bool extends Fragment_Builder {
+class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Initializes the expression with a first operand.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function init() {
 		$this->reset();
@@ -31,11 +27,11 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	 * Use ->or() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR operator.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function _or() {
 		$args = func_get_args();
-		$this->add($args, Fragment_Operand_Bool::_OR);
+		$this->add($args, \Glue\DB\Fragment_Operand_Bool::_OR);
 		return $this;
 	}
 
@@ -43,11 +39,11 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	 * Use ->and() instead of this. Adds a boolean operand at the end of the expression, connecting it with
 	 * the AND operator.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function _and() {
 		$args = func_get_args();
-		$this->add($args, Fragment_Operand_Bool::_AND);
+		$this->add($args, \Glue\DB\Fragment_Operand_Bool::_AND);
 		return $this;
 	}
 
@@ -55,11 +51,11 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	 * Adds a boolean operand at the end of the expression, connecting it with
 	 * the OR NOT operator.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function ornot() {
 		$args = func_get_args();
-		$this->add($args, Fragment_Operand_Bool::ORNOT);
+		$this->add($args, \Glue\DB\Fragment_Operand_Bool::ORNOT);
 		return $this;
 	}
 
@@ -67,11 +63,11 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	 * Adds a boolean operand at the end of the expression, connecting it with
 	 * the AND NOT operator.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function andnot() {
 		$args = func_get_args();
-		$this->add($args, Fragment_Operand_Bool::ANDNOT);
+		$this->add($args, \Glue\DB\Fragment_Operand_Bool::ANDNOT);
 		return $this;
 	}
 
@@ -87,11 +83,11 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 		$first	= array_shift($values);
 
 		// Build fragment :
-		if ($first instanceof Fragment)
+		if ($first instanceof \Glue\DB\Fragment)
 			$fragment = $first;
 		else
-			$fragment = new Fragment_Template($first, $values);
-		$operand = new Fragment_Operand_Bool($fragment, $operator);
+			$fragment = new \Glue\DB\Fragment_Template($first, $values);
+		$operand = new \Glue\DB\Fragment_Operand_Bool($fragment, $operator);
 
 		// Give fragment a context :
 		$operand->context($this);
@@ -103,12 +99,12 @@ class Fragment_Builder_Bool extends Fragment_Builder {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_bool($this, $style);
 	}

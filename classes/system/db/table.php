@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Column,
-	\Glue\DB\Exception;
-
 /**
  * Base virtual table class.
  *
@@ -94,7 +91,7 @@ class Table {
 	 * @return string
 	 */
 	protected function init_dbname() {
-		return Database::DEFAULTDB; // TODO Do something better than this. We should look into each
+		return \Glue\DB\Database::DEFAULTDB; // TODO Do something better than this. We should look into each
 										   // available database and search for one that owns the real table.
 	}
 
@@ -121,7 +118,7 @@ class Table {
 		$info_table = $this->db()->table_info($this->dbtable);
 		foreach ($info_table['columns'] as $info_column) {
 			// Create column object :
-			$column = new Column(
+			$column = new \Glue\DB\Column(
 					$this,
 					$info_column['column'],
 					$info_column['type'],
@@ -146,11 +143,11 @@ class Table {
 	 * may redefine this if, for example, you wish to change the name of a real column
 	 * without impacting the PHP application, or the other way around.
 	 *
-	 * @param Column $column
+	 * @param \Glue\DB\Column $column
 	 *
 	 * @return string
 	 */
-	public function get_column_alias(Column $column) {
+	public function get_column_alias(\Glue\DB\Column $column) {
 		return $column->dbcolumn();
 	}
 
@@ -161,11 +158,11 @@ class Table {
 	 * guess the right PHP type from the db type (sqlite ?) or because you want some
 	 * funky formatting like serialization.
 	 *
-	 * @param Column $column
+	 * @param \Glue\DB\Column $column
 	 *
-	 * @return Formatter
+	 * @return \Glue\DB\Formatter
 	 */
-	public function get_column_formatter(Column $column) {
+	public function get_column_formatter(\Glue\DB\Column $column) {
 		return $this->db()->get_formatter($column);
 	}
 
@@ -181,10 +178,10 @@ class Table {
 	/**
 	 * Returns the database object this virtual table is stored into.
 	 *
-	 * @return Database
+	 * @return \Glue\DB\Database
 	 */
 	public function db() {
-		return DB::db($this->dbname);
+		return \Glue\DB\DB::database($this->dbname);
 	}
 
 	/**
@@ -228,11 +225,11 @@ class Table {
 	 *
 	 * @param string $name
 	 *
-	 * @return Column
+	 * @return \Glue\DB\Column
 	 */
 	public function column($name) {
 		if ( ! isset($this->columns[$name]))
-			throw new Exception("There is no column " . $name . " in table " . $this->name . ".");
+			throw new \Glue\DB\Exception("There is no column " . $name . " in table " . $this->name . ".");
 		return $this->columns[$name];
 	}
 
@@ -252,7 +249,7 @@ class Table {
 	 *
 	 * @param string $name Virtual table name.
 	 *
-	 * @return Table
+	 * @return \Glue\DB\Table
 	 */
 	static public function get($name) {
 		$name = strtolower($name);
@@ -267,7 +264,7 @@ class Table {
 	 *
 	 * @param string $name Virtual table name.
 	 *
-	 * @return Table
+	 * @return \Glue\DB\Table
 	 */
 	static protected function create_from_cache($name) {
 		// Look up object into cache directory :
@@ -291,13 +288,13 @@ class Table {
 	 *
 	 * @param string $name
 	 *
-	 * @return Table
+	 * @return \Glue\DB\Table
 	 */
 	static protected function create_from_class($name) {
-		$class = '\\Glue\\DB\\Table_' . ucfirst($name);
+		$class = 'Glue\\DB\\Table_' . ucfirst($name);
 		if (class_exists($class))
 			return new $class($name);
 		else
-			return \Glue\DB\Table($name);
+			return new \Glue\DB\Table($name);
 	}
 }

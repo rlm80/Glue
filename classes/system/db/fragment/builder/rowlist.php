@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Row,
-	\Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that provides a fluent interface to build a list of rows in an insert query.
  *
@@ -13,12 +10,12 @@ use \Glue\DB\Fragment_Row,
  * @license    MIT
  */
 
-class Fragment_Builder_Rowlist extends Fragment_Builder {
+class Fragment_Builder_Rowlist extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds an element at the end of the rows list. You may pass an array of values,
 	 * or an unlimited number of parameters.
 	 *
-	 * @return Fragment_Row
+	 * @return \Glue\DB\Fragment_Row
 	 */
 	public function _and() {
 		// Get values :
@@ -29,7 +26,7 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 			$values = $args;
 
 		// Build fragment :
-		$fragment = new Fragment_Row($values);
+		$fragment = new \Glue\DB\Fragment_Row($values);
 
 		// Give fragment context :
 		$fragment->context($this);
@@ -44,12 +41,12 @@ class Fragment_Builder_Rowlist extends Fragment_Builder {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_rowlist($this, $style);
 	}

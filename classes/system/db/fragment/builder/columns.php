@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that provides a fluent interface to build a list of columns.
  *
@@ -12,15 +10,15 @@ use \Glue\DB\Fragment_Builder;
  * @license    MIT
  */
 
-class Fragment_Builder_Columns extends Fragment_Builder {
+class Fragment_Builder_Columns extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds an column at the end of the columns list.
 	 *
-	 * @param Fragment_Column $column
+	 * @param \Glue\DB\Fragment_Column $column
 	 *
-	 * @return Fragment_Builder_Columns
+	 * @return \Glue\DB\Fragment_Builder_Columns
 	 */
-	public function _and(Fragment_Column $column) {
+	public function _and(\Glue\DB\Fragment_Column $column) {
 		$this->push($column);
 		return $this;
 	}
@@ -28,12 +26,12 @@ class Fragment_Builder_Columns extends Fragment_Builder {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_columns($this, $style);
 	}

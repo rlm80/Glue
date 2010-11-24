@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder_Bool;
-
 /**
  * Fragment that provides a fluent interface to build a having clause.
  *
@@ -12,16 +10,16 @@ use \Glue\DB\Fragment_Builder_Bool;
  * @license    MIT
  */
 
-class Fragment_Builder_Bool_Having extends Fragment_Builder_Bool {
+class Fragment_Builder_Bool_Having extends \Glue\DB\Fragment_Builder_Bool {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_bool_having($this, $style);
 	}

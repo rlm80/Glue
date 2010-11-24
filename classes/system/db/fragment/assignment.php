@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Value,
-	\Glue\DB\Fragment;
-
 /**
  * Fragment that represents an assignment in an update query.
  *
@@ -13,24 +10,24 @@ use \Glue\DB\Fragment_Value,
  * @license    MIT
  */
 
-class Fragment_Assignment extends Fragment {
+class Fragment_Assignment extends \Glue\DB\Fragment {
 	/**
-	 * @var Fragment_Column Left side of the assignment.
+	 * @var \Glue\DB\Fragment_Column Left side of the assignment.
 	 */
 	protected $column;
 
 	/**
-	 * @var Fragment Right side of the assignment.
+	 * @var \Glue\DB\Fragment Right side of the assignment.
 	 */
 	protected $to;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Fragment_Column $set
+	 * @param \Glue\DB\Fragment_Column $set
 	 * @param mixed $to
 	 */
-	public function __construct(Fragment_Column $column, $to = null) {
+	public function __construct(\Glue\DB\Fragment_Column $column, $to = null) {
 		$this->column($column);
 		$this->to($to);
 	}
@@ -38,11 +35,11 @@ class Fragment_Assignment extends Fragment {
 	/**
 	 * Left side of the assignment getter/setter.
 	 *
-	 * @param Fragment_Column $column
+	 * @param \Glue\DB\Fragment_Column $column
 	 *
 	 * @return mixed
 	 */
-	public function column(Fragment_Column $column = null) {
+	public function column(\Glue\DB\Fragment_Column $column = null) {
 		if (func_num_args() === 0)
 			return $this->column;
 		else
@@ -61,8 +58,8 @@ class Fragment_Assignment extends Fragment {
 			return $this->to;
 		else {
 			// Turn parameter into a fragment if it isn't already :
-			if ( ! $to instanceof Fragment)
-				$to = new Fragment_Value($to);
+			if ( ! $to instanceof \Glue\DB\Fragment)
+				$to = new \Glue\DB\Fragment_Value($to);
 
 			// Replace to by new fragment :
 			return $this->set_property('to', $to);
@@ -72,12 +69,12 @@ class Fragment_Assignment extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_assignment($this, $style);
 	}

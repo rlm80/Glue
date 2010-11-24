@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Builders are fragments that provide a fluent API to build an assembly of children fragments.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-abstract class Fragment_Builder extends Fragment {
+abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	/**
 	 * @var array List of children fragments.
 	 */
@@ -21,9 +19,9 @@ abstract class Fragment_Builder extends Fragment {
 	/**
 	 * Adds a child at the end of the children list.
 	 *
-	 * @param Fragment $fragment
+	 * @param \Glue\DB\Fragment $fragment
 	 */
-	protected function push(Fragment $fragment) {
+	protected function push(\Glue\DB\Fragment $fragment) {
 		$this->children[] = $fragment;
 		$fragment->register_user($this);
 		$this->invalidate();
@@ -32,7 +30,7 @@ abstract class Fragment_Builder extends Fragment {
 	/**
 	 * Returns last fragment pushed, or false if there is no such fragment.
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
 	public function last() {
 		return end($this->children);
@@ -41,7 +39,7 @@ abstract class Fragment_Builder extends Fragment {
 	/**
 	 * Returns first fragment pushed, or false if there is no such fragment.
 	 *
-	 * @return Fragment
+	 * @return \Glue\DB\Fragment
 	 */
 	public function first() {
 		return reset($this->children);
@@ -50,7 +48,7 @@ abstract class Fragment_Builder extends Fragment {
 	/**
 	 * Removes the last child at the end of the children list.
 	 *
-	 * @return Fragment_Builder
+	 * @return \Glue\DB\Fragment_Builder
 	 */
 	public function pop() {
 		$fragment = array_pop($this->children);
@@ -62,7 +60,7 @@ abstract class Fragment_Builder extends Fragment {
 	/**
 	 * Removes all children.
 	 *
-	 * @return Fragment_Builder
+	 * @return \Glue\DB\Fragment_Builder
 	 */
 	public function reset() {
 		while (count($this->children) > 0)

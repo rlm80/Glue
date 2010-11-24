@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Aliased;
-
 /**
  * Fragment that represents an aliased column in a select list.
  *
@@ -12,15 +10,15 @@ use \Glue\DB\Fragment_Aliased;
  * @license    MIT
  */
 
-class Fragment_Aliased_Column extends Fragment_Aliased {
+class Fragment_Aliased_Column extends \Glue\DB\Fragment_Aliased {
 	/**
 	 * Sets up binding between statement data and the column.
 	 *
-	 * @param Statement $stmt
+	 * @param \Glue\DB\Statement $stmt
 	 * @param integer $index
 	 * @param boolean $delayed
 	 */
-	public function bind(Statement $stmt, $index, $delayed) {
+	public function bind(\Glue\DB\Statement $stmt, $index, $delayed) {
 		$column	= $this->aliased();
 		$alias	= $this->as();
 		$column->bind($stmt, $alias, $index, $delayed);

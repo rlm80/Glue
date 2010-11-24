@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Fragment that represents anything that compiles into "... AS ...".
  *
@@ -12,9 +10,9 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-class Fragment_Aliased extends Fragment {
+class Fragment_Aliased extends \Glue\DB\Fragment {
 	/**
-	 * @var Fragment Fragment that needs to have an alias.
+	 * @var \Glue\DB\Fragment Fragment that needs to have an alias.
 	 */
 	protected $aliased;
 
@@ -26,10 +24,10 @@ class Fragment_Aliased extends Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param Fragment $aliased
+	 * @param \Glue\DB\Fragment $aliased
 	 * @param string $as
 	 */
-	public function __construct(Fragment $aliased, $as = null) {
+	public function __construct(\Glue\DB\Fragment $aliased, $as = null) {
 		$this->aliased($aliased);
 		$this->as($as);
 	}
@@ -37,11 +35,11 @@ class Fragment_Aliased extends Fragment {
 	/**
 	 * Fragment getter/setter.
 	 *
-	 * @param Fragment $aliased
+	 * @param \Glue\DB\Fragment $aliased
 	 *
 	 * @return mixed
 	 */
-	public function aliased(Fragment $aliased = null) {
+	public function aliased(\Glue\DB\Fragment $aliased = null) {
 		if (func_num_args() === 0)
 			return $this->aliased;
 		else
@@ -65,12 +63,12 @@ class Fragment_Aliased extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	function compile(Database $db, $style) {
+	function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_aliased($this, $style);
 	}

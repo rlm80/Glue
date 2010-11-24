@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Base fragement class for queries.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Fragment;
  * @license MIT
  */
 
-abstract class Fragment_Query extends Fragment {
+abstract class Fragment_Query extends \Glue\DB\Fragment {
 	/**
 	 * @var integer Number of rows affected by the last call to execute().
 	 */
@@ -30,7 +28,7 @@ abstract class Fragment_Query extends Fragment {
 	/**
 	 * Returns database object, determined from the tables this query manipulates.
 	 *
-	 *  @return Database
+	 *  @return \Glue\DB\Database
 	 */
 	abstract public function db();
 
@@ -40,7 +38,7 @@ abstract class Fragment_Query extends Fragment {
 	 * $sql = DB::select('mytable')->where('1=1')->sql(); // Doesn't work ! Returns only the SQL of the last builder accessed : the where clause.
 	 * $sql = DB::select('mytable')->where('1=1')->query()->sql(); // Works. Returns the SQL of the whole query.
 	 *
-	 * @return Fragment_Query
+	 * @return \Glue\DB\Fragment_Query
 	 */
 	public function query() {
 		return $this;
@@ -52,7 +50,7 @@ abstract class Fragment_Query extends Fragment {
 	 * more than once, or if you need query parameters, this is the method of choice for security
 	 * and performance.
 	 *
-	 * @return Statement
+	 * @return \Glue\DB\Statement
 	 */
 	public function prepare(array $driver_options = array()) {
 		$db = $this->db();
@@ -63,7 +61,7 @@ abstract class Fragment_Query extends Fragment {
 	/**
 	 * Executes current query.
 	 *
-	 * @return Fragment_Query
+	 * @return \Glue\DB\Fragment_Query
 	 */
 	public function execute() {
 		$db = $this->db();

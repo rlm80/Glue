@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use Glue\DB\Database as Database;
-
 /**
  * Base MySQL database class.
  *
@@ -12,7 +10,7 @@ use Glue\DB\Database as Database;
  * @license    MIT
  */
 
-class Database_MySQL extends Database {
+class Database_MySQL extends \Glue\DB\Database {
 	/**
 	 * @var string The hostname on which the database server resides.
 	 */
@@ -147,11 +145,11 @@ class Database_MySQL extends Database {
 	/**
 	 * Returns the appropriate formatter for given column.
 	 *
-	 * @param Column $column
+	 * @param \Glue\DB\Column $column
 	 *
-	 * @return Formatter
+	 * @return \Glue\DB\Formatter
 	 */
-	public function get_formatter(Column $column)  {
+	public function get_formatter(\Glue\DB\Column $column)  {
 		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
 		if (preg_match('/^\S+/', $column->dbtype(), $matches))
 			$dbtype = $matches[0];
@@ -163,39 +161,39 @@ class Database_MySQL extends Database {
 		switch ($dbtype) {
 			// Integer types :
 			case 'TINYINT'; case 'SMALLINT'; case 'MEDIUMINT'; case 'INT'; case 'BIGINT';
-				$formatter = new Formatter_Integer;
+				$formatter = new \Glue\DB\Formatter_Integer;
 				break;
 
 			// Real types :
 			case 'FLOAT'; case 'DOUBLE'; case 'DECIMAL';
-				$formatter = new Formatter_Float;
+				$formatter = new \Glue\DB\Formatter_Float;
 				break;
 
 			// Boolean types :
 			case 'BIT';
-				$formatter = new Formatter_Boolean;
+				$formatter = new \Glue\DB\Formatter_Boolean;
 				break;
 
 			// String types :
 			case 'CHAR'; case 'VARCHAR'; case 'TINYTEXT'; case 'TEXT';
 			case 'MEDIUMTEXT'; case 'LONGTEXT'; case 'ENUM'; case 'SET';
-				$formatter = new Formatter_String;
+				$formatter = new \Glue\DB\Formatter_String;
 				break;
 
 			// Binary types :
 			case 'BINARY'; case 'VARBINARY'; case 'TINYBLOB'; case 'BLOB';
 			case 'MEDIUMBLOB'; case 'LONGBLOB';
-				$formatter = new Formatter_String; // TODO Is this the right thing to do ?
+				$formatter = new \Glue\DB\Formatter_String; // TODO Is this the right thing to do ?
 				break;
 
 			// Date and time types :
 			case 'DATE'; case 'DATETIME'; case 'TIME'; case 'TIMESTAMP'; case 'YEAR';
-				$formatter = new Formatter_String; // TODO Is this the right thing to do ?
+				$formatter = new \Glue\DB\Formatter_String; // TODO Is this the right thing to do ?
 				break;
 
 			// Default :
 			default;
-				throw new Kohana_Exception("Unknown MySQL data type : " . $dbtype);
+				throw new \Glue\DB\Exception("Unknown MySQL data type : " . $dbtype);
 		}
 
 		return $formatter;

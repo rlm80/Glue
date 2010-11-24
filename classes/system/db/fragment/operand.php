@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Fragment that represents an operand in an expression.
  *
@@ -12,23 +10,24 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-abstract class Fragment_Operand extends Fragment {
+abstract class Fragment_Operand extends \Glue\DB\Fragment {
 	/**
 	 * @var integer Operator.
 	 */
 	protected $operator;
 
 	/**
-	 * @var Fragment Operand.
+	 * @var \Glue\DB\Fragment Operand.
 	 */
 	protected $operand;
 
 	/**
 	 * Constructor.
-	 *
+	 * 
+	 * @param \Glue\DB\Fragment $operand
 	 * @param integer $operator Null means first operand.
 	 */
-	public function __construct(Fragment $operand, $operator = null) {
+	public function __construct(\Glue\DB\Fragment $operand, $operator = null) {
 		$this->operand($operand);
 		$this->operator($operator);
 	}
@@ -50,11 +49,11 @@ abstract class Fragment_Operand extends Fragment {
 	/**
 	 * Operand getter/setter.
 	 *
-	 * @param Fragment $operand
+	 * @param \Glue\DB\Fragment $operand
 	 *
 	 * @return mixed
 	 */
-	public function operand(Fragment $operand = null) {
+	public function operand(\Glue\DB\Fragment $operand = null) {
 		if (func_num_args() === 0)
 			return $this->operand;
 		else

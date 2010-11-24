@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment;
-
 /**
  * Fragment that represents anything that compiles into "... ASC" or "... DESC".
  *
@@ -12,13 +10,13 @@ use \Glue\DB\Fragment;
  * @license    MIT
  */
 
-class Fragment_Ordered extends Fragment {
+class Fragment_Ordered extends \Glue\DB\Fragment {
 	// Order constants :
 	const ASC	= 0;
 	const DESC	= 1;
 
 	/**
-	 * @var Fragment Fragment that needs to have an order.
+	 * @var \Glue\DB\Fragment Fragment that needs to have an order.
 	 */
 	protected $ordered;
 
@@ -30,10 +28,10 @@ class Fragment_Ordered extends Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param Fragment $ordered
+	 * @param \Glue\DB\Fragment $ordered
 	 * @param integer $ordered
 	 */
-	public function __construct(Fragment $ordered, $order = null) {
+	public function __construct(\Glue\DB\Fragment $ordered, $order = null) {
 		$this->ordered($ordered);
 		$this->order($order);
 	}
@@ -41,19 +39,19 @@ class Fragment_Ordered extends Fragment {
 	/**
 	 * Sets order to ASC.
 	 *
-	 * @return Fragment_Ordered
+	 * @return \Glue\DB\Fragment_Ordered
 	 */
 	public function asc() {
-		return $this->order(Fragment_Ordered::ASC);
+		return $this->order(\Glue\DB\Fragment_Ordered::ASC);
 	}
 
 	/**
 	 * Sets order to DESC.
 	 *
-	 * @return Fragment_Ordered
+	 * @return \Glue\DB\Fragment_Ordered
 	 */
 	public function desc() {
-		return $this->order(Fragment_Ordered::DESC);
+		return $this->order(\Glue\DB\Fragment_Ordered::DESC);
 	}
 
 	/**
@@ -73,11 +71,11 @@ class Fragment_Ordered extends Fragment {
 	/**
 	 * Fragment getter/setter.
 	 *
-	 * @param Fragment $ordered
+	 * @param \Glue\DB\Fragment $ordered
 	 *
 	 * @return mixed
 	 */
-	public function ordered(Fragment $ordered = null) {
+	public function ordered(\Glue\DB\Fragment $ordered = null) {
 		if (func_num_args() === 0)
 			return $this->ordered;
 		else
@@ -87,12 +85,12 @@ class Fragment_Ordered extends Fragment {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_ordered($this, $style);
 	}

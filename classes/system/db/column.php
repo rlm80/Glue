@@ -14,7 +14,7 @@ namespace Glue\System\DB;
 
 class Column {
 	/**
-	 * @var Table Virtual table this column belongs to.
+	 * @var \Glue\DB\Table Virtual table this column belongs to.
 	 */
 	protected $table;
 
@@ -24,7 +24,7 @@ class Column {
 	protected $name;
 
 	/**
-	 * @var Formatter Formatter object to format values coming from and going to this column.
+	 * @var \Glue\DB\Formatter Formatter object to format values coming from and going to this column.
 	 */
 	protected $formatter;
 
@@ -71,7 +71,7 @@ class Column {
 	/**
 	 * Constructor.
 	 */
-	public function __construct(Table $table, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
+	public function __construct(\Glue\DB\Table $table, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
 		// Init properties :
 		$this->table		= $table;
 		$this->dbcolumn		= $dbcolumn;
@@ -100,7 +100,7 @@ class Column {
 	/**
 	 * Returns the virtual table of this column.
 	 *
-	 * @return Table
+	 * @return \Glue\DB\Table
 	 */
 	public function table() {
 		return $this->table;
@@ -109,7 +109,7 @@ class Column {
 	/**
 	 * Returns formatter.
 	 *
-	 * @return Formatter
+	 * @return \Glue\DB\Formatter
 	 */
 	public function formatter() {
 		return $this->formatter;

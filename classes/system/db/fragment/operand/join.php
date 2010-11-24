@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Builder_Bool,
-	\Glue\DB\Fragment_Operand;
-
 /**
  * Fragment that represents an operand in a join expression.
  *
@@ -13,26 +10,26 @@ use \Glue\DB\Fragment_Builder_Bool,
  * @license    MIT
  */
 
-class Fragment_Operand_Join extends Fragment_Operand {
+class Fragment_Operand_Join extends \Glue\DB\Fragment_Operand {
 	// Join operators :
 	const LEFT_OUTER_JOIN	= 0;
 	const RIGHT_OUTER_JOIN	= 1;
 	const INNER_JOIN		= 2;
 
 	/**
-	 * @var Fragment_Builder_Bool On clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool On clause.
 	 */
 	protected $on;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Fragment $operand
+	 * @param \Glue\DB\Fragment $operand
 	 * @param integer $operator Null means first operand of join expression => no on clause.
 	 */
-	public function __construct(Fragment $operand, $operator = null) {
+	public function __construct(\Glue\DB\Fragment $operand, $operator = null) {
 		parent::__construct($operand, $operator);
-		$this->on = new Fragment_Builder_Bool();
+		$this->on = new \Glue\DB\Fragment_Builder_Bool();
 		$this->on->register_user($this);
 		$this->on->context($this);
 	}
@@ -40,7 +37,7 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	/**
 	 *  Returns the on clause, initializing it with given parameters if any.
 	 *
-	 * @return Fragment_Builder_Bool
+	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function on() { // TODO think more about this function
 		if (func_num_args() > 0) {
@@ -54,7 +51,7 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	/**
 	 * Forwards call to operand.
 	 *
-	 * @return Fragment_Operand_Join
+	 * @return \Glue\DB\Fragment_Operand_Join
 	 */
 	public function _as($alias) {
 		$this->operand()->_as($alias);
@@ -64,12 +61,12 @@ class Fragment_Operand_Join extends Fragment_Operand {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_operand_join($this, $style);
 	}

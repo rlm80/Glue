@@ -2,8 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Operand;
-
 /**
  * Fragment that represents an operand in a boolean expression.
  *
@@ -12,7 +10,7 @@ use \Glue\DB\Fragment_Operand;
  * @license    MIT
  */
 
-class Fragment_Operand_Bool extends Fragment_Operand {
+class Fragment_Operand_Bool extends \Glue\DB\Fragment_Operand {
 	// Boolean operators :
 	const _AND		= 0;
 	const _OR		= 1;
@@ -22,12 +20,12 @@ class Fragment_Operand_Bool extends Fragment_Operand {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_operand_bool($this, $style);
 	}

@@ -2,9 +2,6 @@
 
 namespace Glue\System\DB;
 
-use \Glue\DB\Fragment_Ordered,
-	\Glue\DB\Fragment_Builder;
-
 /**
  * Fragment that provides a fluent interface to build an order by clause.
  *
@@ -13,12 +10,12 @@ use \Glue\DB\Fragment_Ordered,
  * @license    MIT
  */
 
-class Fragment_Builder_Orderby extends Fragment_Builder {
+class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds an element at the end of the order by. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.
 	 *
-	 * @return Fragment_Ordered
+	 * @return \Glue\DB\Fragment_Ordered
 	 */
 	public function _and() {
 		// Get params :
@@ -28,10 +25,10 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 		$first = array_shift($params);
 
 		// Build fragment :
-		if ($first instanceof Fragment)
-			$fragment = new Fragment_Ordered($first);
+		if ($first instanceof \Glue\DB\Fragment)
+			$fragment = new \Glue\DB\Fragment_Ordered($first);
 		else
-			$fragment = new Fragment_Ordered(new Fragment_Template($first, $params));
+			$fragment = new \Glue\DB\Fragment_Ordered(new \Glue\DB\Fragment_Template($first, $params));
 
 		// Give fragment a context :
 		$fragment->context($this);
@@ -46,12 +43,12 @@ class Fragment_Builder_Orderby extends Fragment_Builder {
 	/**
 	 * Forwards call to given database.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Database $db
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(Database $db, $style) {
+	protected function compile(\Glue\DB\Database $db, $style) {
 		// Forwards call to database :
 		return $db->compile_builder_orderby($this, $style);
 	}
