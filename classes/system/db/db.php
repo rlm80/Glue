@@ -14,22 +14,22 @@ namespace Glue\System\DB;
 
 class DB {
 	/**
-	 * We need to define this so that PHP doesn't think the function db() is the constructor.
-	 */
-	private function __construct() {}
-
-	/**
-	 * Returns the database object identified by $db_name.
+	 * Returns a connection that is a singleton instance of the database class identified by $id
+	 * in the connections array of \Glue\DB\Config. Calling the function with no parameter returns
+	 * the default connection, which is a singleton instance of the first database class to appear
+	 * in the connections array.
 	 *
-	 * Subsequent calls to this function with the same parameter will return the same database
-	 * instance, instead of creating a new one.
-	 *
-	 * @param string $db_name
+	 * @param string $id
 	 *
 	 * @return \Glue\DB\Database
 	 */
-	public static function db($db_name = \Glue\DB\Database::DEFAULTDB) {
-		return \Glue\DB\Database::get($db_name);
+	public static function db($id = null) {
+		// No connection identifier given means first element in the connection array :
+		if ( ! isset($id)) {
+			$connections = \Glue\DB\Config::connections();
+			list($id, ) = each($connections);
+		}
+		return \Glue\DB\Database::get($id);
 	}
 
 	/**
@@ -170,4 +170,9 @@ class DB {
 		else
 			return $f;
 	}
+
+	/**
+	 * We need to define this so that PHP doesn't think the function db() is the constructor.
+	 */
+	private function __construct() {}
 }

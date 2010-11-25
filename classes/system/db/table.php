@@ -91,7 +91,7 @@ class Table {
 	 * @return string
 	 */
 	protected function init_dbname() {
-		return \Glue\DB\Database::DEFAULTDB; // TODO Do something better than this. We should look into each
+		return 'default'; // TODO Do something better than this. We should look into each
 										   // available database and search for one that owns the real table.
 	}
 

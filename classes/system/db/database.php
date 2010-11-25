@@ -18,11 +18,6 @@ use \PDO;
 
 abstract class Database extends PDO {
 	/**
-	 * @var string Name of the default database.
-	 */
-	const DEFAULTDB = 'Primary';
-
-	/**
 	 * @var array Database instances cache.
 	 */
 	static protected $instances = array();
@@ -98,7 +93,7 @@ abstract class Database extends PDO {
 	abstract protected function dsn();
 
 	/**
-	 * Getter for database name.
+	 * Getter for database identifier.
 	 *
 	 * @return string
 	 */
@@ -147,34 +142,33 @@ abstract class Database extends PDO {
 	abstract public function real_tables();
 
 	/**
-	 * Lazy loads a database object, stores it in cache, and returns it.
+	 * Returns a database object from cache, or creates it if it isn't there already.
 	 *
-	 * @param string $name
+	 * @param string $id
 	 *
 	 * @return \Glue\DB\Database
 	 */
-	static public function get($name) {
-		$name = strtolower($name);
-		if( ! isset(self::$instances[$name]))
-			self::$instances[$name] = self::create($name);
-		return self::$instances[$name];
+	static public function get($id) {
+		if( ! isset(self::$instances[$id]))
+			self::$instances[$id] = self::create($id);
+		return self::$instances[$id];
 	}
 
 	/**
-	 * Returns a new database instance. Throws class not found exception if
-	 * no class is defined for given database.
+	 * Creates a new database instance and returns it.
 	 *
-	 * @param string $name
+	 * @param string $id
 	 *
 	 * @return \Glue\DB\Database
 	 */
-	static protected function create($name) {
+	static protected function create($id) {
 		// Class name :
-		$class = 'Glue\\DB\\Database_' . ucfirst($name);
+		$connections	= \Glue\DB\Config::connections();
+		$class			= $connections[$id];
 
 		// Unlock constructor, create instance and relock constructor :
 		self::$constuctor_locked = false;
-		$instance = new $class($name);
+		$instance = new $class($id);
 		self::$constuctor_locked = true;
 
 		return $instance;

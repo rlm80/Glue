@@ -22,7 +22,7 @@ class Database_MySQL extends \Glue\DB\Database {
 	protected $port;
 
 	/**
-	 * @var string The name of the database.
+	 * @var string The name of the database. TODO rename this $database and renamed $name as $id + same with columns, tables...
 	 */
 	protected $dbname;
 
