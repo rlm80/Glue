@@ -35,14 +35,12 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p><b>Class aliases</b> live in the <span class="inline_code">\Glue</span> namespace. By default, the alias <span class="inline_code">\Glue\A</span> points to the system class <span class="inline_code">\Glue\System\A</span>. However, if you define a user class <span class="inline_code">\Glue\User\A</span>, then the alias <span class="inline_code">\Glue\A</span> will start pointing to your <span class="inline_code">\Glue\User\A</span> class instead. In other words, a user class takes precedence over a system class of the same name.</p>
 
-<p>You can picture yourself the aliasing process that populates the <span class="inline_code">\Glue</span> namespace this way :</p>
-
-<div style="overflow: auto; text-indent: 20px; font-weight: bold">System classes (\Glue\System)
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">System classes (\Glue\System namespace)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px; visibility:hidden;">C</div>
 </div>
-<div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes (\Glue\User)
+<div style="overflow: auto; text-indent: 20px; font-weight: bold">User classes (\Glue\User namespace)
 	<div style="text-indent: 0px; height: 54px; float: left; width: 54px; line-height: 54px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
@@ -52,7 +50,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 	<div style="text-indent: 0px; height: 25px; float: left; width: 54px; line-height: 25px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
 	<div style="text-indent: 0px; height: 25px; float: left; width: 54px; line-height: 25px; text-align: center; font-size: 25px; margin: 5px;">&uarr;</div>
 </div>
-<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin : 0 0 20px 0">Class aliases (\Glue)
+<div style="overflow: auto; text-indent: 20px; font-weight: bold; margin : 0 0 20px 0">Class aliases (\Glue namespace)
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: yellow; border: 2px solid black; margin: 5px;">A</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">B</div>
 	<div style="text-indent: 0px; height: 50px; float: left; width: 50px; line-height: 50px; text-align: center; background-color: red; border: 2px solid black; margin: 5px;">C</div>
@@ -62,7 +60,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. You only define classes in the user directory. This way you can upgrade to the next version of the library with no fear of losing your changes, if you made some.</p>
 
-<p>To provide the ability to change the behavior of the library without actually touching its code is the whole point of the aliasing system.</p>
+<p>To provide the ability to customize the library without actually touching its code is the whole point of the aliasing system.</p>
 
 <h2>Creating user classes</h2>
 
