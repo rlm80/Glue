@@ -5,9 +5,7 @@ title: Guide
 
 <h2>Defining options</h2>
 
-<p>There is no config file.</p>
-
-<p>All available options are protected properties of the main DBAL class <span class="inline_code">\Glue\System\DB\DB</span> . They are assigned default values on declaration. If these default values don't suit your needs, the best way to change them is to <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\DB</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\DB</span> class.</p>
+<p>There is no config file. All available options are protected properties of the <span class="inline_code">\Glue\DB\Config</span> class. They are assigned default values on declaration. If these default values don't suit your needs, you must <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\Config</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\DB</span> class.</p>
 
 <p>You may either override the properties declarations :</p>
 
@@ -17,7 +15,7 @@ title: Guide
 
   namespace Glue\User\DB;
 
-  class DB extends \Glue\System\DB\DB {
+  class Config extends \Glue\System\DB\Config {
     // Properties declarations override :
     protected $some_option    = 'some value';
     protected $another_option = 2;
@@ -32,7 +30,7 @@ title: Guide
 
   namespace Glue\User\DB;
 
-  class DB extends \Glue\System\DB\DB {
+  class Config extends \Glue\System\DB\Config {
     // Constructor override :
     protected function __construct() {
       $this->some_option    = 'some ' . 'value';
@@ -40,17 +38,20 @@ title: Guide
     }
   }
 ?>
+
+<p>This method also has the added benefit that your IDE will show you all available options just after you type <span class="inline_code">$this-></span>.</p>
+
 {% endhighlight %}
 
 <h2>Accessing options</h2>
 
-<p>For each option property called <span class="inline_code">&lt;myoption&gt;,</span> there is a static getter called <span class="inline_code">DB::option_&lt;myoption&gt;()</span> :</p>
+<p>For each option property called <span class="inline_code">&lt;myoption&gt;,</span> there is a static getter called <span class="inline_code">DB::&lt;myoption&gt;()</span> :</p>
 
 {% highlight php %}
 <?php
-  use \Glue\DB\DB;
+  use \Glue\DB\Config;
   
-  $myvalue = DB::option_myoption();
+  $myvalue = Config::myoption();
 ?>
 {% endhighlight %}
 
