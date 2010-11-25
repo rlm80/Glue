@@ -5,13 +5,13 @@ title: Guide
 
 <h2>Defining options</h2>
 
-<p>There is no config file. All available options are protected properties of the <span class="inline_code">\Glue\DB\Config</span> class. They are assigned default values on declaration. If these default values don't suit your needs, you must <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\Config</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\DB</span> class.</p>
+<p>There is no config file. All available options are protected properties of the <span class="inline_code">\Glue\DB\Config</span> class. They are assigned default values on declaration. If these default values don't suit your needs, you must <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\Config</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\Config</span> class.</p>
 
 <p>You may either override the properties declarations :</p>
 
 {% highlight php %}
 <?php
-  // File classes/user/db/db.php
+  // File classes/user/db/config.php
 
   namespace Glue\User\DB;
 
@@ -26,13 +26,14 @@ title: Guide
 <p>Or you may override the constructor if you need expressions that aren't constants :</p>
 {% highlight php %}
 <?php
-  // File classes/user/db/db.php
+  // File classes/user/db/config.php
 
   namespace Glue\User\DB;
 
   class Config extends \Glue\System\DB\Config {
     // Constructor override :
     protected function __construct() {
+      parent::__construct();
       $this->some_option    = 'some ' . 'value';
       $this->another_option = 1 + 1;	  
     }
