@@ -7,7 +7,9 @@ title: Guide
 
 <p>There is no config file.</p>
 
-<p>All available options are protected properties of the main DBAL class <span class="inline_code">\Glue\System\DB\DB</span> . They are assigned default values on declaration. If these default values don't suit your needs, the best way to change them is to <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\DB</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\DB</span> class like so :</p>
+<p>All available options are protected properties of the main DBAL class <span class="inline_code">\Glue\System\DB\DB</span> . They are assigned default values on declaration. If these default values don't suit your needs, the best way to change them is to <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\DB</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\DB</span> class.</p>
+
+<p>You may either override the properties declarations :</p>
 
 {% highlight php %}
 <?php
@@ -16,16 +18,25 @@ title: Guide
   namespace Glue\User\DB;
 
   class DB extends \Glue\System\DB\DB {
-    // You may override the option declaration like this :
-    protected $some_option = 'some value';
+    // Properties declarations override :
+    protected $some_option    = 'some value';
+    protected $another_option = 2;
+  }
+?>
+{% endhighlight %}
 
-    // Or preferably you may override the constructor of the singleton like this :
+<p>Or you may override the constructor if you need expressions that aren't constants :</p>
+{% highlight php %}
+<?php
+  // File classes/user/db/db.php
+
+  namespace Glue\User\DB;
+
+  class DB extends \Glue\System\DB\DB {
+    // Constructor override :
     protected function __construct() {
-      parent::__construct();
-
-      // Set options :
-      $this->some_other_option = 'some ' . 'other ' . 'value';
-      $this->yet_another_option = 1 + 1;
+      $this->some_option    = 'some ' . 'value';
+      $this->another_option = 1 + 1;	  
     }
   }
 ?>
