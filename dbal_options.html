@@ -1,0 +1,46 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Defining options</h2>
+
+<p>There is no config file.</p>
+
+<p>All available options are protected properties of the main database class ~\Glue\System\DB\DB . They are assigned default values on declaration. The best way to change these values is to <a href="/Glue/file_system.html#override_with_extension">override</a> the ~\Glue\System\DB\DB system class with your own copy by creating a ~\Glue\User\DB\DB class like so :</p>
+
+{% highlight php %}
+<?php
+  // File classes/user/db/db.php
+  
+  namespace Glue\User\DB;
+  
+  class DB extends \Glue\System\DB\DB {
+    // You may override the option declaration like this :
+    protected $some_option = 'some value';
+	
+	// Or preferably you may override the constructor like this :
+	protected function __construct() {
+	  parent::__construct();
+	  
+	  // Set options :
+	  $this->some_other_option = 'some ' . 'other ' . 'value';
+	  $this->yet_another_option = 1 + 1;
+	}
+  }
+?>
+{% endhighlight %}
+
+<h2>Accessing options</h2>
+
+<p>For each option property called ~&lt;myoption&gt;, there is a static getter called ~DB::option_&lt;myoption&gt;() :</p>
+
+{% highlight php %}
+<?php
+  use \Glue\DB\DB;
+  
+  $myvalue = DB::option_myoption();
+?>
+{% endhighlight %}
+
+<h2>Available options</h2>

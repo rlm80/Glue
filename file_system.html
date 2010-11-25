@@ -84,7 +84,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 <?php
   // File classes/user/db/foo/bar.php
   
-  namespace \Glue\User\DB;
+  namespace Glue\User\DB;
   
   class Foo_Bar extends \Glue\DB\Foo {
   
@@ -92,7 +92,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 ?>
 {% endhighlight %}
 
-<p>In the code above, notice the use of the <span class="inline_code">\Glue\DB\Foo</span> alias. This way, if the system class <span class="inline_code">\Glue\System\DB\Foo</span> is ever overriden by the user class <span class="inline_code">\Glue\User\DB\Foo</span>, or code, like the rest of the library, will automatically benefit from the change.</p>
+<p>In the code above, notice the use of the <span class="inline_code">\Glue\DB\Foo</span> alias. This way, if the system class <span class="inline_code">\Glue\System\DB\Foo</span> is ever overriden by the user class <span class="inline_code">\Glue\User\DB\Foo</span>, your code will automatically benefit from the change with the rest of the library.</p>
 
 <h3>Overriding a system class with your own version</h3>
 
@@ -102,7 +102,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 <?php
   // File classes/user/db/foo.php
   
-  namespace \Glue\User\DB;
+  namespace Glue\User\DB;
   
   class Foo {
   
@@ -110,9 +110,9 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 ?>
 {% endhighlight %}
 
-<p>You normally wouldn't want to do this. Instead, you'd rather build your new class upon the existing system class, possibly overriding a few methods. See below.</p>
+<p>You normally wouldn't want to do this. Instead, you'd rather build your new class upon the existing system class, possibly overriding a few methods :</p>
 
-<h3>Overriding a system class with an extension of itself</h3>
+<h3><A name="override_with_extension">Overriding a system class with an extension of itself</a></h3>
 
 <p>This is how you would override the <span class="inline_code">\Glue\System\DB\Foo</span> class with an extension of the existing system class : </p>
 
@@ -120,7 +120,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 <?php
   // File classes/user/db/foo.php
   
-  namespace \Glue\User\DB;
+  namespace Glue\User\DB;
   
   class Foo extends \Glue\System\DB\Foo {
   
