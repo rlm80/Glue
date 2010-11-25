@@ -54,7 +54,7 @@ abstract class Fragment {
 	public function sql(\Glue\DB\Database $db = null, $style = self::STYLE_DEFAULT) {
 		// No database given ? Means default database :
 		if ( ! isset($db))
-			$db = \Glue\DB\DB::database(Database::DEFAULTDB);
+			$db = \Glue\DB\DB::db(Database::DEFAULTDB);
 
 		// Get name of given database instance :
 		$dbname = $db->name();

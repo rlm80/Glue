@@ -14,6 +14,11 @@ namespace Glue\System\DB;
 
 class DB {
 	/**
+	 * We need to define this so that PHP doesn't think the function db() is the constructor.
+	 */
+	private function __construct() {}
+
+	/**
 	 * Returns the database object identified by $db_name.
 	 *
 	 * Subsequent calls to this function with the same parameter will return the same database
@@ -23,7 +28,7 @@ class DB {
 	 *
 	 * @return \Glue\DB\Database
 	 */
-	public static function database($db_name = \Glue\DB\Database::DEFAULTDB) {
+	public static function db($db_name = \Glue\DB\Database::DEFAULTDB) {
 		return \Glue\DB\Database::get($db_name);
 	}
 
