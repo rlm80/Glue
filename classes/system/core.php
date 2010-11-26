@@ -29,7 +29,7 @@ class Core {
 	 * @see http://rlm80.github.com/Glue/file_system.html
 	 *
 	 * @param string $class
-	 * 
+	 *
 	 * @return boolean
 	 */
 	static public function load_class($class) {
@@ -43,14 +43,14 @@ class Core {
 		if (preg_match('`^glue\\\\(system|user)\\\\(db|orm)\\\\([^\\\\]*)$`', $class, $matches)) {
 			// Build path where the class is supposed to be located :
 			$path = ($matches[1] === 'system' ? \Glue\CLASSPATH_SYSTEM : \Glue\CLASSPATH_USER) . $matches[2] . '/' . str_replace('_', '/', $matches[3]) . '.php';
-			
+
 			// Check if such a file exists and include it :
 			if (is_file($path)) {
 				include $path;
-				return TRUE;	
+				return TRUE;
 			}
 			else
-				return FALSE;  
+				return FALSE;
 		}
 
 		// Load alias :
@@ -58,33 +58,55 @@ class Core {
 			// Attempt alias to user class :
 			if (class_exists($original = 'Glue\\User\\' . $matches[1], true))
 				return class_alias($original, $class);
-			
+
 			// Attempt alias to system class :
 			if (class_exists($original = 'Glue\\System\\' . $matches[1], true))
 				return class_alias($original, $class);
 		}
-		
+
 		return FALSE;
 	}
 
+	/**
+	 * Generates auto-complete file for IDE at the appropirate location.
+	 */
 	static public function gendoc() {
-		// Init doc file with new namespace :
-		//$doc = "<?php\n\nnamespace $namespace;\n\n";
+		// Init doc file :
+		$doc = "<?php \n\n";
+
+		// Generate DB docs :
+		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'db/');
+		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'db/');
+		$classes		= array_merge($classes_system, $classes_user);
+		$doc .= "namespace Glue\DB {\n\n";
+		$doc .= implode("\n\n", $classes);
+		$doc .= "\n\n}\n\n";
+
+		// Generate ORM docs :
+		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'orm/');
+		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'orm/');
+		$classes		= array_merge($classes_system, $classes_user);
+		$doc .= "namespace Glue\ORM {\n\n";
+		$doc .= implode("\n\n", $classes);
+		$doc .= "\n\n}\n\n";
+
+		// Save docs :
+		file_put_contents(\Glue\ROOTPATH . 'ide/autocomplete.php', $doc);
 	}
 
 	/**
-	 * Returns classes skeletons for all class files found in given path.
+	 * Returns class skeletons for all class files found in given path, as an array indexed by class name.
 	 *
 	 * @param string $path
 	 *
-	 * @return string
+	 * @return array
 	 */
 	static protected function get_doc($path) {
 		// Get all php files in path (including subdirectories) :
 		$files = self::globr($path, '*.php');
 
 		// Loop on each file and generate classes skeletons :
-		$doc = '';
+		$docs = array();
 		foreach($files as $file) {
 			// Get file content :
 			$content = file_get_contents($file);
@@ -114,10 +136,10 @@ class Core {
 			$content = preg_replace('`/\*\*([^{};]*?\*/[^{};]*?\sfunction\s+(\w+))`sm', '/** @see \\' . $ns . '\\' . $class . '::\2()' . "\n" . ' \1', $content);
 
 			// Append class skeleton to doc :
-			$doc .= "\n\n" . $content;
+			$docs[$class] = $content;
 		}
 
-		return $doc;
+		return $docs;
 	}
 
 	/**
