@@ -1,0 +1,24 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Using database connections</h2>
+
+<p>Once you've defined your database connections, you may get singleton instances like this :</p>
+
+{% highlight php %}
+<?php
+  use Glue\DB\DB;
+
+  // Work with main database :
+  DB::db('main')->exec("DELETE FROM fruits WHERE colour = 'red'");
+  
+  // Work with forum database :
+  $forum = DB::db('forum');
+  $forum->exec('...');
+  $forum->exec('...');
+?>
+{% endhighlight %}
+
+<p>The first database in the connections array is the default that will be used if no identifier</p>

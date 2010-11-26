@@ -13,7 +13,23 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
 
 <p>A database class is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Database_MySQL</span>, <span class="inline_code">\Glue\DB\Database_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Database_SQLite</span>. You must create one database class by database connection.</p>
 
-<p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes (the class names don't matter) :</p>
+<p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes (the class names don't matter).</p>
+
+<p>Main SQLite database class :</p>
+
+{% highlight php %}
+<?php  
+  // File classes/user/db/database/mysql/main.php
+
+  namespace Glue\User\DB;
+
+  class Database_SQLite_Main extends \Glue\DB\Database_SQLite {
+    protected $path = '...';
+  }  
+?>
+{% endhighlight %}
+
+<p>Forum MySQL database class :</p>
 
 {% highlight php %}
 <?php
@@ -29,24 +45,32 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
 ?>
 {% endhighlight %}
 
+<h3>Registering a database class in the connections array</h3>
+
+<p>You must make your database classes known to the library by registering them in the connections array with their identifiers. An identifier is a short name that you will use in the future to refer to a database connection, for example to issue queries to it. This is done in the Config class.</p>
+
+<p>To register the two database classes above, you would do the following :</p>
+
 {% highlight php %}
-<?php  
-  // File classes/user/db/database/mysql/main.php
+<?php
+  // File classes/user/db/config.php
 
   namespace Glue\User\DB;
 
-  class Database_SQLite_Main extends \Glue\DB\Database_SQLite {
-    protected $path = '...';
-  }  
+  class Config extends \Glue\System\DB\Config {
+    protected function __construct() {
+      parent::__construct();
+	  
+	  // Options :
+      $this->connections = array(
+          'main'  => 'Glue\\DB\\Database_SQLite_Main',
+          'forum' => 'Glue\\DB\\Database_MySQL_Forum',
+        );
+	  
+    }
+  }
 ?>
 {% endhighlight %}
-
-
-
-
-
-
-
 
 
 
