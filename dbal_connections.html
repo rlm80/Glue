@@ -7,7 +7,7 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
 
 <h2>Database connections</h2>
 
-<p>A connection object is a PDO instance connected to a specific database. Connections expand on the existing <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO API</a> for issuing queries to provide functions for database introspection and functions to generate RDBMS specific SQL.</p>
+<p>A connection object is a PDO instance connected to a specific database. Connections expand on the existing <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO API</a> and provide a unified API for database introspection and functions to generate RDBMS specific SQL.</p>
 
 <p>The library comes with three connection classes that extend PDO : <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> and <span class="inline_code">\Glue\DB\Connection_SQLite</span>. Each of them has a specific constructor that takes connection parameters appropriate for the database it is designed to work with.</p>
 
@@ -102,6 +102,8 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
   
   // Is the same as :
   DB::cn()->exec("DELETE FROM mytable WHERE id = 10");
+  
+  // Because 'main' is the first connection defined in the connections array.
 ?>
 {% endhighlight %}
 
