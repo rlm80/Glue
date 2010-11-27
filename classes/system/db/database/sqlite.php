@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Database_Sqlite extends \Glue\DB\Database {
+class Database_SQLite extends \Glue\DB\Database {
 	/**
 	 * @var string Absolute path to the database file on disk.
 	 */

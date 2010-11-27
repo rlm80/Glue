@@ -16,102 +16,46 @@ use \PDO;
  * @license    MIT
  */
 
-abstract class Database extends PDO {
+abstract class Database extends PDO { // TODO rename this Connection, because that's what it is....
 	/**
 	 * @var array Database instances cache.
 	 */
 	static protected $instances = array();
 
 	/**
-	 * @var string Identifier of the current database.
-	 */
-	protected $name;
-
-	/**
-	 * @var string The user name for the DSN string.
-	 */
-	protected $username;
-
-	/**
-	 * @var string The password for the DSN string.
-	 */
-	protected $password;
-
-	/**
-	 * @var string A key=>value array of driver-specific connection options.
-	 */
-	protected $options = array();
-
-	/**
-	 * @var string Connection charset.
-	 */
-	protected $charset = 'utf8';
-
-	/**
-	 * @var boolean Locks constructor access from anywhere but self::create.
-	 * 				This ensures correct singleton behaviour even though constructor must
-	 * 				remain public because parent constructor is. The other solution was
-	 * 				to wrap the PDO instance into this class instead of extending PDO,
-	 * 				but this is not good because we wish to expose the whole PDO interface.
-	 */
-	private static $constuctor_locked = TRUE;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param string $name Identifier of this database.
+	 * @param $dsn DSN string that identifies target database.
+	 * @param $username Username used to connect to the database.
+	 * @param $password Password used to connect to the database.
+	 * @param $options A key=>value array of driver-specific connection options.
+	 * @param $charset Connection charset.
 	 */
-	public function __construct($name) {
-		// Check lock :
-		if (self::$constuctor_locked)
-			throw \Glue\DB\Exception('Cannot instanciate databases directly. Call GlueDB::db($name) instead.');
-
-		// Set identifier :
-		$this->name = $name;
-
+	public function __construct($dsn, $username, $password, $options, $charset) {
 		// Set PDO options :
-		$this->options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
-		$this->options[PDO::ATTR_STATEMENT_CLASS]	= array('Glue\\DB\\Statement', array($this));
+		$options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
+		$options[PDO::ATTR_STATEMENT_CLASS]	= array('Glue\\DB\\Statement', array($this));
 
 		// Call parent constructor to establish connection :
-		parent::__construct($this->dsn(), $this->username, $this->password, $this->options);
-
-		// Unset connection parameters for security, to make sure no forgotten debug message
-		// displays them unintentionaly to the user :
-		$this->username = null;
-		$this->password = null;
+		parent::__construct($dsn, $username, $password, $options);
 
 		// Set connection charset :
-		$this->set_charset();
-	}
-
-	/**
-	 * Returns the DSN pointing to the current database.
-	 *
-	 * @returns string
-	 */
-	abstract protected function dsn();
-
-	/**
-	 * Getter for database identifier.
-	 *
-	 * @return string
-	 */
-	public function name() {
-		return $this->name;
+		$this->set_charset($charset);
 	}
 
 	/**
 	 * Issues the right query to set current connection charset. This is probably
 	 * RDBMS specific so it's factored out of the constructor into a function
 	 * that can be redefined if necessary.
+	 *
+	 * @param string $charset
 	 */
-	protected function set_charset() {
-		$this->exec('SET NAMES ' . $this->quote($this->charset));
+	protected function set_charset($charset) {
+		$this->exec('SET NAMES ' . $this->quote($charset));
 	}
 
 	/**
-	 * Returns the appropriate formatter for given column. TODO is this used ?
+	 * Returns the appropriate formatter for given column.
 	 *
 	 * @param \Glue\DB\Column $column
 	 *
@@ -166,12 +110,8 @@ abstract class Database extends PDO {
 		$connections	= \Glue\DB\Config::connections();
 		$class			= $connections[$id];
 
-		// Unlock constructor, create instance and relock constructor :
-		self::$constuctor_locked = false;
-		$instance = new $class($id);
-		self::$constuctor_locked = true;
-
-		return $instance;
+		// Create instance and return it :
+		return new $class();
 	}
 
 	/* ***************************************************************************************************** */

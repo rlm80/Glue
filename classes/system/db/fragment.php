@@ -56,15 +56,13 @@ abstract class Fragment {
 		if ( ! isset($db))
 			$db = \Glue\DB\DB::db();
 
-		// Get name of given database instance :
-		$dbname = $db->name();
-
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
-		if ( ! isset($this->sql[$dbname][$style]))
-			$this->sql[$dbname][$style] = $this->compile($db, $style);
+		$hash = spl_object_hash($db);
+		if ( ! isset($this->sql[$hash][$style]))
+			$this->sql[$hash][$style] = $this->compile($db, $style);
 
 		// Return SQL :
-		return $this->sql[$dbname][$style];
+		return $this->sql[$hash][$style];
 	}
 
 	/**

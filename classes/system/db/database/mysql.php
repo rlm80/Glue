@@ -12,34 +12,33 @@ namespace Glue\System\DB;
 
 class Database_MySQL extends \Glue\DB\Database {
 	/**
-	 * @var string The hostname on which the database server resides.
-	 */
-	protected $host = 'localhost';
-
-	/**
-	 * @var string The port number where the database server is listening.
-	 */
-	protected $port;
-
-	/**
-	 * @var string The name of the database. TODO rename this $database and renamed $name as $id + same with columns, tables...
+	 * @var string The name of the database. We must store this because introspection queries require it.
 	 */
 	protected $dbname;
 
-	/*
-	 * Builds DSN string ( http://www.php.net/manual/en/ref.pdo-mysql.connection.php ).
+	/**
+	 * Constructor.
 	 *
-	 * @returns string
+	 * @param $dbname The name of the database.
+	 * @param $username Username used to connect to the database.
+	 * @param $password Password used to connect to the database.
+	 * @param $host The hostname on which the database server resides.
+	 * @param $port The port number where the database server is listening.
+	 * @param $options A key=>value array of driver-specific connection options.
+	 * @param $charset Connection charset.
 	 */
-	protected function dsn() {
-		// Builds DSN :
-		$dsn = 'mysql:host=' . $this->host . ';';
-		if (isset($this->port))
-			$dsn .= 'port=' . $this->port . ';';
-		if (isset($this->dbname))
-			$dsn .= 'dbname=' . $this->dbname . ';';
+	public function __construct($dbname, $username, $password, $host = 'localhost', $port = null, $options = array(), $charset = 'utf8') {
+		// Build DSN :
+		$dsn = 'mysql:' .
+			   'host=' . $host . ';' .
+			   (isset($port) ? 'port=' . $port . ';' : '') .
+			   'dbname=' . $dbname . ';';
 
-		return $dsn;
+		// Store dbname :
+		$this->dbname = $dbname;
+
+		// Call parent constructor :
+		parent::__construct($dsn, $username, $password, $options, $charset);
 	}
 
 	/**
