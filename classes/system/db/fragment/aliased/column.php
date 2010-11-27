@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that represents an aliased column in a select list.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

@@ -7,7 +7,7 @@ namespace Glue\System\DB;
  *
  * Config options are stored as properties of a singleton instance of this class.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -16,10 +16,10 @@ class Config {
 	/*--------------------------------  OPTIONS  ------------------------------------*/
 
 	/**
-	 * @var array Connection ids => database classes mapping.
+	 * @var array Connection ids => connection classes mapping.
 	 * @see \Glue\DB\DB::db()
 	 */
-	protected $connections = array('default' => 'Glue\\DB\\Database_Mysql_default');
+	protected $connections = array('default' => 'Glue\\DB\\Connection_Mysql_default');
 
 	/*-------------------------------  /OPTIONS  ------------------------------------*/
 
@@ -34,7 +34,7 @@ class Config {
 	protected function __construct() {}
 
 	/**
-	 * Returns database classes array.
+	 * Returns connections classes array.
 	 */
 	static public function connections() {
 		return static::instance()->connections;

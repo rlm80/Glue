@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that represents an assignment in an update query.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -67,15 +67,15 @@ class Fragment_Assignment extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_assignment($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_assignment($this, $style);
 	}
 }

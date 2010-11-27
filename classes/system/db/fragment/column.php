@@ -6,7 +6,7 @@ namespace Glue\System\DB;
  * Fragment that represents a column of a specific table - alias pair and compiles into
  * a "<table_alias>.<column_name>" SQL string.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -98,15 +98,15 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_column($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_column($this, $style);
 	}
 }

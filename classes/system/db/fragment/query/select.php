@@ -216,7 +216,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	public function db() {
 		$op = $this->from();
@@ -252,9 +252,9 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	 */
 	public function execute() {
 		// Execute query and get statement :
-		$db = $this->db();
-		$sql = $this->sql($db);
-		$stmt = $db->query($sql);
+		$cn = $this->db();
+		$sql = $this->sql($cn);
+		$stmt = $cn->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_BOUND);
 
 		// Bind columns :
@@ -280,15 +280,15 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_query_select($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_query_select($this, $style);
 	}
 }

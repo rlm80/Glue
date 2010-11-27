@@ -17,7 +17,7 @@ namespace Glue\System\DB;
  * invalidated. This cache invalidation process is cascaded recursively from the fragment to its
  * users and the users of its users and so on.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -46,20 +46,20 @@ abstract class Fragment {
 	/**
 	 * Returns compiled SQL string according to given database SQL dialect.
 	 *
-	 * @param \Glue\DB\Database $db Database that defines what SQL dialect must be used to compile the fragment.
+	 * @param \Glue\DB\Connection $cn Connection that defines what SQL dialect must be used to compile the fragment.
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	public function sql(\Glue\DB\Database $db = null, $style = self::STYLE_DEFAULT) {
+	public function sql(\Glue\DB\Connection $cn = null, $style = self::STYLE_DEFAULT) {
 		// No database given ? Means default database :
-		if ( ! isset($db))
-			$db = \Glue\DB\DB::db();
+		if ( ! isset($cn))
+			$cn = \Glue\DB\DB::db();
 
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
-		$hash = spl_object_hash($db);
+		$hash = spl_object_hash($cn);
 		if ( ! isset($this->sql[$hash][$style]))
-			$this->sql[$hash][$style] = $this->compile($db, $style);
+			$this->sql[$hash][$style] = $this->compile($cn, $style);
 
 		// Return SQL :
 		return $this->sql[$hash][$style];
@@ -69,12 +69,12 @@ abstract class Fragment {
 	 * Returns freshly compiled (i.e. not retrieved from cache) SQL string, according
 	 * to given database SQL dialect.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	abstract protected function compile(\Glue\DB\Database $db, $style);
+	abstract protected function compile(\Glue\DB\Connection $cn, $style);
 
 	/**
 	 * Adds a fragment to the list of fragments that make direct use of this

@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that represents an operand in an expression.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

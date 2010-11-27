@@ -116,22 +116,22 @@ class Fragment_Query_Delete extends \Glue\DB\Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	public function db() {
 		return $this->from()->aliased()->table()->db();
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_query_delete($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_query_delete($this, $style);
 	}
 }

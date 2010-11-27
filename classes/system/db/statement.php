@@ -9,18 +9,18 @@ use \PDOStatement, \PDO;
  *
  * PDOStatement extension that adds automatic type casting.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
 class Statement extends PDOStatement {
     /**
-     * @var \Glue\DB\Database PDO instance that spawned this statement. Automatically
+     * @var \Glue\DB\Connection PDO instance that spawned this statement. Automatically
      * 						passed by PDO to the constructor of this class when a new
      * 						statement is created.
      */
-    protected $db;
+    protected $cn;
 
     /**
      * @var array Array of formatters that will be used to type cast column values.
@@ -50,10 +50,10 @@ class Statement extends PDOStatement {
     /**
      * Constructor.
      *
-     * @param \Glue\DB\Database $db
+     * @param \Glue\DB\Connection $cn
      */
-    protected function __construct($db) {
-        $this->db = $db;
+    protected function __construct($cn) {
+        $this->db = $cn;
     }
     
     /**

@@ -20,7 +20,7 @@ namespace Glue\System\DB;
  * - set up a Formatter for a column, other than the default one that simply
  *   type cast the values coming from the database according to the underlying column type.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -178,7 +178,7 @@ class Table {
 	/**
 	 * Returns the database object this virtual table is stored into.
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	public function db() {
 		return \Glue\DB\DB::db($this->dbname);

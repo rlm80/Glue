@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that provides a fluent interface to build a group by clause.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -34,15 +34,15 @@ class Fragment_Builder_Groupby extends \Glue\DB\Fragment_Builder {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_builder_groupby($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_builder_groupby($this, $style);
 	}
 }

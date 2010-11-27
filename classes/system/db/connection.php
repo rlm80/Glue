@@ -5,20 +5,20 @@ namespace Glue\System\DB;
 use \PDO;
 
 /**
- * Base database class.
+ * Base database connection class.
  *
- * A database object is a PDO instance connected to a specific database, with a unified interface
- * for database introspection and functions to generate RDBMS specific SQL from data structures
- * representing pieces of SQL queries.
+ * A connection object is a PDO instance connected to a specific database. Connections provide
+ * a unified interface for database introspection and functions to generate RDBMS specific SQL
+ * from data structures representing pieces of SQL queries.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-abstract class Database extends PDO { // TODO rename this Connection, because that's what it is....
+abstract class Connection extends PDO {
 	/**
-	 * @var array Database instances cache.
+	 * @var array Connection instances cache.
 	 */
 	static protected $instances = array();
 
@@ -29,29 +29,14 @@ abstract class Database extends PDO { // TODO rename this Connection, because th
 	 * @param $username Username used to connect to the database.
 	 * @param $password Password used to connect to the database.
 	 * @param $options A key=>value array of driver-specific connection options.
-	 * @param $charset Connection charset.
 	 */
-	public function __construct($dsn, $username, $password, $options, $charset) {
+	public function __construct($dsn, $username, $password, $options) {
 		// Set PDO options :
 		$options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
 		$options[PDO::ATTR_STATEMENT_CLASS]	= array('Glue\\DB\\Statement', array($this));
 
 		// Call parent constructor to establish connection :
 		parent::__construct($dsn, $username, $password, $options);
-
-		// Set connection charset :
-		$this->set_charset($charset);
-	}
-
-	/**
-	 * Issues the right query to set current connection charset. This is probably
-	 * RDBMS specific so it's factored out of the constructor into a function
-	 * that can be redefined if necessary.
-	 *
-	 * @param string $charset
-	 */
-	protected function set_charset($charset) {
-		$this->exec('SET NAMES ' . $this->quote($charset));
 	}
 
 	/**
@@ -86,11 +71,11 @@ abstract class Database extends PDO { // TODO rename this Connection, because th
 	abstract public function real_tables();
 
 	/**
-	 * Returns a database object from cache, or creates it if it isn't there already.
+	 * Returns a connection object from cache, or creates it if it isn't there already.
 	 *
 	 * @param string $id
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	static public function get($id) {
 		if( ! isset(self::$instances[$id]))
@@ -99,11 +84,11 @@ abstract class Database extends PDO { // TODO rename this Connection, because th
 	}
 
 	/**
-	 * Creates a new database instance and returns it.
+	 * Creates a new connection instance and returns it.
 	 *
 	 * @param string $id
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	static protected function create($id) {
 		// Class name :
@@ -615,7 +600,7 @@ abstract class Database extends PDO { // TODO rename this Connection, because th
 	}
 
 	/**
-	 * Quotes an identifier according to current database conventions.
+	 * Quotes an identifier according to current connection conventions.
 	 *
 	 * @param string $identifier
 	 *

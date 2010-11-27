@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that represents anything that compiles into "... AS ...".
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -61,15 +61,15 @@ class Fragment_Aliased extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_aliased($this, $style);
+	function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_aliased($this, $style);
 	}
 }

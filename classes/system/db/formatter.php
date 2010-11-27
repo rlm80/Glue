@@ -8,7 +8,7 @@ namespace Glue\System\DB;
  * A formatter is an object that converts raw data coming from the database (usually
  * only strings) into a format suitable for PHP, and the other way around.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

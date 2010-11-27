@@ -6,7 +6,7 @@ namespace Glue\User\DB;
  * This class overrides the \Glue\System\DB\Config class. You can set the options in the constructor. If you're
  * using an IDE, just type "$this->" in there and the auto-complete system will show you all available options.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

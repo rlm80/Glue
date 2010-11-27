@@ -10,7 +10,7 @@ use \ArrayAccess;
  * Also provides easy access to column fragments through the use of $obj->__get($column), and access to the
  * result of a select query through the use of $obj['<column>'].
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

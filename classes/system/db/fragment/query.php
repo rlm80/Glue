@@ -28,7 +28,7 @@ abstract class Fragment_Query extends \Glue\DB\Fragment {
 	/**
 	 * Returns database object, determined from the tables this query manipulates.
 	 *
-	 *  @return \Glue\DB\Database
+	 *  @return \Glue\DB\Connection
 	 */
 	abstract public function db();
 
@@ -53,9 +53,9 @@ abstract class Fragment_Query extends \Glue\DB\Fragment {
 	 * @return \Glue\DB\Statement
 	 */
 	public function prepare(array $driver_options = array()) {
-		$db = $this->db();
-		$sql = $this->sql($db);
-		return $db->prepare($sql, $driver_options);
+		$cn = $this->db();
+		$sql = $this->sql($cn);
+		return $cn->prepare($sql, $driver_options);
 	}
 
 	/**
@@ -64,9 +64,9 @@ abstract class Fragment_Query extends \Glue\DB\Fragment {
 	 * @return \Glue\DB\Fragment_Query
 	 */
 	public function execute() {
-		$db = $this->db();
-		$sql = $this->sql($db);
-		$this->row_count = (integer) $db->exec($sql);
+		$cn = $this->db();
+		$sql = $this->sql($cn);
+		$this->row_count = (integer) $cn->exec($sql);
 		return $this;
 	}
 }

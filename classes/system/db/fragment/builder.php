@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Builders are fragments that provide a fluent API to build an assembly of children fragments.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

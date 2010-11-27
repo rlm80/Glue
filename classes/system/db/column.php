@@ -7,7 +7,7 @@ namespace Glue\System\DB;
  *
  * TODO : describe this
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

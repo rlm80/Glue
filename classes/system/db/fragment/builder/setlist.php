@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Fragment that provides a fluent interface to build the set list in an update query.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
@@ -34,15 +34,15 @@ class Fragment_Builder_Setlist extends \Glue\DB\Fragment_Builder {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_builder_setlist($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_builder_setlist($this, $style);
 	}
 }

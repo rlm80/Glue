@@ -165,7 +165,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	/**
 	 * Returns database inferred from tables used in the query.
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	public function db() {
 		$op = $this->from();
@@ -175,15 +175,15 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * Forwards call to given database.
+	 * Forwards call to given connection.
 	 *
-	 * @param \Glue\DB\Database $db
+	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Database $db, $style) {
-		// Forwards call to database :
-		return $db->compile_query_update($this, $style);
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Forwards call to connection :
+		return $cn->compile_query_update($this, $style);
 	}
 }

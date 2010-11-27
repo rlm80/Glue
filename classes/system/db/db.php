@@ -3,9 +3,9 @@
 namespace Glue\System\DB;
 
 /**
- * Main GlueDB class.
+ * Main DB class.
  *
- * Contains only static methods. Whatever you do with GlueDB, this should always be your entry point.
+ * Contains only static methods. Entry point for about everything you may want to do with this library.
  *
  * @package GlueDB
  * @author Régis Lemaigre
@@ -14,14 +14,14 @@ namespace Glue\System\DB;
 
 class DB {
 	/**
-	 * Returns a connection that is a singleton instance of the database class identified by $id
+	 * Returns a connection that is a singleton instance of the connection class identified by $id
 	 * in the connections array of \Glue\DB\Config. Calling the function with no parameter returns
-	 * the default connection, which is a singleton instance of the first database class to appear
+	 * the default connection, which is a singleton instance of the first connection class to appear
 	 * in the connections array.
 	 *
 	 * @param string $id
 	 *
-	 * @return \Glue\DB\Database
+	 * @return \Glue\DB\Connection
 	 */
 	public static function db($id = null) {
 		// No connection identifier given means first element in the connection array :
@@ -29,7 +29,7 @@ class DB {
 			$connections = \Glue\DB\Config::connections();
 			list($id, ) = each($connections);
 		}
-		return \Glue\DB\Database::get($id);
+		return \Glue\DB\Connection::get($id);
 	}
 
 	/**

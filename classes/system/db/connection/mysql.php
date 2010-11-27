@@ -3,14 +3,14 @@
 namespace Glue\System\DB;
 
 /**
- * Base MySQL database class.
+ * Base MySQL connection class.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class Database_MySQL extends \Glue\DB\Database {
+class Connection_MySQL extends \Glue\DB\Connection {
 	/**
 	 * @var string The name of the database. We must store this because introspection queries require it.
 	 */
@@ -38,16 +38,17 @@ class Database_MySQL extends \Glue\DB\Database {
 		$this->dbname = $dbname;
 
 		// Call parent constructor :
-		parent::__construct($dsn, $username, $password, $options, $charset);
+		parent::__construct($dsn, $username, $password, $options);
+		
+		// Set connection charset :
+		$this->exec('SET NAMES ' . $this->quote($charset));
 	}
 
 	/**
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered. Returns FALSE if table doesn't exist in database.
 	 *
-	 * Be aware that this function is totally ignorant of any virtual table you may have
-	 * defined explicitely ! It's mostly useful internally to query the real underlying
-	 * database schema. Users should use the introspection API instead.
+	 * @param string $name
 	 *
 	 * @return array
 	 */

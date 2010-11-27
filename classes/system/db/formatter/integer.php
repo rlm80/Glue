@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Integer formatter class.
  *
- * @package    GlueDB
+ * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */

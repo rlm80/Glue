@@ -2,7 +2,7 @@
 
 namespace Glue\User\DB;
 
-class Database_MySQL_Default extends \Glue\DB\Database_MySQL {
+class Connection_MySQL_Default extends \Glue\DB\Connection_MySQL {
 	public function __construct() {
 		parent::__construct(
 			'test',		// Database name.
