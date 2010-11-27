@@ -3,22 +3,36 @@ layout: base
 title: Guide
 ---
 
-<h2>Using database connections</h2>
+Prerequisites : <a href="dbal_connections.html">defining database connections</a>.
 
-<p>Once you've defined your database connections, you may get singleton instances like this :</p>
+<h2>PDO introduction</h2>
+
+<p>Database connection classes extend the <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO class</a>. Everything that can be done with <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a> can also be done with them. This is a quick reminder of some of what you can do with PDO.</p>
+
+<p>The following explanation assumes that you have <a href="dbal_connections.html">defined</a> a default database connection.</p>
+
+<h3>Executing statements (insert, update, delete)</h3>
 
 {% highlight php %}
 <?php
   use Glue\DB\DB;
 
-  // Work with main database :
-  DB::db('main')->exec("DELETE FROM fruits WHERE colour = 'red'");
+  DB::cn()->exec("INSERT INTO fruits VALUES ('lemon','yellow'), ('banana','red')");
+  DB::cn()->exec("UPDATE fruits SET colour = 'yellow' WHERE color = 'red'");
+  DB::cn()->exec("DELETE FROM fruits WHERE colour = 'yellow'");
   
-  // Work with forum database :
-  $forum = DB::db('forum');
-  $forum->exec('...');
-  $forum->exec('...');
 ?>
 {% endhighlight %}
 
-<p>The first database in the connections array is the default that will be used if no identifier</p>
+<h3>Issuing queries (select)</h3>
+
+{% highlight php %}
+<?php
+  use Glue\DB\DB;
+
+  DB::cn()->exec("INSERT INTO fruits VALUES ('lemon','yellow'), ('banana','red')");
+  DB::cn()->exec("UPDATE fruits SET colour = 'yellow' WHERE color = 'red'");
+  DB::cn()->exec("DELETE FROM fruits WHERE colour = 'yellow'");
+  
+?>
+{% endhighlight %}

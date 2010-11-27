@@ -3,6 +3,8 @@ layout: base
 title: Guide
 ---
 
+<p>The following explanation is tailored for the DB library, but it applies to the ORM as well. Just replace "DB" by "ORM".</p>
+
 <h2>Defining options</h2>
 
 <p>All available options are protected properties of the <span class="inline_code">\Glue\DB\Config</span> class. They are assigned default values on declaration. If these default values don't suit your needs, you must <a href="/Glue/file_system.html#override_with_extension">override</a> the <span class="inline_code">\Glue\System\DB\Config</span> class with your own copy by creating a <span class="inline_code">\Glue\User\DB\Config</span> class. A <a href="https://github.com/rlm80/Glue/blob/master/classes/user/db/config.php">file</a> that does just that is included with the library so you can start from there :</p>
