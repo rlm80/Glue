@@ -5,47 +5,67 @@ title: Guide
 
 Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new user class</a>.
 
+<h2>Database connections</h2>
+
+<p>A connection object is a PDO instance connected to a specific database. Besides the usual PDO features (issuing queries and getting results back), connections provide functions for database introspection and functions to generate RDBMS specific SQL from data structures representing pieces of SQL queries, expanding on <a class="external" href="http://php.net/manual/en/pdo.quote.php">PDO::quote()</a>.</p>
+
+<p>The library comes with three connection classes that extend PDO : <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> and <span class="inline_code">\Glue\DB\Connection_SQLite</span>. Each of them has a specific constructor that takes connection parameters appropriate for the database it is designed to work with.</p>
+
 <h2>Defining database connections</h2>
 
-<p>A database connection is created by defining a new database class, and registering it in the connections array with its identifier.</p>
+<p>A database connection is created by defining a new connection class, and registering it in the connections array with its identifier.</p>
 
-<h3>Defining a new database class</h3>
+<h3>Defining a new connection class</h3>
 
-<p>A database class is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Database_MySQL</span>, <span class="inline_code">\Glue\DB\Database_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Database_SQLite</span>. You must create one database class by database connection.</p>
+<p>A connection class is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Connection_SQLite</span>. You must create one connection class by database connection.</p>
 
 <p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes (the class names don't matter) :</p>
 
 {% highlight php %}
 <?php  
-  // File classes/user/db/database/mysql/main.php
+  // File classes/user/db/connection/sqlite/main.php
 
   namespace Glue\User\DB;
 
-  class Database_SQLite_Main extends \Glue\DB\Database_SQLite {
-    protected $path = '...';
+  class Connection_SQLite_Main extends \Glue\DB\Connection_SQLite {
+    public function __construct() {
+      parent::__construct(
+          'my/sqlite/database.sqlite' // Path to sqlite file.
+        );
+    }
   }  
 ?>
 {% endhighlight %}
 
 {% highlight php %}
 <?php
-  // File classes/user/db/database/mysql/forum.php
+  // File classes/user/db/connection/mysql/forum.php
 
   namespace Glue\User\DB;
 
-  class Database_MySQL_Forum extends \Glue\DB\Database_MySQL {
-    protected $username = '...';
-    protected $password = '...';
-    protected $dbname = '...';
+  class Connection_MySQL_Forum extends \Glue\DB\Connection_MySQL {
+    public function __construct() {
+      parent::__construct(
+          'mydb',       // Database name.
+          'myusername', // Username.
+          'mypassword'  // Password.
+        );
+    }
   }
 ?>
 {% endhighlight %}
 
-<h3>Registering a database class in the connections array</h3>
+<p>Defining connections as classes this way allows you to define :</p>
+<ul>
+  <li>connection parameters by overriding the constructor,</li>
+  <li>specific behaviours by overriding methods, should you want for example to log queries that pass through it.</li>
+</ul>
 
-<p>Database classes must be registered in the connections array with their identifiers so that the library knows about them. An identifier is a name that can be used to refer to a database connection, for example to issue queries to it. This must be done in the Config class.</p>
+<h3>Registering a connection class in the connections array</h3>
 
-<p>To register the two database classes above, you would do the following :</p>
+<p>Connection classes must be registered in the connections array, indexed by their identifiers, so that the library knows about them. An identifier is a name that can be used to refer to a database connection, for example to issue queries to it. This must be done in the Config class.</p>
+
+<p>To register the two connection classes above, you would do the following :</p>
 
 {% highlight php %}
 <?php
@@ -59,8 +79,8 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
 	  
 	  // Options :
       $this->connections = array(
-          'main'  => 'Glue\\DB\\Database_SQLite_Main',
-          'forum' => 'Glue\\DB\\Database_MySQL_Forum',
+          'main'  => 'Glue\\DB\\Connection_SQLite_Main',
+          'forum' => 'Glue\\DB\\Connection_MySQL_Forum',
         );
 	  
     }
