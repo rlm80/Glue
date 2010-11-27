@@ -9,9 +9,9 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
 
 <p>Database connection classes extend the <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO class</a>. Everything that can be done with <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a> can also be done with them. This page is a quick reminder of some of what you can do with PDO. The following explanation assumes that you have <a href="dbal_connections.html">defined</a> a default database connection.</p>
 
-<h3>Executing statements (insert, update, delete)</h3>
+<h3>Statements that don't return a result set</h3>
 
-<p>Statements that don't return a result set (insert, update, delete) can be performed using <a class="external" href="http://www.php.net/manual/en/pdo.exec.php">PDO::exec()</a>. It returns the number of affected rows. For insert statements on tables with an auto-incrementing primary key, you may use <a class="external" href="http://www.php.net/manual/en/pdo.lastinsertid.php">PDO::lastInsertId()</a> to get the first id inserted by the last statement on the current connection (so the range of ids inserted is [lastInsertId, lastInsertId + affected rows - 1]).</p>
+<p>Statements that don't return a result set (insert, update, delete, create, drop...) can be performed using <a class="external" href="http://www.php.net/manual/en/pdo.exec.php">PDO::exec()</a>. It returns the number of affected rows. For insert statements on tables with an auto-incrementing primary key, you may use <a class="external" href="http://www.php.net/manual/en/pdo.lastinsertid.php">PDO::lastInsertId()</a> to get the first id inserted by the last statement on the current connection (so the range of ids inserted is [lastInsertId, lastInsertId + affected rows - 1]).</p>
 
 {% highlight php %}
 <?php
@@ -19,7 +19,8 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
   
   try {
     // Insert :
-    $count  = DB::cn()->exec("INSERT INTO fruits VALUES (NULL, 'lemon','yellow'), (NULL, 'banana','red')");
+    $count  = DB::cn()->exec("INSERT INTO fruits (id, name, color)
+                              VALUES (NULL, 'lemon','yellow'), (NULL, 'banana','red')");
     $lid    = DB::cn()->lastInsertId();
     
     // Update :
@@ -34,13 +35,19 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
 ?>
 {% endhighlight %}
 
-<h3>Issuing queries (select)</h3>
+<h3>Statements that return a result set</h3>
+
+<p>Statements that return a result set (select) can be performed using <a class="external" href="http://www.php.net/manual/en/pdo.query.php">PDO::query()</a>. It returns a <a class="external" href="http://www.php.net/manual/en/class.pdostatement.php">PDOStatement</a> object. PDOStatement instances are traversable, so you can loop over result sets using foreach :</p>
 
 {% highlight php %}
 <?php
   use Glue\DB\DB;
 
-  DB::cn()->query("SELECT id, name, color FROM fruits");
+  $stmt = DB::cn()->query("SELECT id, name, color FROM fruits");
   
+  foreach($stmt as $row)
+    echo $row['id'] . ', ' . $row['name'] . ', ' . $row['color'] . "\n";
 ?>
 {% endhighlight %}
+
+<p>For the many other ways to fetch results, see <a class="external" href="http://www.php.net/manual/en/pdostatement.fetch.php">PDOStatement::fetch()</a>.</p>
