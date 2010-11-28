@@ -17,7 +17,7 @@ class Config {
 
 	/**
 	 * @var array Connection ids => connection classes mapping.
-	 * @see \Glue\DB\DB::db()
+	 * @see \Glue\DB\DB::cn()
 	 */
 	protected $connections = array('default' => 'Glue\\DB\\Connection_Mysql_default');
 

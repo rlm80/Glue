@@ -31,12 +31,12 @@ abstract class Connection extends PDO {
 	 * @param $options A key=>value array of driver-specific connection options.
 	 */
 	public function __construct($dsn, $username, $password, $options) {
-		// Set PDO options :
-		$options[PDO::ATTR_ERRMODE]			= PDO::ERRMODE_EXCEPTION;
-		$options[PDO::ATTR_STATEMENT_CLASS]	= array('Glue\\DB\\Statement', array($this));
-
 		// Call parent constructor to establish connection :
 		parent::__construct($dsn, $username, $password, $options);
+		
+		// Set attributes :
+		$this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Glue\\DB\\Statement', array($this)));
 	}
 
 	/**
@@ -52,19 +52,12 @@ abstract class Connection extends PDO {
 	 * Returns structured information about the columns and primary key of a real database table.
 	 * Columns are returned alphabetically ordered.
 	 *
-	 * Be aware that this function is totally ignorant of any virtual table you may have
-	 * defined explicitely ! It's mostly useful internally to query the real underlying
-	 * database schema. Users should use the introspection API instead.
-	 *
 	 * @return array
 	 */
 	public abstract function table_info($name);
 
 	/**
 	 * Returns all tables present in current database as an array of table names.
-	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
 	 *
 	 * @return array Array of table names, numerically indexed, alphabetically ordered.
 	 */

@@ -181,7 +181,7 @@ class Table {
 	 * @return \Glue\DB\Connection
 	 */
 	public function db() {
-		return \Glue\DB\DB::db($this->dbname);
+		return \Glue\DB\DB::cn($this->dbname);
 	}
 
 	/**

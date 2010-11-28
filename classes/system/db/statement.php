@@ -15,10 +15,9 @@ use \PDOStatement, \PDO;
  */
 
 class Statement extends PDOStatement {
+
     /**
-     * @var \Glue\DB\Connection PDO instance that spawned this statement. Automatically
-     * 						passed by PDO to the constructor of this class when a new
-     * 						statement is created.
+     * @var \Glue\DB\Connection PDO instance that spawned this statement.
      */
     protected $cn;
 
@@ -45,15 +44,15 @@ class Statement extends PDOStatement {
     /**
      * @var integer Stores default fetch mode set for this statement, as PHP doesn't make this information available....
      */
-    protected $default_fetch_mode = PDO::FETCH_ASSOC;
+    protected $default_fetch_mode = PDO::FETCH_ASSOC; // TODO make sure this is right
 
     /**
      * Constructor.
      *
      * @param \Glue\DB\Connection $cn
      */
-    protected function __construct($cn) {
-        $this->db = $cn;
+    protected function __construct(\Glue\DB\Connection $cn) {
+       $this->cn = $cn;
     }
     
     /**
@@ -123,7 +122,7 @@ class Statement extends PDOStatement {
      *
      * @see PDOStatement::execute()
      */
-    public function execute($input_parameters = array()) {
+    public function execute($input_parameters = null) {
     	// Execute statement :
     	$return = parent::execute($input_parameters);
     	
@@ -133,7 +132,7 @@ class Statement extends PDOStatement {
     	$this->delayed_bindings = array();
     	
     	// Store last insert id :
-    	$this->last_insert_id = $this->db->lastInsertId();
+    	$this->last_insert_id = $this->cn->lastInsertId();
     	
     	return $return;
     }

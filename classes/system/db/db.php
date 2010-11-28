@@ -23,7 +23,7 @@ class DB {
 	 *
 	 * @return \Glue\DB\Connection
 	 */
-	public static function db($id = null) {
+	public static function cn($id = null) {
 		// No connection identifier given means first element in the connection array :
 		if ( ! isset($id)) {
 			$connections = \Glue\DB\Config::connections();

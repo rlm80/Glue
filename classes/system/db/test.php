@@ -31,15 +31,15 @@ class Test {
 
 	static private function create_test_tables() {
 		self::drop_test_tables();
-		db::db()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
-		db::db()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
-		db::db()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
+		db::cn()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
+		db::cn()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
+		db::cn()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
 	}
 
 	static private function drop_test_tables() {
-		try { db::db()->exec("drop table glusers");		} catch (\Exception $e) {};
-		try { db::db()->exec("drop table glprofiles");	} catch (\Exception $e) {};
-		try { db::db()->exec("drop table glposts");		} catch (\Exception $e) {};
+		try { db::cn()->exec("drop table glusers");		} catch (\Exception $e) {};
+		try { db::cn()->exec("drop table glprofiles");	} catch (\Exception $e) {};
+		try { db::cn()->exec("drop table glposts");		} catch (\Exception $e) {};
 	}
 
 	static private function test_fragments() {
@@ -231,7 +231,7 @@ class Test {
 		}
 
 		/*
-		$stmt = db::db()->query("select login as login from glusers");
+		$stmt = db::cn()->query("select login as login from glusers");
 		//$stmt->bindColumn('login', $test);
 		$stmt->setFetchMode(PDO::FETCH_BOTH);
 		while($res = $stmt->fetch(PDO::FETCH_ASSOC)) {

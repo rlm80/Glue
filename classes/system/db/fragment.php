@@ -54,7 +54,7 @@ abstract class Fragment {
 	public function sql(\Glue\DB\Connection $cn = null, $style = self::STYLE_DEFAULT) {
 		// No database given ? Means default database :
 		if ( ! isset($cn))
-			$cn = \Glue\DB\DB::db();
+			$cn = \Glue\DB\DB::cn();
 
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
 		$hash = spl_object_hash($cn);
