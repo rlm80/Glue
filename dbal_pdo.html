@@ -61,7 +61,7 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
 
 <h3>Prepared statements</h3>
 
-<p>For statements that need to be executed more than once, with various parameter values, you should always use prepared statements because it is faster and safer. A prepared statement is a statement with placeholders for values ("parameters"), that is sent once to the RDBMS for compiling, and then executed as many times as necessary with various parameter values. Since the statement only need to be compiled once, it's faster. Since the statement only need to be compiled once, it's faster. Since PDO automatically quotes parameter values, it's safer.</p>
+<p>For statements that need to be executed more than once, you should always use <a class="external" href="http://www.php.net/manual/en/pdo.prepared-statements.php">prepared statements</a>. A prepared statement is a statement with parameters that is sent once to the RDBMS for compiling, and then executed as many times as necessary with various parameter values. Since the statement only need to be compiled once, it's faster. Since PDO automatically quotes parameter values, it's safer.</p>
 
 {% highlight php %}
 <?php
