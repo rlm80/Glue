@@ -7,6 +7,8 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
 
 <h2>PDO introduction</h2>
 
+<p>The PDO introduction page states : "PDO provides a data-access abstraction layer, which means that, regardless of which database you're using, you use the same functions to issue queries and fetch data."</p>
+
 <p>Database connection classes extend the <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO class</a>. Everything that can be done with <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a> can also be done with them. This page is a quick reminder of some of what you can do with PDO. The following explanation assumes that you have <a href="dbal_connections.html">defined</a> a default database connection.</p>
 
 <h3>Statements that don't return a result set</h3>
@@ -24,10 +26,10 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
     $lid    = DB::cn()->lastInsertId();
     
     // Update :
-    $count = DB::cn()->exec("UPDATE fruits SET color = 'yellow' WHERE color = 'red'");
+    $count  = DB::cn()->exec("UPDATE fruits SET color = 'yellow' WHERE color = 'red'");
     
     // Delete :
-    $count = DB::cn()->exec("DELETE FROM fruits WHERE color = 'yellow'");  
+    $count  = DB::cn()->exec("DELETE FROM fruits WHERE color = 'yellow'");  
   }
   catch (PDOException $e) {
     echo $e->getMessage();
@@ -42,12 +44,50 @@ Prerequisites : <a href="dbal_connections.html">defining database connections</a
 {% highlight php %}
 <?php
   use Glue\DB\DB;
-
-  $stmt = DB::cn()->query("SELECT id, name, color FROM fruits");
   
-  foreach($stmt as $row)
-    echo $row['id'] . ', ' . $row['name'] . ', ' . $row['color'] . "\n";
+  try {
+    $stmt = DB::cn()->query("SELECT id, name, color FROM fruits");
+    
+    foreach($stmt as $row)
+      echo $row['id'] . ', ' . $row['name'] . ', ' . $row['color'] . "\n";
+  }
+  catch (PDOException $e) {
+    echo $e->getMessage();
+  }    
 ?>
 {% endhighlight %}
 
 <p>For the many other ways to fetch results, see <a class="external" href="http://www.php.net/manual/en/pdostatement.fetch.php">PDOStatement::fetch()</a>.</p>
+
+<h3>Prepared statements</h3>
+
+<p>For statements that need to be executed more than once, with various parameter values, you should always use prepared statements because it is faster and safer. A prepared statement is a statement with placeholders for values ("parameters"), that is sent once to the RDBMS for compiling, and then executed as many times as necessary with various parameter values. Since the statement only need to be compiled once, it's faster. Since the statement only need to be compiled once, it's faster. Since PDO automatically quotes parameter values, it's safer.</p>
+
+{% highlight php %}
+<?php
+  use Glue\DB\DB;
+  
+  try {
+    $stmt = DB::cn()->prepare("INSERT INTO fruits VALUES (:name, :color)");
+    
+    $stmt->bindParam(':name',   $name);
+    $stmt->bindParam(':color',  $color);
+    
+    $name = 'lemon';  $color = 'yellow';  $stmt->execute();
+    $name = 'cherry'; $color = 'red';     $stmt->execute();
+  }
+  catch (PDOException $e) {
+    echo $e->getMessage();
+  }    
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
