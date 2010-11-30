@@ -2,7 +2,79 @@
 layout: base
 title: Guide
 ---
-
 <h2>Database introspection</h2>
 
 <p>Database introspection refers to the means of retrieving database schema meta-data : table names, columns names, column types and indexes.</p>
+
+
+<h2>Aliasing system</h2>
+
+<p>By default, tables and columns are known to the application by the same names they have in the database :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Returns data about the column 'mycolumn' of the table 'mytable'
+  $col_data = DB::table('mytable')->column('mycolumn');
+  
+  // Returns "SELECT `mytable`.`mycolumn` FROM `mytable`"
+  $sql = DB::select('mytable', $m)->columns('mycolumn')->root()->sql();
+	
+?>
+{% endhighlight %}
+
+<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span> :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Returns data about the column 'anothercolumn' of the table 'anothertable'
+  $col_data = DB::table('mytable')->column('mycolumn');
+  
+  // Returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
+  $sql = DB::select('mytable', $m)->columns('mycolumn')->root()->sql();
+	
+?>
+{% endhighlight %}
+
+<p>Table aliases are defined by extending the ~\Glue\DB\Table class. The class name defines the table alias. The real table name my be defined by overriding the <span class="inline_code">$dbtable</span> property declaration. Column aliases may be defined by overriding the function <span class="inline_code">string get_column_alias(\Glue\DB\Column $column)</span> :</p>
+
+{% highlight php %}
+<?php
+  // File classes/user/db/foo/bar.php
+  
+  namespace Glue\User\DB;
+  
+  class Table_Anothertable extends \Glue\DB\Table {
+    
+    // Override real table name :
+    protected $dbtable = 'mytable';
+    
+    // Override column alias for mycolumn :
+    public function get_column_alias(\Glue\DB\Column $column) {
+      if ($column->dbname() === 'mycolumn')
+        return 'anothercolumn';
+      return parent::get_column_alias($column);
+    }
+  }
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
