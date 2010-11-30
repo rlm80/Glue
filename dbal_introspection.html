@@ -20,26 +20,12 @@ title: Guide
   $col_data = DB::table('mytable')->column('mycolumn');
   
   // Returns "SELECT `mytable`.`mycolumn` FROM `mytable`"
-  $sql = DB::select('mytable', $m)->columns('mycolumn')->root()->sql();
+  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
 	
 ?>
 {% endhighlight %}
 
-<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span> :</p>
-
-{% highlight php %}
-<?php
-  
-  use Glue\DB\DB;
-  
-  // Returns data about the column 'anothercolumn' of the table 'anothertable'
-  $col_data = DB::table('mytable')->column('mycolumn');
-  
-  // Returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
-  $sql = DB::select('mytable', $m)->columns('mycolumn')->root()->sql();
-	
-?>
-{% endhighlight %}
+<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span>.</p>
 
 <p>Table aliases are defined by extending the ~\Glue\DB\Table class. The class name defines the table alias. The real table name my be defined by overriding the <span class="inline_code">$dbtable</span> property declaration. Column aliases may be defined by overriding the function <span class="inline_code">string get_column_alias(\Glue\DB\Column $column)</span> :</p>
 
@@ -64,7 +50,21 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<p>The introspection API and the query builder will now reflect those changes :</p>
 
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Actually returns data about the column 'anothercolumn' of the table 'anothertable'
+  $col_data = DB::table('mytable')->column('mycolumn');
+  
+  // Actually returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
+  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
+	
+?>
+{% endhighlight %}
 
 
 
