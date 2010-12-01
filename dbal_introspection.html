@@ -9,14 +9,14 @@ title: Guide
 
 <h2>Aliasing system</h2>
 
-<p>By default, tables and columns are known to the application by the same names they have in the database :</p>
+<p>By default, tables and columns are known to the application by the same names that they have in whatever database they are stored into :</p>
 
 {% highlight php %}
 <?php
   
   use Glue\DB\DB;
   
-  // Returns data about the column 'mycolumn' of the table 'mytable'
+  // Returns data about the column 'mycolumn' of the database table 'mytable'
   $col_data = DB::table('mytable')->column('mycolumn');
   
   // Returns "SELECT `mytable`.`mycolumn` FROM `mytable`"
@@ -25,9 +25,29 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span>.</p>
+<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span> :</p>
 
-<p>Table aliases are defined by extending the ~\Glue\DB\Table class. The class name defines the table alias. The real table name my be defined by overriding the <span class="inline_code">$dbtable</span> property declaration. Column aliases may be defined by overriding the function <span class="inline_code">string get_column_alias(\Glue\DB\Column $column)</span> :</p>
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Now returns data about the column 'anothercolumn' of the table 'anothertable'
+  $col_data = DB::table('mytable')->column('mycolumn');
+  
+  // Now returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
+  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
+	
+?>
+{% endhighlight %}
+
+<p>Setting up aliases is done by defining your own virtual tables.</p>
+
+<h2>Virtual tables</h2>
+
+<p>Table names in the introspection API or in the query builder don't actually refer to a database tables. They refer to PHP objects called virtual tables.</p>
+
+<p> To set up such aliases, you must define a virtual table. Table aliases are defined by extending the ~\Glue\DB\Table class. The class name defines the table alias. The real table name my be defined by overriding the <span class="inline_code">$dbtable</span> property declaration. Column aliases may be defined by overriding the function <span class="inline_code">string get_column_alias(\Glue\DB\Column $column)</span> :</p>
 
 {% highlight php %}
 <?php
@@ -51,20 +71,6 @@ title: Guide
 {% endhighlight %}
 
 <p>The introspection API and the query builder will now reflect those changes :</p>
-
-{% highlight php %}
-<?php
-  
-  use Glue\DB\DB;
-  
-  // Actually returns data about the column 'anothercolumn' of the table 'anothertable'
-  $col_data = DB::table('mytable')->column('mycolumn');
-  
-  // Actually returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
-  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
-	
-?>
-{% endhighlight %}
 
 
 

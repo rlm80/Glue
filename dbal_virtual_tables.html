@@ -1,0 +1,16 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Table aliasing layer</h2>
+
+<p>In the introspection API or in the query builder, table names don't refer to database tables. They refer to virtual tables.</p>
+
+<p>Virtual tables are simply aliases for real database tables. Like real database tables, virtual tables have a name and columns. By default, for every table in the database connections you have defined, there is a virtual table that have the same name and the same columns.</p>
+
+<h2>Should you care about all this ?</h2>
+
+<p>Usually, no. If you don't define your own virtual tables, the layer is transparent.</p>
+
+<p>Virtual tables may only come in handy if you want to deploy an application on top of a database schema over which you have no control, or one that you cannot afford to change. In such a case, you can't rename columns and tables to match the identifiers used in your application. You may then setup virtual tables to resolve the inconsistencies between the identifiers used in the database and the one used in your application.</p>
