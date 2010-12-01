@@ -6,6 +6,78 @@ title: Guide
 
 <p>Database introspection refers to the means of retrieving database schema meta-data : table names, columns names, column types and indexes.</p>
 
+<p>Table data is stored in instances of the <span class="inline_code">\Glue\DB\Table</span> class. These objects can be retrieved like this :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Returns data about table 'mytable' of connection 'myconnection'
+  $table = DB::cn('myconnection')->table('mytable');
+  
+?>
+{% endhighlight %}
+
+<p>Column data is stored in instances of the <span class="inline_code">\Glue\DB\Column</span></p> class. These objects can be retrieved like this :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Returns data about column 'mycolumn' of table 'mytable' of connection 'myconnection'
+  $column = DB::cn('myconnection')->table('mytable')->column('mycolumn');
+  
+  // Available data about that column :
+  $name       = $column->name();        // Name
+	$type       = $column->type()));      // Database type (as returned by RDBMS)
+  $phptype    = $column->phptype());    // Most appropriate PHP type to store column data    
+	$nullable   = $column->nullable());   // Whether or not column is nullable
+	$maxlength  = $column->maxlength());  // Max length for character columns
+  $precision  = $column->precision());  // Decimal(6,2) ? => precision = 6
+	$scale      = $column->scale());      // Decimal(6,2) ? => scale = 2
+	$default    = $column->default());    // Default column value (type casted according to php type)
+	$auto       = $column->auto());       // Whether or not column is auto-incrementing
+?>
+{% endhighlight %}
+
+<p>It is also possible to list all tables on a connection, and all columns of a table :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+
+  // Display tables of default connection :
+  foreach(DB::cn()->tables() as $table) {
+    // Display table name :
+    echo $table->name() . '<br/>';
+    
+    // Display columns of current table :
+    foreach($table->columns() as $column) {
+      // Display column name :
+      echo '&nbsp;&nbsp;' . $column->name() . '<br/>';
+    }
+  }
+?>
+{% endhighlight %}
+
+<p>All of these columns and tables objects behave as singletons. They are created upon first request and then reused. That is :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  $t1 = DB::cn()->table('mytable');
+  $t2 = DB::cn()->table('mytable');
+  
+  var_dump($t1 === $t2); // TRUE
+?>
+{% endhighlight %}
+
+<p>All introspected data is cached on disk as serialized <span class="inline_code">\Glue\DB\Table</span> objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely (see options).</p>
 
 <h2>Aliasing system</h2>
 
