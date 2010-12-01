@@ -14,78 +14,63 @@ namespace Glue\System\DB;
 
 class Column {
 	/**
-	 * @var \Glue\DB\Table Virtual table this column belongs to.
+	 * @var \Glue\DB\Table Table this column belongs to.
 	 */
 	protected $table;
 
 	/**
-	 * @var string Name of this column, as you would refer to it in queries.
+	 * @var string Name of this column.
 	 */
 	protected $name;
 
 	/**
-	 * @var \Glue\DB\Formatter Formatter object to format values coming from and going to this column.
-	 */
-	protected $formatter;
-
-	/**
-	 * @var string Underlying database column.
-	 */
-	protected $dbcolumn;
-
-	/**
 	 * @var string Native database type.
 	 */
-	protected $dbtype;
+	protected $type;
 
 	/**
-	 * @var string Whether or not the underlying database column is nullable.
+	 * @var string Whether or not the column is nullable.
 	 */
-	protected $dbnullable;
+	protected $nullable;
 
 	/**
-	 * @var string Maximum length of the underlying database column (for text).
+	 * @var string Maximum length of the column (for text).
 	 */
-	protected $dbmaxlength;
+	protected $maxlength;
 
 	/**
-	 * @var string Precision of the underlying database column (total number of significant digits).
+	 * @var string Precision of the column (total number of significant digits).
 	 */
-	protected $dbprecision;
+	protected $precision;
 
 	/**
-	 * @var string Scale of the underlying database column (number of significant digits in the decimal part).
+	 * @var string Scale of the column (number of significant digits in the decimal part).
 	 */
-	protected $dbscale;
+	protected $scale;
 
 	/**
-	 * @var string Default value of the underlying database column (stored as is from the database, not type casted).
+	 * @var string Default value of the column (stored as is from the database, not type casted).
 	 */
-	protected $dbdefault;
+	protected $default;
 
 	/**
-	 * @var boolean Whether or not the underlying database column auto-incrementing.
+	 * @var boolean Whether or not the column auto-incrementing.
 	 */
-	protected $dbauto;
+	protected $auto;
 
 	/**
 	 * Constructor.
 	 */
-	public function __construct(\Glue\DB\Table $table, $dbcolumn, $dbtype, $dbnullable, $dbmaxlength, $dbprecision, $dbscale, $dbdefault, $dbauto) {
-		// Init properties :
+	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto) {
 		$this->table		= $table;
-		$this->dbcolumn		= $dbcolumn;
-		$this->dbtype		= $dbtype;
-		$this->dbnullable	= $dbnullable;
-		$this->dbmaxlength	= $dbmaxlength;
-		$this->dbprecision	= $dbprecision;
-		$this->dbscale		= $dbscale;
-		$this->dbdefault	= $dbdefault;
-		$this->dbauto		= $dbauto;
-
-		// Get from table object (because there the method can be redefined) :
-		$this->formatter	= $table->get_column_formatter($this);
-		$this->name			= $table->get_column_alias($this);
+		$this->name			= $name;
+		$this->type			= $type;
+		$this->nullable		= $nullable;
+		$this->maxlength	= $maxlength;
+		$this->precision	= $precision;
+		$this->scale		= $scale;
+		$this->default		= $default;
+		$this->auto			= $auto;
 	}
 
 	/**
@@ -98,7 +83,7 @@ class Column {
 	}
 
 	/**
-	 * Returns the virtual table of this column.
+	 * Returns the table of this column.
 	 *
 	 * @return \Glue\DB\Table
 	 */
@@ -107,84 +92,71 @@ class Column {
 	}
 
 	/**
-	 * Returns formatter.
-	 *
-	 * @return \Glue\DB\Formatter
-	 */
-	public function formatter() {
-		return $this->formatter;
-	}
-
-	/**
-	 * Returns the underlying database column for this virtual column.
+	 * Returns the column database type.
 	 *
 	 * @return string
 	 */
-	public function dbcolumn() {
-		return $this->dbcolumn;
+	public function type() {
+		return $this->type;
 	}
 
 	/**
-	 * Returns the underlying column database type.
-	 *
-	 * @return string
-	 */
-	public function dbtype() {
-		return $this->dbtype;
-	}
-
-	/**
-	 * Returns whether or not the underlying column can accept null values.
+	 * Returns whether or not the column can accept null values.
 	 *
 	 * @return boolean
 	 */
-	public function dbnullable() {
-		return $this->dbnullable;
+	public function nullable() {
+		return $this->nullable;
 	}
 
 	/**
-	 * Returns the maximum length that underlying column accepts.
+	 * Returns the maximum length that column accepts.
 	 *
 	 * @return integer
 	 */
-	public function dbmaxlength() {
-		return $this->dbmaxlength;
+	public function maxlength() {
+		return $this->maxlength;
 	}
 
 	/**
-	 * Returns the total number of significant digits of the underlying column.
+	 * Returns the total number of significant digits of the column.
 	 *
 	 * @return integer
 	 */
-	public function dbprecision() {
-		return $this->dbprecision;
+	public function precision() {
+		return $this->precision;
 	}
 
 	/**
-	 * Returns the number of significant digits in the decimal part af the underlying column.
+	 * Returns the number of significant digits in the decimal part af the column.
 	 *
 	 * @return integer
 	 */
-	public function dbscale() {
-		return $this->dbscale;
+	public function scale() {
+		return $this->scale;
 	}
 
 	/**
-	 * Returns the default value of the underlying column (raw from the database, not type casted !).
+	 * Returns the default value of the column (raw from the database, not type casted !).
 	 *
 	 * @return string
 	 */
-	public function dbdefault() {
-		return $this->dbdefault;
+	public function _default() {
+		return $this->default;
 	}
 
 	/**
-	 * Whether or not the underlying column is auto-incrementing.
+	 * Whether or not the column is auto-incrementing.
 	 *
 	 * @return boolean
 	 */
-	public function dbauto() {
-		return $this->dbauto;
+	public function auto() {
+		return $this->auto;
+	}
+
+	public function __call($name, $args) {
+		if ($name === 'default')
+			return call_user_func_array(array($this, '_default'), $args);
 	}
 }
 

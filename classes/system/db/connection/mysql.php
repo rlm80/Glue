@@ -39,9 +39,85 @@ class Connection_MySQL extends \Glue\DB\Connection {
 
 		// Call parent constructor :
 		parent::__construct($dsn, $username, $password, $options);
-		
+
 		// Set connection charset :
 		$this->exec('SET NAMES ' . $this->quote($charset));
+	}
+
+	/**
+	 * Loads a table by database introspection.
+	 *
+	 * @param string $name
+	 *
+	 * @return \Glue\DB\Table
+	 */
+	public function create_table($name) {
+		// Query information schema to get columns information :
+		$stmt = $this->prepare("
+			SELECT
+				column_name,
+				data_type,
+				is_nullable,
+				column_default,
+				character_maximum_length,
+				numeric_precision,
+				numeric_scale,
+				extra
+			FROM
+				information_schema.columns
+			WHERE
+				table_schema = :dbname AND
+				table_name = :tablename
+		");
+		$stmt->execute(array(
+			':dbname'		=> $this->dbname,
+			':tablename'	=> $name
+		));
+
+		// Create columns data structure :
+		$columns = array();
+		foreach($stmt as $row) {
+			$columns[] = array(
+				'column'	=> trim(strtolower($row[0])),					// Column name
+				'type'		=> trim(strtolower($row[1])),					// Native database type
+				'nullable'	=> (boolean) $row[2],							// Whether or not the column is nullable
+				'default'	=> $row[3],										// Maximum length of a text column
+				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,	// Precision of the column
+				'precision' => isset($row[5]) ? (integer) $row[5] : null,	// Scale of the column
+				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
+				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
+			);
+		}
+
+		// No columns ? Means table didn't exist :
+		if (count($columns) === 0)
+			throw new \Glue\DB\Exception("Table " . $name . " not found on connection " . $this->id . ".");
+
+		// Query information schema to get pk information :
+		$stmt = $this->prepare("
+			SELECT
+				column_name
+			FROM
+				information_schema.statistics
+			WHERE
+				table_schema = :dbname AND
+				table_name = :tablename AND
+				index_name = 'PRIMARY'
+			ORDER BY
+				seq_in_index
+		");
+		$stmt->execute(array(
+			':dbname'		=> $this->dbname,
+			':tablename'	=> $name
+		));
+
+		// Create columns data structure :
+		$pk = array();
+		foreach($stmt as $row)
+			$pk[] = $row[0];
+
+		// Create and return new table object :
+		return new \Glue\DB\Table($this->id, $name, $columns, $pk);
 	}
 
 	/**
@@ -52,7 +128,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	public function table_info($name) {
+	public function table_info($name) { // TODO remove this function
 		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT

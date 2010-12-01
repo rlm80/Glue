@@ -23,6 +23,16 @@ abstract class Connection extends PDO {
 	static protected $instances = array();
 
 	/**
+	 * @var array Table instances cache.
+	 */
+	protected $tables = array();
+
+	/**
+	 * @var string Connection id.
+	 */
+	protected $id;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param $dsn DSN string that identifies target database.
@@ -33,11 +43,77 @@ abstract class Connection extends PDO {
 	public function __construct($dsn, $username, $password, $options) {
 		// Call parent constructor to establish connection :
 		parent::__construct($dsn, $username, $password, $options);
-		
+
 		// Set attributes :
 		$this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Glue\\DB\\Statement', array($this)));
 	}
+
+	/**
+	 * Connection id setter.
+	 *
+	 * @param string $id
+	 */
+	public function set_id($id) {
+		$this->id = $id;
+	}
+
+	/**
+	 * Returns all the tables defined on this connection.
+	 *
+	 * @return array
+	 */
+	public function tables() {
+		// TODO
+	}
+
+	/**
+	 * Loads a table object, stores it in cache, and returns it.
+	 *
+	 * @param string $name Table name.
+	 *
+	 * @return \Glue\DB\Table
+	 */
+	public function table($name) {
+		$name = strtolower($name);
+		if( ! isset($this->tables[$name]))
+			$this->tables[$name] = $this->create_table_from_cache($name);
+		return $this->tables[$name];
+	}
+
+	/**
+	 * Loads a table from the disk cache. If it isn't there already, creates
+	 * a new cache entry for it.
+	 *
+	 * @param string $name Virtual table name.
+	 *
+	 * @return \Glue\DB\Table
+	 */
+	protected function create_table_from_cache($name) {
+		// Look up object into cache directory :
+		$dir	= \Glue\ROOTPATH . "cache/db/tables/"  . $this->id . '/';
+		$path	= $dir . $name . ".tmp";
+
+		// Check cache availability :
+		if ( ! file_exists($path)) {
+			$table = $this->create_table($name);
+			if ( ! is_dir($dir)) mkdir($dir, 777, true);
+			file_put_contents($path, serialize($table));
+		}
+
+		// Return table from cache :
+		return unserialize(file_get_contents($path));
+	}
+
+
+	/**
+	 * Loads a table by database introspection.
+	 *
+	 * @param string $name
+	 *
+	 * @return \Glue\DB\Table
+	 */
+	abstract protected function create_table($name);
 
 	/**
 	 * Returns the appropriate formatter for given column.
@@ -88,8 +164,11 @@ abstract class Connection extends PDO {
 		$connections	= \Glue\DB\Config::connections();
 		$class			= $connections[$id];
 
-		// Create instance and return it :
-		return new $class();
+		// Create instance :
+		$cn = new $class();
+		$cn->set_id($id);
+
+		return $cn;
 	}
 
 	/* ***************************************************************************************************** */
