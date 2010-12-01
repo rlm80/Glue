@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Column class.
  *
- * TODO : describe this
+ * Holds introspected data about a database column.
  *
  * @package    Glue
  * @author     Régis Lemaigre

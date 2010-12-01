@@ -5,7 +5,7 @@ namespace Glue\System\DB;
 /**
  * Table class.
  *
- * Holds introspected data about a cnid table.
+ * Holds introspected data about a database table.
  *
  * @package    Glue
  * @author     Régis Lemaigre

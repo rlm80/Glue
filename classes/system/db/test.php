@@ -19,8 +19,9 @@ class Test {
 		echo ("<pre>");
 		self::create_test_tables();
 		try {
-			self::test_fragments();
-			self::test_queries();
+			self::test_introspection();
+			//self::test_fragments();
+			//self::test_queries();
 		}
 		catch (\Exception $e) {
 			self::drop_test_tables();
@@ -31,17 +32,95 @@ class Test {
 
 	static private function create_test_tables() {
 		self::drop_test_tables();
+		db::cn()->exec("create table glintro (a integer auto_increment, b integer, c varchar(31) null default 'test', d decimal(6,2), primary key(a, b))");
 		db::cn()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
 		db::cn()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
 		db::cn()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
 	}
 
 	static private function drop_test_tables() {
+		try { db::cn()->exec("drop table glintro");		} catch (\Exception $e) {};
 		try { db::cn()->exec("drop table glusers");		} catch (\Exception $e) {};
 		try { db::cn()->exec("drop table glprofiles");	} catch (\Exception $e) {};
 		try { db::cn()->exec("drop table glposts");		} catch (\Exception $e) {};
 	}
 
+	static private function test_introspection() {
+		// Get table data :
+		$table = \Glue\DB\DB::cn()->table('glintro');
+		
+		// Define tests :
+		$tests['table name'] = array('glintro', $table->name());
+		
+		$arr = array();
+		foreach($table->pk() as $pkc)
+			$arr[] = $pkc->name();
+		sort($arr);
+		$tests['table pk'] = array('a,b', implode(',', $arr));
+		
+		
+		$c = $table->column('a');
+		$tests['a name'] = array('a', $c->name());
+		$tests['a type'] = array('int', strtolower($c->type()));
+		$tests['a nullable'] = array(false, $c->nullable());
+		$tests['a maxlength'] = array(null, $c->maxlength());
+		$tests['a precision'] = array(10, $c->precision());
+		$tests['a scale'] = array(0, $c->scale());
+		$tests['a default'] = array(null, $c->default());
+		$tests['a auto'] = array(true, $c->auto());
+		
+		$c = $table->column('b');
+		$tests['b name'] = array('b', $c->name());
+		$tests['b type'] = array('int', strtolower($c->type()));
+		$tests['b nullable'] = array(false, $c->nullable());
+		$tests['b maxlength'] = array(null, $c->maxlength());
+		$tests['b precision'] = array(10, $c->precision());
+		$tests['b scale'] = array(0, $c->scale());
+		$tests['b default'] = array('0', $c->default());
+		$tests['b auto'] = array(false, $c->auto());	
+
+		$c = $table->column('c');
+		$tests['c name'] = array('c', $c->name());
+		$tests['c type'] = array('varchar', strtolower($c->type()));
+		$tests['c nullable'] = array(true, $c->nullable());
+		$tests['c maxlength'] = array(31, $c->maxlength());
+		$tests['c precision'] = array(null, $c->precision());
+		$tests['c scale'] = array(null, $c->scale());
+		$tests['c default'] = array('test', $c->default());
+		$tests['c auto'] = array(false, $c->auto());			
+		
+	/*
+string(1) "a"
+string(3) "int"
+bool(true)
+NULL
+int(10)
+int(0)
+NULL
+bool(true)
+
+	 * */
+		
+		/*
+				'table pk' => array(
+						'expected' => 'glintro',
+						'real' => $table->name()
+					),
+			);*/
+			
+		// Checks :
+		foreach($tests as $type => $data) {
+			list($expected, $real) = $data;
+			echo ("Testing introspection : " . $type . " ...");
+			if ($expected === $real)
+				echo "ok \n";
+			else {
+				echo "error ! " . $real . " doesn't match target " . $expected . "\n";
+				return false;
+			}
+		}
+	}
+	
 	static private function test_fragments() {
 		$tests = array(
 			'value - string'	=> array(
