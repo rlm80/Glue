@@ -31,14 +31,14 @@ title: Guide
   
   // Available data about that column :
   $name       = $column->name();        // Name
-	$type       = $column->type()));      // Database type (as returned by RDBMS)
+  $type       = $column->type()));      // Database type (as returned by RDBMS)
   $phptype    = $column->phptype());    // Most appropriate PHP type to store column data    
-	$nullable   = $column->nullable());   // Whether or not column is nullable
-	$maxlength  = $column->maxlength());  // Max length for character columns
+  $nullable   = $column->nullable());   // Whether or not column is nullable
+  $maxlength  = $column->maxlength());  // Max length for character columns
   $precision  = $column->precision());  // Decimal(6,2) ? => precision = 6
-	$scale      = $column->scale());      // Decimal(6,2) ? => scale = 2
-	$default    = $column->default());    // Default column value (type casted according to php type)
-	$auto       = $column->auto());       // Whether or not column is auto-incrementing
+  $scale      = $column->scale());      // Decimal(6,2) ? => scale = 2
+  $default    = $column->default());    // Default column value (type casted according to php type)
+  $auto       = $column->auto());       // Whether or not column is auto-incrementing
 ?>
 {% endhighlight %}
 
@@ -93,7 +93,7 @@ title: Guide
   
   // Returns "SELECT `mytable`.`mycolumn` FROM `mytable`"
   $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
-	
+  
 ?>
 {% endhighlight %}
 
@@ -109,7 +109,7 @@ title: Guide
   
   // Now returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
   $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
-	
+  
 ?>
 {% endhighlight %}
 
