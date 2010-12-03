@@ -52,9 +52,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h3>Listing tables and columns</h3>
-
-<p>Tables :</p>
+<h3>Listing tables</h3>
 
 {% highlight php %}
 <?php
@@ -62,8 +60,8 @@ title: Guide
   use Glue\DB\DB;
 
   // List tables of default connection :
-  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names, doesn't load table objects !
-  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names, does load table objects !
+  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names (faster)
+  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names (slower)
   
   // Checking existence of a table :
   $exists = DB::cn()->table_exists('mytable'); // Doesn't load table object, only check existence
@@ -71,7 +69,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Columns :</p>
+<h3>Listing columns</h3>
 
 {% highlight php %}
 <?php
@@ -93,7 +91,7 @@ title: Guide
 
 <h3>Caching</h3>
 
-<p>All of these columns and tables objects behave as singletons. They are created upon first request, cached and then reused. That is :</p>
+<p>During a page load, all of these columns and tables objects are created upon first request and then reused. That is :</p>
 
 {% highlight php %}
 <?php
@@ -112,7 +110,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>All introspected data is cached on disk as serialized <span class="inline_code">\Glue\DB\Table</span> objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely (see options).</p>
+<p>Between each page load, all introspected data is cached on disk as serialized <span class="inline_code">\Glue\DB\Table</span> objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely (see options).</p>
 
 <h2>Aliasing system</h2>
 
