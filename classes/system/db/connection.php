@@ -88,6 +88,18 @@ abstract class Connection extends PDO {
 	}
 
 	/**
+	 * Returns an array with all available tables on this connection, as an array of names indexed
+	 * by names.
+	 *
+	 * @return array
+	 */
+	public function table_list() {
+		if( ! isset($this->table_list))
+			$this->table_list = $this->create_table_list_from_cache();
+		return $this->table_list;
+	}
+
+	/**
 	 * Loads a table object, stores it in cache, and returns it.
 	 *
 	 * @param string $name Table name.
@@ -98,18 +110,6 @@ abstract class Connection extends PDO {
 		if( ! isset($this->tables[$name]))
 			$this->tables[$name] = $this->create_table_from_cache($name);
 		return $this->tables[$name];
-	}
-
-	/**
-	 * Returns an array with all available tables on this connection, as an array of names indexed
-	 * by names.
-	 *
-	 * @return array
-	 */
-	public function table_list() {
-		if( ! isset($this->table_list))
-			$this->table_list = $this->create_table_list_from_cache();
-		return $this->table_list;
 	}
 
 	/**
@@ -127,7 +127,7 @@ abstract class Connection extends PDO {
 
 		// Check cache availability :
 		if ( ! file_exists($path)) {
-			$table = $this->create_table($name);
+			$table = $this->create_table_from_class($name);
 			if ( ! is_dir($dir)) mkdir($dir, 777, true);
 			file_put_contents($path, serialize($table));
 		}
@@ -138,13 +138,19 @@ abstract class Connection extends PDO {
 
 
 	/**
-	 * Loads a table by database introspection.
+	 * Loads a table by instanciating the appropriate class.
 	 *
 	 * @param string $name
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	abstract protected function create_table($name);
+	protected function create_table_from_class($name) {
+		$class = 'Glue\\DB\\Table_' . ucfirst($this->id) . '_' . ucfirst($name);
+		if (class_exists($class))
+			return new $class($this->id, $name);
+		else
+			return new \Glue\DB\Table($this->id, $name);
+	}
 
 	/**
 	 * Loads the table list from the disk cache. If it isn't there already, creates
@@ -159,7 +165,7 @@ abstract class Connection extends PDO {
 
 		// Check cache availability :
 		if ( ! file_exists($path)) {
-			$list = $this->create_table_list();
+			$list = $this->intro_table_list();
 			if ( ! is_dir($dir)) mkdir($dir, 777, true);
 			file_put_contents($path, serialize($list));
 		}
@@ -169,11 +175,20 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Loads table list by database introspection.
+	 * Returns table list by database introspection.
 	 *
 	 * @return array
 	 */
-	abstract public function create_table_list();
+	abstract public function intro_table_list();
+
+	/**
+	 * Returns table information by database introspection.
+	 *
+	 * @param $name
+	 *
+	 * @return array
+	 */
+	abstract public function intro_table($name);
 
 	/**
 	 * Returns the appropriate formatter for given db type.

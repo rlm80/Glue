@@ -32,17 +32,17 @@ class Connection_SQLite extends \Glue\DB\Connection {
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	abstract protected function create_table($name) {
-		throw new \Glue\DB\Exception("The Connection::create_table function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+	abstract protected function intro_table($name) {
+		throw new \Glue\DB\Exception("The Connection::intro_table function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**
-	 * Loads table list by database introspection.
+	 * Returns table list by database introspection.
 	 *
 	 * @return array
 	 */
-	public function create_table_list() {
-		throw new \Glue\DB\Exception("The Connection::create_table_list function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+	public function intro_table_list() {
+		throw new \Glue\DB\Exception("The Connection::intro_table_list function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**

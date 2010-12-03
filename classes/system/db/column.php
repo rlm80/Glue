@@ -14,12 +14,17 @@ namespace Glue\System\DB;
 
 class Column {
 	/**
-	 * @var \Glue\DB\Table Table this column belongs to.
+	 * @var \Glue\DB\Table Table object this column belongs to.
 	 */
 	protected $table;
 
 	/**
-	 * @var string Name of this column.
+	 * @var string Name of this column, as it is known to the application.
+	 */
+	protected $alias;
+
+	/**
+	 * @var string Name of this column, as it is known to the database.
 	 */
 	protected $name;
 
@@ -66,7 +71,8 @@ class Column {
 	/**
 	 * Constructor.
 	 */
-	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto, \Glue\DB\Formatter $formatter) {
+	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto) {
+		// Init basic properties :
 		$this->table		= $table;
 		$this->name			= $name;
 		$this->type			= $type;
@@ -76,7 +82,10 @@ class Column {
 		$this->scale		= $scale;
 		$this->default		= $default;
 		$this->auto			= $auto;
-		$this->formatter	= $formatter;
+
+		// Get from table object :
+		$this->formatter	= $this->table->_get_column_formatter($this);
+		$this->alias		= $this->table->_get_column_alias($this);
 	}
 
 	/**

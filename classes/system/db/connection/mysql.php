@@ -45,13 +45,13 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Loads a table by database introspection.
+	 * Return information about given table name on current connection by database introspection.
 	 *
 	 * @param string $name
 	 *
-	 * @return \Glue\DB\Table
+	 * @return array
 	 */
-	public function create_table($name) {
+	public function intro_table($name) {
 		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT
@@ -121,16 +121,19 @@ class Connection_MySQL extends \Glue\DB\Connection {
 		foreach($stmt as $row)
 			$pk[] = $row[0];
 
-		// Create and return new table object :
-		return new \Glue\DB\Table($this->id, $name, $columns, $pk);
+		// Create and return info :
+		return array(
+				'columns'	=> $columns,
+				'pk'		=> $pk
+			);
 	}
 
 	/**
-	 * Loads table list by database introspection.
+	 * Retruns table list by database introspection.
 	 *
 	 * @return array
 	 */
-	public function create_table_list() {
+	public function intro_table_list() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();

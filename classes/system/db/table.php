@@ -19,7 +19,12 @@ class Table {
 	protected $cnid;
 
 	/**
-	 * @var string Name of this table.
+	 * @var string Name of this table, as it is known to the application.
+	 */
+	protected $alias;
+
+	/**
+	 * @var string Name of this table, as it is known to the database.
 	 */
 	protected $name;
 
@@ -37,35 +42,46 @@ class Table {
 	 * Constructor.
 	 *
 	 * @param string $cnid Connection id.
-	 * @param string $name Table name.
-	 * @param string $columns Data structure representing columns.
-	 * @param string $pk Data structure representing columns.
+	 * @param string $alias Table alias.
 	 */
-	public function __construct($cnid, $name, $columns, $pk) {
+	public function __construct($cnid, $alias) {
+		// Init basic properties :
 		$this->cnid		= $cnid;
-		$this->name		= $name;
+		$this->alias	= $alias;
+		$this->name		= $this->init_name();
+
+		// Get table info by introspection :
+		$info = $this->cn()->table_info($this->name);
 
 		// Build columns :
 		$this->columns = array();
-		foreach ($columns as $column) {
-			$this->columns[$column['column']] = new \Glue\DB\Column(
+		foreach ($info['columns'] as $ic) {
+			// Create column object :
+			$column = new \Glue\DB\Column(
 					$this,
-					$column['column'],
-					$column['type'],
-					$column['nullable'],
-					$column['maxlength'],
-					$column['precision'],
-					$column['scale'],
-					$column['default'],
-					$column['auto'],
-					$column['formatter']
+					$ic['column'],
+					$ic['type'],
+					$ic['nullable'],
+					$ic['maxlength'],
+					$ic['precision'],
+					$ic['scale'],
+					$ic['default'],
+					$ic['auto']
 				);
+
+			// Add columns :
+			$this->columns[$column->alias()] = $column;
 		}
 
 		// Build pk :
 		$this->pk = array();
-		foreach($pk as $col)
-			$this->pk[] = $this->columns[$col];
+		foreach($info['pk'] as $col) {
+			foreach($this->columns as $column) {
+				if ($column->name() === $col)
+					break;
+			}
+			$this->pk[$column->alias()] = $column;
+		}
 	}
 
 	/**
@@ -137,5 +153,27 @@ class Table {
 		if ( ! isset($this->columns[$name]))
 			throw new \Glue\DB\Exception("There is no column " . $name . " in table " . $this->name . " of connection " . $this->cnid . " .");
 		return $this->columns[$name];
+	}
+
+	/**
+	 * Returns the alias under which a DB column will be known in PHP-land.
+	 *
+	 * @param \Glue\DB\Column $column
+	 *
+	 * @return string
+	 */
+	public function _get_column_alias(\Glue\DB\Column $column) {
+		return $column->name();
+	}
+
+	/**
+	 * Returns the appropriate formatter for given column.
+	 *
+	 * @param \Glue\DB\Column $column
+	 *
+	 * @return \Glue\DB\Formatter
+	 */
+	public function _get_column_formatter(\Glue\DB\Column $column) {
+		return $this->cn()->get_formatter($column->type());
 	}
 }

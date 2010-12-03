@@ -45,23 +45,21 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Loads a table by database introspection.
-	 *
-	 * @param string $name
-	 *
-	 * @return \Glue\DB\Table
-	 */
-	abstract protected function create_table($name)
-		throw new \Glue\DB\Exception("The Connection::create_table function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
-	}
-
-	/**
-	 * Loads table list by database introspection.
+	 * Returns table information by database introspection.
 	 *
 	 * @return array
 	 */
-	public function create_table_list() {
-		throw new \Glue\DB\Exception("The Connection::create_table_list function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	abstract protected function intro_table($name)
+		throw new \Glue\DB\Exception("The Connection::intro_table function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	}
+
+	/**
+	 * Returns table list by database introspection.
+	 *
+	 * @return array
+	 */
+	public function intro_table_list() {
+		throw new \Glue\DB\Exception("The Connection::intro_table_list function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
 	}
 
 
