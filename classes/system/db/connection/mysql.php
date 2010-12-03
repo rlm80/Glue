@@ -77,16 +77,21 @@ class Connection_MySQL extends \Glue\DB\Connection {
 		// Create columns data structure :
 		$columns = array();
 		foreach($stmt as $row) {
+			// Build array :
 			$columns[] = array(
 				'column'	=> trim(strtolower($row[0])),					// Column name
 				'type'		=> trim(strtolower($row[1])),					// Native database type
-				'nullable'	=> (boolean) $row[2],							// Whether or not the column is nullable
+				'nullable'	=> ($row[2] === 'YES' ? true : false),			// Whether or not the column is nullable
 				'default'	=> $row[3],										// Maximum length of a text column
 				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,	// Precision of the column
 				'precision' => isset($row[5]) ? (integer) $row[5] : null,	// Scale of the column
 				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
 				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
 			);
+
+			// Set formatter :
+			$n = count($columns) - 1;
+			$columns[$n]['formatter'] = $this->get_formatter($columns[$n]['type']);
 		}
 
 		// No columns ? Means table didn't exist :
@@ -121,113 +126,29 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Returns structured information about the columns and primary key of a real database table.
-	 * Columns are returned alphabetically ordered. Returns FALSE if table doesn't exist in database.
-	 *
-	 * @param string $name
+	 * Loads table list by database introspection.
 	 *
 	 * @return array
 	 */
-	public function table_info($name) { // TODO remove this function
-		// Query information schema to get columns information :
-		$stmt = $this->prepare("
-			SELECT
-				column_name,
-				data_type,
-				is_nullable,
-				column_default,
-				character_maximum_length,
-				numeric_precision,
-				numeric_scale,
-				extra
-			FROM
-				information_schema.columns
-			WHERE
-				table_schema = :dbname AND
-				table_name = :tablename
-		");
-		$stmt->execute(array(
-			':dbname'		=> $this->dbname,
-			':tablename'	=> $name
-		));
-
-		// Create columns data structure :
-		$columns = array();
-		while ($row = $stmt->fetch()) {
-			$columns[] = array(
-				'column'	=> trim(strtolower($row[0])),					// Column name
-				'type'		=> trim(strtolower($row[1])),					// Native database type
-				'nullable'	=> (boolean) $row[2],							// Whether or not the column is nullable
-				'default'	=> $row[3],										// Maximum length of a text column
-				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,	// Precision of the column
-				'precision' => isset($row[5]) ? (integer) $row[5] : null,	// Scale of the column
-				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
-				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
-			);
-		}
-		sort($columns);
-
-		// No columns ? Means table didn't exist :
-		if (count($columns) === 0)
-			return FALSE;
-
-		// Query information schema to get pk information :
-		$stmt = $this->prepare("
-			SELECT
-				column_name
-			FROM
-				information_schema.statistics
-			WHERE
-				table_schema = :dbname AND
-				table_name = :tablename AND
-				index_name = 'PRIMARY'
-			ORDER BY
-				seq_in_index
-		");
-		$stmt->execute(array(
-			':dbname'		=> $this->dbname,
-			':tablename'	=> $name
-		));
-
-		// Create columns data structure :
-		$pk = array();
-		while ($row = $stmt->fetch())
-			$pk[] = $row[0];
-
-		return array(
-				'columns'	=> $columns,
-				'pk'		=> $pk,
-			);
-	}
-
-	/**
-	 * Returns all tables present in current database as an array of table names.
-	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
-	 *
-	 * @return array Array of table names, numerically indexed, alphabetically ordered.
-	 */
-	public function real_tables() {
+	public function create_table_list() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();
 		while ($table = $stmt->fetchColumn())
-			$tables[] = $table;
-		sort($tables);
+			$tables[$table] = $table;
 		return $tables;
 	}
 
 	/**
-	 * Returns the appropriate formatter for given column.
+	 * Returns the appropriate formatter for given db type.
 	 *
-	 * @param \Glue\DB\Column $column
+	 * @param string $dbtype
 	 *
 	 * @return \Glue\DB\Formatter
 	 */
-	public function get_formatter(\Glue\DB\Column $column)  {
+	public function get_formatter($dbtype) {
 		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
-		if (preg_match('/^\S+/', $column->dbtype(), $matches))
+		if (preg_match('/^\S+/', $dbtype, $matches))
 			$dbtype = $matches[0];
 
 		// Convert type to upper case :

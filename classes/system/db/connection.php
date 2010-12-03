@@ -28,6 +28,11 @@ abstract class Connection extends PDO {
 	protected $tables = array();
 
 	/**
+	 * @var array Table list cache.
+	 */
+	protected $table_list;
+
+	/**
 	 * @var string Connection id.
 	 */
 	protected $id;
@@ -59,12 +64,27 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Returns all the tables defined on this connection.
+	 * Returns all the tables defined on this connection as an array indexed by table names.
 	 *
 	 * @return array
 	 */
 	public function tables() {
-		// TODO
+		$tables	= array();
+		$list	= $this->list_tables();
+		foreach ($list as $name)
+			$tables[$name] = $this->table($name);
+		return $tables;
+	}
+
+	/**
+	 * Whether or not the table exists on this connection.
+	 *
+	 * @param string $name
+	 *
+	 * @return boolean
+	 */
+	public function table_exists($name) {
+		return array_key_exists($name, $this->list_tables());
 	}
 
 	/**
@@ -75,17 +95,28 @@ abstract class Connection extends PDO {
 	 * @return \Glue\DB\Table
 	 */
 	public function table($name) {
-		$name = strtolower($name);
 		if( ! isset($this->tables[$name]))
 			$this->tables[$name] = $this->create_table_from_cache($name);
 		return $this->tables[$name];
 	}
 
 	/**
+	 * Returns an array with all available tables on this connection, as an array of names indexed
+	 * by names.
+	 *
+	 * @return array
+	 */
+	public function table_list() {
+		if( ! isset($this->table_list))
+			$this->table_list = $this->create_table_list_from_cache();
+		return $this->table_list;
+	}
+
+	/**
 	 * Loads a table from the disk cache. If it isn't there already, creates
 	 * a new cache entry for it.
 	 *
-	 * @param string $name Virtual table name.
+	 * @param string $name Table name.
 	 *
 	 * @return \Glue\DB\Table
 	 */
@@ -116,28 +147,42 @@ abstract class Connection extends PDO {
 	abstract protected function create_table($name);
 
 	/**
-	 * Returns the appropriate formatter for given column.
-	 *
-	 * @param \Glue\DB\Column $column
-	 *
-	 * @return \Glue\DB\Formatter
-	 */
-	abstract public function get_formatter(\Glue\DB\Column $column);
-
-	/**
-	 * Returns structured information about the columns and primary key of a real database table.
-	 * Columns are returned alphabetically ordered.
+	 * Loads the table list from the disk cache. If it isn't there already, creates
+	 * a new cache entry for it.
 	 *
 	 * @return array
 	 */
-	public abstract function table_info($name);
+	protected function create_table_list_from_cache() {
+		// Look up object into cache directory :
+		$dir	= \Glue\ROOTPATH . "cache/db/tables/list/";
+		$path	= $dir . $this->id . ".tmp";
+
+		// Check cache availability :
+		if ( ! file_exists($path)) {
+			$list = $this->create_table_list();
+			if ( ! is_dir($dir)) mkdir($dir, 777, true);
+			file_put_contents($path, serialize($list));
+		}
+
+		// Return table list from cache :
+		return unserialize(file_get_contents($path));
+	}
 
 	/**
-	 * Returns all tables present in current database as an array of table names.
+	 * Loads table list by database introspection.
 	 *
-	 * @return array Array of table names, numerically indexed, alphabetically ordered.
+	 * @return array
 	 */
-	abstract public function real_tables();
+	abstract public function create_table_list();
+
+	/**
+	 * Returns the appropriate formatter for given db type.
+	 *
+	 * @param string $dbtype
+	 *
+	 * @return \Glue\DB\Formatter
+	 */
+	abstract public function get_formatter($dbtype);
 
 	/**
 	 * Returns a connection object from cache, or creates it if it isn't there already.

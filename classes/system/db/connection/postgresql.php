@@ -15,7 +15,7 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 	 * @var string The name of the database. We must store this because introspection queries require it.
 	 */
 	protected $dbname;
-		
+
 	/**
 	 * Constructor.
 	 *
@@ -39,43 +39,40 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 
 		// Call parent constructor :
 		parent::__construct($dsn, $username, $password, $options);
-		
+
 		// Set connection charset :
 		$this->exec('SET NAMES ' . $this->quote($charset));
 	}
 
 	/**
-	 * Returns structured information about the columns and primary key of a real database table.
-	 * Columns are returned alphabetically ordered. Returns FALSE if table doesn't exist in database.
+	 * Loads a table by database introspection.
 	 *
 	 * @param string $name
 	 *
+	 * @return \Glue\DB\Table
+	 */
+	abstract protected function create_table($name)
+		throw new \Glue\DB\Exception("The Connection::create_table function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	}
+
+	/**
+	 * Loads table list by database introspection.
+	 *
 	 * @return array
 	 */
-	public function table_info($name) {
-		throw new \Glue\DB\Exception("The Connection::table_info function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	public function create_table_list() {
+		throw new \Glue\DB\Exception("The Connection::create_table_list function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
 	}
 
-	/**
-	 * Returns all tables present in current database as an array of table names.
-	 *
-	 * Be aware that this function is totally ignorant of any virtual table
-	 * you may have defined explicitely !
-	 *
-	 * @return array Array of table names, numerically indexed, alphabetically ordered.
-	 */
-	public function real_tables() {
-		throw new \Glue\DB\Exception("The Connection::real_tables function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
-	}
 
 	/**
-	 * Returns the appropriate formatter for given column.
+	 * Returns the appropriate formatter for given db type.
 	 *
-	 * @param \Glue\DB\Column $column
+	 * @param string $dbtype
 	 *
 	 * @return \Glue\DB\Formatter
 	 */
-	public function get_formatter(\Glue\DB\Column $column)  {
+	public function get_formatter($dbtype) {
 		throw new \Glue\DB\Exception("The Connection::get_phptype function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it.");
 	}
 }

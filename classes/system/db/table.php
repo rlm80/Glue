@@ -57,7 +57,8 @@ class Table {
 					$column['precision'],
 					$column['scale'],
 					$column['default'],
-					$column['auto']
+					$column['auto'],
+					$column['formatter']
 				);
 		}
 
@@ -95,12 +96,34 @@ class Table {
 	}
 
 	/**
-	 * Returns the columns of this table.
+	 * Returns the columns of this table as an array indexed by column names.
 	 *
 	 * @return array
 	 */
 	public function columns() {
 		return $this->columns;
+	}
+
+	/**
+	 * Returns whether or not given column name is part of this table.
+	 *
+	 * @param $name
+	 *
+	 * @return boolean
+	 */
+	public function column_exists($name) {
+		return array_key_exists($name, $this->columns);
+	}
+
+	/**
+	 * Returns an array with all available columns on this table, as an array of names indexed
+	 * by names. Introduced for symetry with \Glue\DB\Connection::table_list() .
+	 *
+	 * @return array
+	 */
+	public function column_list() {
+		$colnames = array_keys($this->columns());
+		return array_combine($colnames, $colnames);
 	}
 
 	/**

@@ -59,9 +59,14 @@ class Column {
 	protected $auto;
 
 	/**
+	 * @var \Glue\DB\Formatter
+	 */
+	protected $formatter;
+
+	/**
 	 * Constructor.
 	 */
-	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto) {
+	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto, \Glue\DB\Formatter $formatter) {
 		$this->table		= $table;
 		$this->name			= $name;
 		$this->type			= $type;
@@ -71,6 +76,7 @@ class Column {
 		$this->scale		= $scale;
 		$this->default		= $default;
 		$this->auto			= $auto;
+		$this->formatter	= $formatter;
 	}
 
 	/**
@@ -98,6 +104,24 @@ class Column {
 	 */
 	public function type() {
 		return $this->type;
+	}
+
+	/**
+	 * Returns the most appropriate PHP type.
+	 *
+	 * @return string
+	 */
+	public function phptype() {
+		return $this->formatter->type();
+	}
+
+	/**
+	 * Returns the formatter.
+	 *
+	 * @return \Glue\DB\Formatter
+	 */
+	public function formatter() {
+		return $this->formatter;
 	}
 
 	/**
@@ -137,12 +161,17 @@ class Column {
 	}
 
 	/**
-	 * Returns the default value of the column (raw from the database, not type casted !).
+	 * Returns the default value of the column (type casted).
+	 *
+	 * @param $typecast Whether or not to return typecasted data.
 	 *
 	 * @return string
 	 */
-	public function _default() {
-		return $this->default;
+	public function _default($typecast = true) {
+		if ($typecast)
+			return $this->formatter->format($this->default);
+		else
+			return $this->default;
 	}
 
 	/**
