@@ -70,7 +70,7 @@ abstract class Connection extends PDO {
 	 */
 	public function tables() {
 		$tables	= array();
-		$list	= $this->list_tables();
+		$list	= $this->table_list();
 		foreach ($list as $name)
 			$tables[$name] = $this->table($name);
 		return $tables;
@@ -121,19 +121,11 @@ abstract class Connection extends PDO {
 	 * @return \Glue\DB\Table
 	 */
 	protected function create_table_from_cache($name) {
-		// Look up object into cache directory :
-		$dir	= \Glue\ROOTPATH . "cache/db/tables/"  . $this->id . '/';
-		$path	= $dir . $name . ".tmp";
-
-		// Check cache availability :
-		if ( ! file_exists($path)) {
-			$table = $this->create_table_from_class($name);
-			if ( ! is_dir($dir)) mkdir($dir, 777, true);
-			file_put_contents($path, serialize($table));
-		}
-
-		// Return table from cache :
-		return unserialize(file_get_contents($path));
+		return \Glue\Core::get_cached_object(
+			'db/tables/'  . $this->id . '/' . $name . '.tmp',
+			array($this, '_create_table_from_class'),
+			array($name)
+		);
 	}
 
 
@@ -144,7 +136,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	protected function create_table_from_class($name) {
+	public function _create_table_from_class($name) {
 		$class = 'Glue\\DB\\Table_' . ucfirst($this->id) . '_' . ucfirst($name);
 		if (class_exists($class))
 			return new $class($this->id, $name);
@@ -159,19 +151,10 @@ abstract class Connection extends PDO {
 	 * @return array
 	 */
 	protected function create_table_list_from_cache() {
-		// Look up object into cache directory :
-		$dir	= \Glue\ROOTPATH . "cache/db/tables/list/";
-		$path	= $dir . $this->id . ".tmp";
-
-		// Check cache availability :
-		if ( ! file_exists($path)) {
-			$list = $this->intro_table_list();
-			if ( ! is_dir($dir)) mkdir($dir, 777, true);
-			file_put_contents($path, serialize($list));
-		}
-
-		// Return table list from cache :
-		return unserialize(file_get_contents($path));
+		return \Glue\Core::get_cached_object(
+			'db/tables/list/' . $this->id . '.tmp',
+			array($this, '_intro_table_list')
+		);
 	}
 
 	/**
@@ -179,7 +162,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return array
 	 */
-	abstract public function intro_table_list();
+	abstract public function _intro_table_list();
 
 	/**
 	 * Returns table information by database introspection.
@@ -188,7 +171,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return array
 	 */
-	abstract public function intro_table($name);
+	abstract public function _intro_table($name);
 
 	/**
 	 * Returns the appropriate formatter for given db type.

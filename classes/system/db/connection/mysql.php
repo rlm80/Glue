@@ -51,7 +51,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	public function intro_table($name) {
+	public function _intro_table($name) {
 		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT
@@ -133,7 +133,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	public function intro_table_list() {
+	public function _intro_table_list() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();

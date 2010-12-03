@@ -89,6 +89,15 @@ class Column {
 	}
 
 	/**
+	 * Returns column alias.
+	 *
+	 * @return string
+	 */
+	public function alias() {
+		return $this->alias;
+	}
+
+	/**
 	 * Returns column name.
 	 *
 	 * @return string

@@ -15,6 +15,7 @@ namespace Glue;
 
 	// Define path constants :
 	define('Glue\\ROOTPATH', __DIR__ . '/');
+	define('Glue\\CACHEPATH', ROOTPATH . 'cache/');
 	define('Glue\\CLASSPATH_SYSTEM', ROOTPATH . 'classes/system/');
 	define('Glue\\CLASSPATH_USER', ROOTPATH . 'classes/user/');
 

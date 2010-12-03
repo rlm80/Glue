@@ -51,7 +51,7 @@ class Table {
 		$this->name		= $this->init_name();
 
 		// Get table info by introspection :
-		$info = $this->cn()->table_info($this->name);
+		$info = $this->cn()->_intro_table($this->name);
 
 		// Build columns :
 		$this->columns = array();
@@ -82,6 +82,15 @@ class Table {
 			}
 			$this->pk[$column->alias()] = $column;
 		}
+	}
+
+	/**
+	 * Returns real table name.
+	 *
+	 * @return string
+	 */
+	protected function init_name() {
+		return $this->alias;
 	}
 
 	/**

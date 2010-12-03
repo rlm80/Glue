@@ -159,4 +159,33 @@ class Core {
 	  }
 	  return $files;
 	}
+
+	/**
+	 * Returns cached object serialized in file $file of directory $dir. If not found,
+	 * creates the object using $create_callback, serializes it in file $path, and returns it.
+	 *
+	 * @param string $path Path to cache file.
+	 * @param callback $create_callback Callback function that creates the object.
+	 * @param array $create_args Arguments of callback function.
+	 *
+	 * @return object
+	 */
+	static public function get_cached_object($path, $create_callback, $create_args = array()) {
+		// Split path :
+		$parts	= explode('/', $path);
+		$file	= array_pop($parts);
+		$dir	= \Glue\CACHEPATH . implode('/', $parts);
+
+		// Check cache availability :
+		if (file_exists($path))
+			$object = unserialize(file_get_contents($path));
+		else {
+			$object = call_user_func_array($create_callback, $create_args);
+			if ( ! is_dir($dir)) mkdir($dir, 777, true);
+			file_put_contents($dir . '/' . $file, serialize($object));
+		}
+
+		// Return object :
+		return $object;
+	}
 }
