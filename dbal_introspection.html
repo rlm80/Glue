@@ -6,7 +6,9 @@ title: Guide
 
 <p>Database introspection refers to the means of retrieving database schema meta-data : table names, columns names, column types and indexes.</p>
 
-<p>Table data is stored in instances of the <span class="inline_code">\Glue\DB\Table</span> class. These objects can be retrieved like this :</p>
+<h3>Table data</h3>
+
+<p>Table data is represented as instances of the <span class="inline_code">\Glue\DB\Table</span> class. These objects can be retrieved and used like this :</p>
 
 {% highlight php %}
 <?php
@@ -16,10 +18,18 @@ title: Guide
   // Returns data about table 'mytable' of connection 'myconnection'
   $table = DB::cn('myconnection')->table('mytable');
   
+  // Available data about that table :
+  $name     = $table->name();     // Name
+  $cn       = $table->cn();       // Connection
+  $columns  = $table->columns();  // Columns array
+  $pk       = $table->pk();       // Primary key columns array
+  
 ?>
 {% endhighlight %}
 
-<p>Column data is stored in instances of the <span class="inline_code">\Glue\DB\Column</span></p> class. These objects can be retrieved like this :</p>
+<h3>Column data</h3>
+
+<p>Column data is stored in instances of the <span class="inline_code">\Glue\DB\Column</span> class. These objects can be retrieved and used like this :</p>
 
 {% highlight php %}
 <?php
@@ -42,28 +52,48 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>It is also possible to list all tables on a connection, and all columns of a table :</p>
+<h3>Listing tables and columns</h3>
+
+<p>Tables :</p>
 
 {% highlight php %}
 <?php
   
   use Glue\DB\DB;
 
-  // Display tables of default connection :
-  foreach(DB::cn()->tables() as $table) {
-    // Display table name :
-    echo $table->name() . '<br/>';
-    
-    // Display columns of current table :
-    foreach($table->columns() as $column) {
-      // Display column name :
-      echo '&nbsp;&nbsp;' . $column->name() . '<br/>';
-    }
-  }
+  // List tables of default connection :
+  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names, doesn't load table objects !
+  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names, does load table objects !
+  
+  // Checking existence of a table :
+  $exists = DB::cn()->table_exists('mytable'); // Doesn't load table object, only check existence
+
 ?>
 {% endhighlight %}
 
-<p>All of these columns and tables objects behave as singletons. They are created upon first request and then reused. That is :</p>
+<p>Columns :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Get table :
+  $table = DB::cn()->table('mytable'); 
+
+  // List columns :
+  $list     = $table->column_list(); // Returns array of column names indexed by names
+  $columns  = $table->columns();     // Returns array of column objects indexed by names
+  
+  // Checking existence of a column :
+  $exists = $table->column_exists('mycolumn');
+
+?>
+{% endhighlight %}
+
+<h3>Caching</h3>
+
+<p>All of these columns and tables objects behave as singletons. They are created upon first request, cached and then reused. That is :</p>
 
 {% highlight php %}
 <?php
@@ -74,6 +104,11 @@ title: Guide
   $t2 = DB::cn()->table('mytable');
   
   var_dump($t1 === $t2); // TRUE
+  
+  $c1 = $t1->column('mycolumn');
+  $c2 = $t2->column('mycolumn');
+  
+  var_dump($c1 === $c2); // TRUE  
 ?>
 {% endhighlight %}
 
