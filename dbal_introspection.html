@@ -4,7 +4,7 @@ title: Guide
 ---
 <h2>Database introspection</h2>
 
-<p>Database introspection refers to the means of retrieving database schema meta-data : table names, columns names, column types and indexes.</p>
+<p>Database introspection refers to the means of retrieving database schema meta-data : table names, column names, column types and indexes.</p>
 
 <h3>Table data</h3>
 
@@ -60,11 +60,11 @@ title: Guide
   use Glue\DB\DB;
 
   // List tables of default connection :
-  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names (faster)
-  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names (slower)
+  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names
+  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names
   
   // Checking existence of a table :
-  $exists = DB::cn()->table_exists('mytable'); // Doesn't load table object, only check existence
+  $exists = DB::cn()->table_exists('mytable');
 
 ?>
 {% endhighlight %}
@@ -91,7 +91,7 @@ title: Guide
 
 <h3>Caching</h3>
 
-<p>During a page load, all of these columns and tables objects are created upon first request and then reused. That is :</p>
+<p>During a page load, all of these column and table objects are created upon first request and then reused. That is :</p>
 
 {% highlight php %}
 <?php
@@ -112,47 +112,43 @@ title: Guide
 
 <p>Between each page load, all introspected data is cached on disk as serialized <span class="inline_code">\Glue\DB\Table</span> objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely (see options).</p>
 
-<h2>Aliasing system</h2>
+<h2>Views</h2>
 
-<p>By default, tables and columns are known to the application by the same names that they have in whatever database they are stored into :</p>
+<p>The library supports a basic kind of views.</p>
 
-{% highlight php %}
-<?php
-  
-  use Glue\DB\DB;
-  
-  // Returns data about the column 'mycolumn' of the database table 'mytable'
-  $col_data = DB::table('mytable')->column('mycolumn');
-  
-  // Returns "SELECT `mytable`.`mycolumn` FROM `mytable`"
-  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
-  
-?>
-{% endhighlight %}
-
-<p>However, aliases may be defined. If you do so, each time you refer to <span class="inline_code">mytable</span> and <span class="inline_code">mycolumn</span>, the library knows that you actually mean for example <span class="inline_code">anothertable</span> and <span class="inline_code">anothercolumn</span> :</p>
+<p>Suppose you have an application that requires a User(login, password) table. But what you have in the database is a Person(name, password) table, a legacy table that you can't afford to refactor. Views offer a solution to this problem. By defining a User view you can turn the results of these queries :</p>
 
 {% highlight php %}
 <?php
   
   use Glue\DB\DB;
   
-  // Now returns data about the column 'anothercolumn' of the table 'anothertable'
-  $col_data = DB::table('mytable')->column('mycolumn');
+  // Returns data about the column 'login' of the database table 'User'
+  $col_data = DB::table('User')->column('login');
   
-  // Now returns "SELECT `anothertable`.`anothercolumn` FROM `anothertable`"
-  $sql = DB::select('mytable', $m)->columns($m->mycolumn)->root()->sql();
+  // Returns "SELECT `User`.`login` FROM `User`"
+  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
   
 ?>
 {% endhighlight %}
 
-<p>Setting up aliases is done by defining your own virtual tables.</p>
+<p>...into this :</p>
 
-<h2>Virtual tables</h2>
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Returns data about the column 'name' of the database table 'Person'
+  $col_data = DB::table('User')->column('login');
+  
+  // Returns "SELECT `Person`.`name` FROM `Person`"
+  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
+  
+?>
+{% endhighlight %}
 
-<p>Table names in the introspection API or in the query builder don't actually refer to a database tables. They refer to PHP objects called virtual tables.</p>
-
-<p> To set up such aliases, you must define a virtual table. Table aliases are defined by extending the ~\Glue\DB\Table class. The class name defines the table alias. The real table name my be defined by overriding the <span class="inline_code">$dbtable</span> property declaration. Column aliases may be defined by overriding the function <span class="inline_code">string get_column_alias(\Glue\DB\Column $column)</span> :</p>
+<p>Views are special <span class="inline_code">\Glue\DB\Table</span> objects. They behave just like tables, they show up in the introspection API and can be used in queries just the same. They have names and columns. However, unlike normal table objects, they are mapped to an underlying database table that may have a different name and different columns. That mapping is defined by creating a class that extends <span class="inline_code">\Glue\DB\Table</span> :</p>
 
 {% highlight php %}
 <?php
@@ -160,32 +156,22 @@ title: Guide
   
   namespace Glue\User\DB;
   
-  class Table_Anothertable extends \Glue\DB\Table {
+  class Table_User extends \Glue\DB\Table {
     
     // Override real table name :
-    protected $dbtable = 'mytable';
+    protected function init_name() {
+      return 'Person';
+    }
     
-    // Override column alias for mycolumn :
+    // Override column alias for 'name' :
     public function get_column_alias(\Glue\DB\Column $column) {
-      if ($column->dbname() === 'mycolumn')
-        return 'anothercolumn';
+      if ($column->name() === 'name')
+        return 'login';
       return parent::get_column_alias($column);
     }
   }
 ?>
 {% endhighlight %}
 
-<p>The introspection API and the query builder will now reflect those changes :</p>
-
-
-
-
-
-
-
-
-
-
-
-
+<p>The name of the class tells the library that the view is named 'User'. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the name column.</p>
 
