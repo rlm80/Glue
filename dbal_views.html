@@ -7,45 +7,21 @@ title: Guide
 
 <h2>Views</h2>
 
-<p>The library supports a basic kind of views.</p>
+<p>This library supports a basic kind of views defined in PHP.</p>
 
-<h3>The problem</h3>
+<h3>Database Views</h3>
 
-<p>Suppose you have an application that requires a User(login, password) table. But what you have in the database is a Person(name, password) table, a legacy table that you can't afford to refactor. Views offer a solution to this problem. By defining a User view you can turn the results of these queries :</p>
+<p>True database views are tables with content dynamically defined by the result set of a query. Such views can be used in SELECT queries like any other table. However, it is usually impossible to insert, update and delete data from them.</p>
 
-{% highlight php %}
-<?php
-  
-  use Glue\DB\DB;
-  
-  // Returns data about the column 'login' of the database table 'User'
-  $col_data = DB::table('User')->column('login');
-  
-  // Returns "SELECT `User`.`login` FROM `User`"
-  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
-  
-?>
-{% endhighlight %}
+<h3>PHP Views</h3>
 
-<p>...into this :</p>
+<p>This library supports a basic kind of views defined in PHP. PHP views only map to a single table instead of a query, but it is possible to insert, update and delete data from them. The implementation is a simple name translation system : for example each time you refer to column 'A.a' of the view 'A' in a query, the library knows it actually means the column 'B.b' of the table 'B' and it makes the appropriate replacements before sending the query to the database.</p>
 
-{% highlight php %}
-<?php
-  
-  use Glue\DB\DB;
-  
-  // Returns data about the column 'name' of the database table 'Person'
-  $col_data = DB::table('User')->column('login');
-  
-  // Returns "SELECT `Person`.`name` FROM `Person`"
-  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
-  
-?>
-{% endhighlight %}
+<h3>Defining Views</h3>
 
-<h3>The solution</h3>
+<p>Views are special <span class="inline_code">\Glue\DB\Table</span> objects. They behave just like tables, they show up in the introspection API and can be used in queries just the same. They have names and columns. However, unlike normal table objects, they are mapped to an underlying database table that may have a different name and different columns. That mapping is defined by creating a class that extends <span class="inline_code">\Glue\DB\Table</span>.</p>
 
-<p>Views are special <span class="inline_code">\Glue\DB\Table</span> objects. They behave just like tables, they show up in the introspection API and can be used in queries just the same. They have names and columns. However, unlike normal table objects, they are mapped to an underlying database table that may have a different name and different columns. That mapping is defined by creating a class that extends <span class="inline_code">\Glue\DB\Table</span> :</p>
+<p>The following example defines a User(login, password) view that maps to the underlying Person(name, password) database table.</p>
 
 {% highlight php %}
 <?php
@@ -55,20 +31,38 @@ title: Guide
   
   class Table_User extends \Glue\DB\Table {
     
-    // Override real table name :
     protected function init_name() {
-      return 'Person';
+      return 'Person'; // Underlying table name.
     }
     
-    // Override column alias for 'name' :
     public function get_column_alias(\Glue\DB\Column $column) {
       if ($column->name() === 'name')
-        return 'login';
-      return parent::get_column_alias($column);
+        return 'login'; // Alias for column 'name'
+      return parent::get_column_alias($column); // Any other column identifier is unchanged
     }
   }
 ?>
 {% endhighlight %}
 
-<p>The name of the class tells the library that the view is named 'User'. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the name column.</p>
+<p>The name of the class tells the library that the view is named 'User'. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the 'name' column.</p>
+
+<h3>Using Views</h3>
+
+<p>Since views are a special kind of tables, you can use them just like you would use tables :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+  
+  // Actually returns data about the column 'name' of the database table 'Person'
+  $column = DB::table('User')->column('login');
+  
+  // Actually returns "SELECT `Person`.`name` FROM `Person`"
+  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
+  
+?>
+{% endhighlight %}
+
+
 
