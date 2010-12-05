@@ -120,13 +120,16 @@ abstract class Connection extends PDO {
 	 * @return array
 	 */
 	protected function create_table_list() {
-		// Get tables :
+		// Get table names :
 		$tables = $this->db_table_list();
 
-		// Get views :
-		$views = array();
-		foreach(glob(\Glue\CLASSPATH_USER . 'db/table/*.php') as $file) {
-			$name = strtolower(substr($file, 0, -4));
+		// Get view names :
+		$views	= array();
+		$dir	= \Glue\CLASSPATH_USER . 'db/table';
+		foreach(\Glue\Core::globr($dir , '*.php') as $file) {
+			$parts = explode('/', substr($file, strlen($dir) + 1, -4));
+			array_shift($parts);
+			$name = implode('_', $parts);
 			$views[$name] = $name;
 		}
 

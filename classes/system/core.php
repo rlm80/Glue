@@ -75,16 +75,16 @@ class Core {
 		$doc = "<?php \n\n";
 
 		// Generate DB docs :
-		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'db/');
-		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'db/');
+		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'db');
+		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'db');
 		$classes		= array_merge($classes_system, $classes_user);
 		$doc .= "namespace Glue\DB {\n\n";
 		$doc .= implode("\n\n", $classes);
 		$doc .= "\n\n}\n\n";
 
 		// Generate ORM docs :
-		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'orm/');
-		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'orm/');
+		$classes_system	= static::get_doc(\Glue\CLASSPATH_SYSTEM	. 'orm');
+		$classes_user	= static::get_doc(\Glue\CLASSPATH_USER		. 'orm');
 		$classes		= array_merge($classes_system, $classes_user);
 		$doc .= "namespace Glue\ORM {\n\n";
 		$doc .= implode("\n\n", $classes);
@@ -153,7 +153,7 @@ class Core {
 	 *
 	 * @return array containing all pattern-matched files.
 	 */
-	static protected function globr($dir, $pattern, $flags = null) {
+	static public function globr($dir, $pattern, $flags = null) {
 	  $files = glob("$dir/$pattern", $flags);
 	  foreach (glob("$dir/*", GLOB_ONLYDIR) as $subDir) {
 		$subFiles = self::globr($subDir, $pattern, $flags);
@@ -189,5 +189,33 @@ class Core {
 		$dir	= \Glue\CACHEPATH . implode('/', $parts);
 		if ( ! is_dir($dir)) mkdir($dir, 777, true);
 		file_put_contents($dir . '/' . $file, serialize($object));
+	}
+
+	/**
+	 * Clears cache.
+	 *
+	 * @param string $path Cache subdirectory to delete.
+	 */
+	static public function clear_cache($path = '') {
+		static::rrmdir(\Glue\CACHEPATH . $path);
+	}
+
+	/**
+	 * Recursively deletes a directory and its content.
+	 *
+	 * @link http://be.php.net/manual/en/function.unlink.php#79940
+	 *
+	 * @param $dir
+	 */
+	static public function rrmdir($dir, $DeleteMe = true) {
+	    if(!$dh = @opendir($dir)) return;
+	    while (false !== ($obj = readdir($dh))) {
+	        if($obj=='.' || $obj=='..') continue;
+	        if (!@unlink($dir.'/'.$obj)) static::rrmdir($dir.'/'.$obj, true);
+	    }
+	    closedir($dh);
+	    if ($DeleteMe){
+	        @rmdir($dir);
+	    }
 	}
 }

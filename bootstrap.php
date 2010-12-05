@@ -14,10 +14,10 @@ namespace Glue;
  */
 
 	// Define path constants :
-	define('Glue\\ROOTPATH', __DIR__ . '/');
-	define('Glue\\CACHEPATH', ROOTPATH . 'cache/');
-	define('Glue\\CLASSPATH_SYSTEM', ROOTPATH . 'classes/system/');
-	define('Glue\\CLASSPATH_USER', ROOTPATH . 'classes/user/');
+	define('Glue\\ROOTPATH', __DIR__ . '/'); // TODO supprimer les '/' finaux
+	define('Glue\\CACHEPATH', ROOTPATH . 'cache/');// TODO supprimer les '/' finaux
+	define('Glue\\CLASSPATH_SYSTEM', ROOTPATH . 'classes/system/');// TODO supprimer les '/' finaux
+	define('Glue\\CLASSPATH_USER', ROOTPATH . 'classes/user/');// TODO supprimer les '/' finaux
 
 	// Require Core class :
 	if (is_file(CLASSPATH_USER . 'core.php')) {
