@@ -29,7 +29,7 @@ title: Guide
   
   namespace Glue\User\DB;
   
-  class Table_User extends \Glue\DB\Table {
+  class Table_User extends \Glue\DB\Table { // TODO changes this, should be Table_<connection id>_User
     
     protected function init_name() {
       return 'Person'; // Underlying table name.
