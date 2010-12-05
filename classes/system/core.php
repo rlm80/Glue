@@ -97,6 +97,8 @@ class Core {
 	/**
 	 * Returns class skeletons for all class files found in given path, as an array indexed by class name.
 	 *
+	 * TODO change this, and store everything as separate files + only system files ?
+	 *
 	 * @param string $path
 	 *
 	 * @return array
@@ -161,31 +163,31 @@ class Core {
 	}
 
 	/**
-	 * Returns cached object serialized in file $file of directory $dir. If not found,
-	 * creates the object using $create_callback, serializes it in file $path, and returns it.
+	 * Returns cached object on $path in the cache directory. Returns null if no cache entry at $path.
+	 *
+	 * @param string $path Path to cache file, relative to cache directory.
+	 *
+	 * @return mixed
+	 */
+	static public function get_cache_entry($path) {
+		$abspath = \Glue\CACHEPATH . $path;
+		if (file_exists($abspath))
+			return unserialize(file_get_contents($abspath));
+		else
+			return null;
+	}
+
+	/**
+	 * Creates new cache entry for $object on $path in cache directory.
 	 *
 	 * @param string $path Path to cache file.
-	 * @param callback $create_callback Callback function that creates the object.
-	 * @param array $create_args Arguments of callback function.
-	 *
-	 * @return object
+	 * @param mixed $object Object to store in cache.
 	 */
-	static public function get_cached_object($path, $create_callback, $create_args = array()) {
-		// Split path :
+	static public function create_cache_entry($path, $object) {
 		$parts	= explode('/', $path);
 		$file	= array_pop($parts);
 		$dir	= \Glue\CACHEPATH . implode('/', $parts);
-
-		// Check cache availability :
-		if (file_exists($path))
-			$object = unserialize(file_get_contents($path));
-		else {
-			$object = call_user_func_array($create_callback, $create_args);
-			if ( ! is_dir($dir)) mkdir($dir, 777, true);
-			file_put_contents($dir . '/' . $file, serialize($object));
-		}
-
-		// Return object :
-		return $object;
+		if ( ! is_dir($dir)) mkdir($dir, 777, true);
+		file_put_contents($dir . '/' . $file, serialize($object));
 	}
 }

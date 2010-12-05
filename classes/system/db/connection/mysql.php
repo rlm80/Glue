@@ -88,10 +88,6 @@ class Connection_MySQL extends \Glue\DB\Connection {
 				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
 				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
 			);
-
-			// Set formatter :
-			$n = count($columns) - 1;
-			$columns[$n]['formatter'] = $this->get_formatter($columns[$n]['type']);
 		}
 
 		// No columns ? Means table didn't exist :
@@ -129,16 +125,18 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Retruns table list by database introspection.
+	 * Retruns table list by database introspection as an array of table names indexed by table name.
 	 *
 	 * @return array
 	 */
-	public function _intro_table_list() {
+	protected function db_table_list() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();
-		while ($table = $stmt->fetchColumn())
-			$tables[$table] = $table;
+		while ($table = $stmt->fetchColumn()) {
+			$name = strtolower($table);
+			$tables[$name] = $name;
+		}
 		return $tables;
 	}
 

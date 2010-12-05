@@ -37,12 +37,12 @@ class Connection_SQLite extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Returns table list by database introspection.
+	 * Retruns table list by database introspection as an array of table names indexed by table name.
 	 *
 	 * @return array
 	 */
-	public function _intro_table_list() {
-		throw new \Glue\DB\Exception("The Connection::intro_table_list function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+	protected function db_table_list() {
+		throw new \Glue\DB\Exception("The Connection::db_table_list function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**

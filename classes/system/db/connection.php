@@ -64,7 +64,7 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Returns all the tables defined on this connection as an array indexed by table names.
+	 * Returns all the tables defined on this connection as an array indexed by table alias.
 	 *
 	 * @return array
 	 */
@@ -84,20 +84,61 @@ abstract class Connection extends PDO {
 	 * @return boolean
 	 */
 	public function table_exists($name) {
-		return array_key_exists($name, $this->list_tables());
+		return array_key_exists($name, $this->table_list());
 	}
 
 	/**
-	 * Returns an array with all available tables on this connection, as an array of names indexed
-	 * by names.
+	 * Returns an array with all available tables on this connection, as an array of table names indexed
+	 * by name.
 	 *
 	 * @return array
 	 */
 	public function table_list() {
 		if( ! isset($this->table_list))
-			$this->table_list = $this->create_table_list_from_cache();
+			$this->table_list = $this->table_list_from_cache();
 		return $this->table_list;
 	}
+
+	/**
+	 * Loads the table list from the disk cache. If it isn't there already, creates
+	 * a new cache entry for it.
+	 *
+	 * @return array
+	 */
+	protected function table_list_from_cache() {
+		$path = 'db/tables/list/' . $this->id . '.tmp';
+		if ( ! $list = \Glue\Core::get_cache_entry($path)) {
+			$list = $this->create_table_list();
+			\Glue\Core::create_cache_entry($path, $list);
+		}
+		return $list;
+	}
+
+	/**
+	 * Creates table list from scratch and returns it.
+	 *
+	 * @return array
+	 */
+	protected function create_table_list() {
+		// Get tables :
+		$tables = $this->db_table_list();
+
+		// Get views :
+		$views = array();
+		foreach(glob(\Glue\CLASSPATH_USER . 'db/table/*.php') as $file) {
+			$name = strtolower(substr($file, 0, -4));
+			$views[$name] = $name;
+		}
+
+		return array_merge($tables, $views);
+	}
+
+	/**
+	 * Retruns table list by database introspection as an array of table names indexed by table name.
+	 *
+	 * @return array
+	 */
+	abstract protected function db_table_list();
 
 	/**
 	 * Loads a table object, stores it in cache, and returns it.
@@ -108,7 +149,7 @@ abstract class Connection extends PDO {
 	 */
 	public function table($name) {
 		if( ! isset($this->tables[$name]))
-			$this->tables[$name] = $this->create_table_from_cache($name);
+			$this->tables[$name] = $this->table_from_cache($name);
 		return $this->tables[$name];
 	}
 
@@ -120,14 +161,14 @@ abstract class Connection extends PDO {
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	protected function create_table_from_cache($name) {
-		return \Glue\Core::get_cached_object(
-			'db/tables/'  . $this->id . '/' . $name . '.tmp',
-			array($this, '_create_table_from_class'),
-			array($name)
-		);
+	protected function table_from_cache($name) {
+		$path = 'db/tables/'  . $this->id . '/' . $name . '.tmp';
+		if ( ! $table = \Glue\Core::get_cache_entry($path)) {
+			$table = $this->create_table($name);
+			\Glue\Core::create_cache_entry($path, $table);
+		}
+		return $table;
 	}
-
 
 	/**
 	 * Loads a table by instanciating the appropriate class.
@@ -136,33 +177,13 @@ abstract class Connection extends PDO {
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	public function _create_table_from_class($name) {
+	protected function create_table($name) {
 		$class = 'Glue\\DB\\Table_' . ucfirst($this->id) . '_' . ucfirst($name);
 		if (class_exists($class))
 			return new $class($this->id, $name);
 		else
 			return new \Glue\DB\Table($this->id, $name);
 	}
-
-	/**
-	 * Loads the table list from the disk cache. If it isn't there already, creates
-	 * a new cache entry for it.
-	 *
-	 * @return array
-	 */
-	protected function create_table_list_from_cache() {
-		return \Glue\Core::get_cached_object(
-			'db/tables/list/' . $this->id . '.tmp',
-			array($this, '_intro_table_list')
-		);
-	}
-
-	/**
-	 * Returns table list by database introspection.
-	 *
-	 * @return array
-	 */
-	abstract public function _intro_table_list();
 
 	/**
 	 * Returns table information by database introspection.
