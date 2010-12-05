@@ -11,11 +11,11 @@ title: Guide
 
 <h3>Database Views</h3>
 
-<p>True database views are tables with content dynamically defined by the result set of a query. Such views can be used in SELECT queries like any other table. However, it is usually impossible to insert, update and delete data from them.</p>
+<p>True <a class="external" href="http://en.wikipedia.org/wiki/View_%28database%29">database views</a> are tables with content dynamically defined by the result set of a query. Such views can be used in SELECT queries like any other table. However, it is usually impossible to insert, update and delete data from them.</p>
 
 <h3>PHP Views</h3>
 
-<p>This library supports a basic kind of views defined in PHP. PHP views only map to a single table instead of a query, but it is possible to insert, update and delete data from them. The implementation is a simple name translation system : for example each time you refer to column 'A.a' of the view 'A' in a query, the library knows it actually means the column 'B.b' of the table 'B' and it makes the appropriate replacements before sending the query to the database.</p>
+<p>PHP views only map to a single table instead of a query, but it is possible to insert, update and delete data from them. The implementation is a simple name translation system : for example each time you refer to the column <span class="inline_code">A.a</a> of the view <span class="inline_code">A</a> in a query, the library knows it actually means the column <span class="inline_code">B.b</a> of the table <span class="inline_code">B</a> and it makes the appropriate replacements before sending the query to the database.</p>
 
 <h3>Defining Views</h3>
 
