@@ -17,11 +17,11 @@ title: Guide
 
 <p>PHP views only map to a single table instead of a query, but it is possible to insert, update and delete data from them. The implementation is a simple name translation system : for example each time you refer to the column <span class="inline_code">A.a</span> of the view <span class="inline_code">A</span> in a query, the library knows it actually means the column <span class="inline_code">B.b</span> of the table <span class="inline_code">B</span> and it makes the appropriate replacements before sending the query to the database.</p>
 
-<h3>Defining Views</h3>
+<h2>Defining Views</h2>
 
 <p>Views are special <span class="inline_code">\Glue\DB\Table</span> objects. They behave just like tables, they show up in the introspection API and can be used in queries just the same. They have names and columns. However, unlike normal table objects, they are mapped to an underlying database table that may have a different name and different columns. That mapping is defined by creating a class that extends <span class="inline_code">\Glue\DB\Table</span>.</p>
 
-<p>The following example defines a User(login, password) view that maps to the underlying Person(name, password) database table.</p>
+<p>The following example defines a <span class="inline_code">User(login, password)</span> view that maps to the underlying <span class="inline_code">Person(name, password)</span> database table.</p>
 
 {% highlight php %}
 <?php
@@ -46,7 +46,7 @@ title: Guide
 
 <p>The name of the class tells the library that the view is named 'User'. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the 'name' column.</p>
 
-<h3>Using Views</h3>
+<h2>Using Views</h2>
 
 <p>Since views are a special kind of tables, you can use them just like you would use tables :</p>
 

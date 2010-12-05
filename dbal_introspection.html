@@ -19,7 +19,8 @@ title: Guide
   $table = DB::cn('myconnection')->table('mytable');
   
   // Available data about that table :
-  $name     = $table->name();     // Name
+  $alias    = $table->alias();    // Name of the table, as it is known in PHP-land (see Views)
+  $name     = $table->name();     // Name of the table, as it is known to the database (see Views)
   $cn       = $table->cn();       // Connection
   $columns  = $table->columns();  // Columns array
   $pk       = $table->pk();       // Primary key columns array
@@ -40,7 +41,8 @@ title: Guide
   $column = DB::cn('myconnection')->table('mytable')->column('mycolumn');
   
   // Available data about that column :
-  $name       = $column->name();        // Name
+  $alias      = $column->alias();       // Name of the table, as it is known in PHP-land (see Views)
+  $name       = $column->name();        // Name of the table, as it is known to the database (see Views)
   $type       = $column->type()));      // Database type (as returned by RDBMS)
   $phptype    = $column->phptype());    // Most appropriate PHP type to store column data    
   $nullable   = $column->nullable());   // Whether or not column is nullable
