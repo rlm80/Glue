@@ -38,29 +38,103 @@ abstract class Connection extends PDO {
 	protected $id;
 
 	/**
+	 * @var string Username used to connect to the database.
+	 */
+	protected $username;
+
+	/**
+	 * @var string Password used to connect to the database.
+	 */
+	protected $password;
+
+	/**
+	 * @var string Connection id.
+	 */
+	protected $options;
+
+	/**
+	 * @var string Connection charset.
+	 */
+	protected $charset;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param $dsn DSN string that identifies target database.
-	 * @param $username Username used to connect to the database.
-	 * @param $password Password used to connect to the database.
-	 * @param $options A key=>value array of driver-specific connection options.
+	 * @param $id Connection identifier.
 	 */
-	public function __construct($dsn, $username, $password, $options) {
+	public function __construct($id) {
+		// Set connection ID :
+		$this->id = $id;
+
+		// Initialize connection data :
+		$this->init();
+
+		// Build DSN :
+		$dsn = $this->dsn();
+
 		// Call parent constructor to establish connection :
-		parent::__construct($dsn, $username, $password, $options);
+		parent::__construct($dsn, $this->username, $this->password, $this->options);
+
+		// Unset username and password to make sure they're not dumped accidentaly on display :
+		unset($this->username);
+		unset($this->password);
 
 		// Set attributes :
 		$this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('Glue\\DB\\Statement', array($this)));
+
+		// Set charset :
+		$this->set_charset();
 	}
 
 	/**
-	 * Connection id setter.
-	 *
-	 * @param string $id
+	 * Builds DSN once all properties have been set.
 	 */
-	public function set_id($id) {
-		$this->id = $id;
+	abstract protected function dsn();
+
+	/**
+	 * Connection data initialization function, meant to be redefined.
+	 */
+	protected function init() {
+		if ( ! isset($this->username))	$this->username	= $this->default_username();
+		if ( ! isset($this->password))	$this->password	= $this->default_password();
+		if ( ! isset($this->options))	$this->options	= $this->default_options();
+		if ( ! isset($this->charset))	$this->charset	= $this->default_charset();
+	}
+
+	/**
+	 * Default username.
+	 */
+	protected function default_username() {
+		return 'root';
+	}
+
+	/**
+	 * Default password.
+	 */
+	protected function default_password() {
+		return '';
+	}
+
+	/**
+	 * Default options.
+	 */
+	protected function default_options() {
+		return null;
+	}
+
+	/**
+	 * Default options.
+	 */
+	protected function default_charset() {
+		return 'utf8';
+	}
+
+	/**
+	 * Sets connection charset.
+	 */
+	protected function set_charset() {
+		$this->exec('SET NAMES ' . $this->quote($charset));
 	}
 
 	/**
@@ -207,16 +281,29 @@ abstract class Connection extends PDO {
 	abstract public function get_formatter($dbtype);
 
 	/**
+	 * Default connection id.
+	 *
+	 * @return string
+	 */
+	static protected function default_id() {
+		return 'default';
+	}
+
+	/**
 	 * Returns a connection object from cache, or creates it if it isn't there already.
 	 *
 	 * @param string $id
 	 *
 	 * @return \Glue\DB\Connection
 	 */
-	static public function get($id) {
-		if( ! isset(self::$instances[$id]))
-			self::$instances[$id] = self::create($id);
-		return self::$instances[$id];
+	static public function get($id = null) {
+		// No id given ? Means default id :
+		$id = static::default_id();
+
+		// Loads and returns connection :
+		if( ! isset(static::$instances[$id]))
+			static::$instances[$id] = static::create($id);
+		return static::$instances[$id];
 	}
 
 	/**
@@ -227,15 +314,8 @@ abstract class Connection extends PDO {
 	 * @return \Glue\DB\Connection
 	 */
 	static protected function create($id) {
-		// Class name :
-		$connections	= \Glue\DB\Config::connections();
-		$class			= $connections[$id];
-
-		// Create instance :
-		$cn = new $class();
-		$cn->set_id($id);
-
-		return $cn;
+		$class = 'Glue\\DB\\Connection_' . ucfirst($id);
+		return new $class($id);
 	}
 
 	/* ***************************************************************************************************** */
