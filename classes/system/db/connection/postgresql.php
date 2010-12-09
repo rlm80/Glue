@@ -17,31 +17,54 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 	protected $dbname;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param $dbname The name of the database.
-	 * @param $username Username used to connect to the database.
-	 * @param $password Password used to connect to the database.
-	 * @param $host The hostname on which the database server resides.
-	 * @param $port The port number where the database server is listening.
-	 * @param $options A key=>value array of driver-specific connection options.
-	 * @param $charset Connection charset.
+	 * @var string The hostname on which the database server resides.
 	 */
-	public function __construct($dbname, $username, $password, $host = 'localhost', $port = null, $options = array(), $charset = 'utf8') {
-		// Build DSN :
-		$dsn = 'pgsql:' .
-			   'host=' . $host . ';' .
-			   (isset($port) ? 'port=' . $port . ';' : '') .
-			   'dbname=' . $dbname . ';';
+	protected $host;
 
-		// Store dbname :
-		$this->dbname = $dbname;
+	/**
+	 * @var string The port number where the database server is listening.
+	 */
+	protected $port;
 
-		// Call parent constructor :
-		parent::__construct($dsn, $username, $password, $options);
+	/**
+	 * Builds DSN once all properties have been set.
+	 */
+	protected function dsn() {
+		return 'pgsql:' .
+			   'host=' . $this->host . ';' .
+			   (isset($this->port) ? 'port=' . $this->port . ';' : '') .
+			   (isset($this->dbname) ?	'dbname=' .	$this->dbname	. ';' : '');
+	}
 
-		// Set connection charset :
-		$this->exec('SET NAMES ' . $this->quote($charset));
+	/**
+	 * Connection data initialization function.
+	 */
+	protected function init() {
+		parent::init();
+		if ( ! isset($this->dbname))	$this->dbname	= $this->default_dbname();
+		if ( ! isset($this->host))		$this->host		= $this->default_host();
+		if ( ! isset($this->port))		$this->port		= $this->default_port();
+	}
+
+	/**
+	 * Default dbname.
+	 */
+	protected function default_dbname() {
+		return null;
+	}
+
+	/**
+	 * Default host.
+	 */
+	protected function default_host() {
+		return 'localhost';
+	}
+
+	/**
+	 * Default port.
+	 */
+	protected function default_port() {
+		return null;
 	}
 
 	/**

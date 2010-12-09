@@ -12,17 +12,30 @@ namespace Glue\System\DB;
 
 class Connection_SQLite extends \Glue\DB\Connection {
 	/**
-	 * Constructor.
-	 *
-	 * @param $path
-	 * @param $options A key=>value array of driver-specific connection options.
+	 * @var string Path to sqlite file.
 	 */
-	public function __construct($path, $options = array()) {
-		// Build DSN :
-		$dsn = 'sqlite:' . $path;
+	protected $path;
 
-		// Call parent constructor :
-		parent::__construct($dsn, null, null, $options);
+	/**
+	 * Builds DSN once all properties have been set.
+	 */
+	protected function dsn() {
+		return 'sqlite:' . $this->path;
+	}
+
+	/**
+	 * Connection data initialization function.
+	 */
+	protected function init() {
+		parent::init();
+		if ( ! isset($this->path)) $this->path = $this->default_path();
+	}
+
+	/**
+	 * Default path.
+	 */
+	protected function default_path() {
+		return null;
 	}
 
 	/**

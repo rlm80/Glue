@@ -18,11 +18,6 @@ use \PDO;
 
 abstract class Connection extends PDO {
 	/**
-	 * @var array Connection instances cache.
-	 */
-	static protected $instances = array();
-
-	/**
 	 * @var array Table instances cache.
 	 */
 	protected $tables = array();
@@ -134,7 +129,7 @@ abstract class Connection extends PDO {
 	 * Sets connection charset.
 	 */
 	protected function set_charset() {
-		$this->exec('SET NAMES ' . $this->quote($charset));
+		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
 
 	/**
@@ -279,44 +274,6 @@ abstract class Connection extends PDO {
 	 * @return \Glue\DB\Formatter
 	 */
 	abstract public function get_formatter($dbtype);
-
-	/**
-	 * Default connection id.
-	 *
-	 * @return string
-	 */
-	static protected function default_id() {
-		return 'default';
-	}
-
-	/**
-	 * Returns a connection object from cache, or creates it if it isn't there already.
-	 *
-	 * @param string $id
-	 *
-	 * @return \Glue\DB\Connection
-	 */
-	static public function get($id = null) {
-		// No id given ? Means default id :
-		$id = static::default_id();
-
-		// Loads and returns connection :
-		if( ! isset(static::$instances[$id]))
-			static::$instances[$id] = static::create($id);
-		return static::$instances[$id];
-	}
-
-	/**
-	 * Creates a new connection instance and returns it.
-	 *
-	 * @param string $id
-	 *
-	 * @return \Glue\DB\Connection
-	 */
-	static protected function create($id) {
-		$class = 'Glue\\DB\\Connection_' . ucfirst($id);
-		return new $class($id);
-	}
 
 	/* ***************************************************************************************************** */
 	/* *********************************** FRAGMENT COMPILER FUNCTIONS ************************************* */

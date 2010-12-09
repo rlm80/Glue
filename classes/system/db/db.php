@@ -14,22 +14,93 @@ namespace Glue\System\DB;
 
 class DB {
 	/**
-	 * Returns a connection that is a singleton instance of the connection class identified by $id
-	 * in the connections array of \Glue\DB\Config. Calling the function with no parameter returns
-	 * the default connection, which is a singleton instance of the first connection class to appear
-	 * in the connections array.
+	 * @var array Connection instances cache.
+	 */
+	static protected $connections = array();
+
+	/**
+	 * @var array Connection ids cache.
+	 */
+	static protected $connection_list = array();
+
+	/**
+	 * Default connection id.
+	 *
+	 * @return string
+	 */
+	static protected function default_connection_id() {
+		return 'default';
+	}
+
+	/**
+	 * Returns connection identified by given id.
 	 *
 	 * @param string $id
 	 *
 	 * @return \Glue\DB\Connection
 	 */
-	public static function cn($id = null) {
-		// No connection identifier given means first element in the connection array :
-		if ( ! isset($id)) {
-			$connections = \Glue\DB\Config::connections();
-			list($id, ) = each($connections);
+	static public function cn($id = null) {
+		// No id given ? Means default id :
+		$id = static::default_connection_id();
+
+		// Loads and returns connection :
+		if( ! isset(static::$connections[$id]))
+			static::$connections[$id] = static::create_connection($id);
+		return static::$connections[$id];
+	}
+
+	/**
+	 * Creates a new connection instance and returns it.
+	 *
+	 * @param string $id
+	 *
+	 * @return \Glue\DB\Connection
+	 */
+	static protected function create_connection($id) {
+		$class = 'Glue\\DB\\Connection_' . ucfirst($id);
+		return new $class($id);
+	}
+
+	/**
+	 * Returns all defined connections as an array of connections indexed by connection id.
+	 *
+	 * @return array
+	 */
+	static public function connections() {
+		$connections	= array();
+		$list			= static::connection_list();
+		foreach ($list as $id)
+			$connections[$id] = static::cn($name);
+		return $connections;
+	}
+
+	/**
+	 * Whether or not the connection is defined.
+	 *
+	 * @param string $name
+	 *
+	 * @return boolean
+	 */
+	static public function connection_exists($id) {
+		return array_key_exists($id, static::connection_list());
+	}
+
+	/**
+	 * Returns an array with all defined connections, as an array of connection ids indexed
+	 * by connection id.
+	 *
+	 * @return array
+	 */
+	static public function connection_list() {
+		if( ! isset(static::$connection_list)) {
+			static::$connection_list = array();
+			$dir = \Glue\CLASSPATH_USER . 'db/connection';
+			foreach(\Glue\Core::globr($dir , '*.php') as $file) {
+				$id = strtolower(substr($file, strlen($dir) + 1, -4));
+				static::$connection_list[$id] = $id;
+			}
 		}
-		return \Glue\DB\Connection::get($id);
+		return static::$connection_list;
 	}
 
 	/**
