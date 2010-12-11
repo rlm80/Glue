@@ -35,10 +35,10 @@ title: Guide
       return 'Person'; // Underlying table name.
     }
     
-    public function get_column_alias(\Glue\DB\Column $column) {
+    public function _get_column_alias(\Glue\DB\Column $column) {
       if ($column->name() === 'name')
         return 'login'; // Alias for column 'name'
-      return parent::get_column_alias($column); // Any other column identifier is unchanged
+      return parent::_get_column_alias($column); // Any other column identifier is unchanged
     }
   }
 ?>
