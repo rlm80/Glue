@@ -9,101 +9,97 @@ Prerequisites : <a href="/Glue/file_system.html#create_new_class">creating a new
 
 <p>A connection object is a PDO instance connected to a specific database. Connections expand on the existing <a class="external" href="http://www.php.net/manual/en/class.pdo.php">PDO API</a> and provide a unified API for database introspection and functions to generate RDBMS specific SQL.</p>
 
-<p>The library comes with three connection classes that extend PDO : <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> and <span class="inline_code">\Glue\DB\Connection_SQLite</span>. Each of them has a specific constructor that takes connection parameters appropriate for the database it is designed to work with.</p>
+<h3>Connection classes</h3>
 
-<h2>Defining database connections</h2>
+<p>The library comes with three connection classes that extend PDO : <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> and <span class="inline_code">\Glue\DB\Connection_SQLite</span>. Each of them has specific properties that define the required parameters to connect to the database it is designed to work with :</p>
 
-<p>A database connection is created by defining a new connection class, and registering it in the connections array with its identifier.</p>
+<p>Common to all connection classes.</p>
+<ul>
+  <li><span class="inline_code">$username</span> : username used to connect to the database (default : 'root').</li>
+  <li><span class="inline_code">$password</span> : password used to connect to the database (default : '').</li>
+  <li><span class="inline_code">$charset</span> : connection charset (default : 'utf8').</li>
+  <li><span class="inline_code">$options</span> : options array passed to PDO constructor (default : null).</li>
+</ul>
 
-<h3>Defining a new connection class</h3>
+<p>MySQL and PostgreSQL.</p>
+<ul>
+  <li><span class="inline_code">$host</span> : host of the database server (default : 'localhost').</li>
+  <li><span class="inline_code">$port</span> : port of the database server (default : null).</li>
+  <li><span class="inline_code">$dbname</span> : name of the database (default : null).</li>
+</ul>
 
-<p>A connection class is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Connection_SQLite</span>. You must create one connection class by database connection.</p>
+<p>SQLite.</p>
+<ul>
+  <li><span class="inline_code">$path</span> : path to sqlite file (default : null).</li>
+</ul>
 
-<p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes (the class names don't matter) :</p>
+<h3>Defining database connections</h3>
+
+<p>A database connection is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Connection_SQLite</span>. You must create one connection class by database connection. The name of the connection class must be of the form <span class="inline_code">Connection_&lt;id&gt;</span>, where &lt;id&gt; is a <b>connection identifier</b> of your own choosing.</p>
+
+<p>Connection identifiers cannot contain underscores and at least one connection must have an identifier called <span class="inline_code">default</span>. That is, a <span class="inline_code">Connection_Default</span> class must exist.</p>
+
+<p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes :</p>
 
 {% highlight php %}
 <?php  
-  // File classes/user/db/connection/sqlite/main.php
+  // File classes/user/db/connection/default.php
 
   namespace Glue\User\DB;
 
-  class Connection_SQLite_Main extends \Glue\DB\Connection_SQLite {
-    public function __construct() {
-      parent::__construct(
-          'my/sqlite/database.sqlite' // Path to sqlite file.
-        );
-    }
+  // Connection 'default'
+  class Connection_Default extends \Glue\DB\Connection_SQLite {
+    protected $path = 'my/sqlite/database.sqlite';
   }  
 ?>
 {% endhighlight %}
 
 {% highlight php %}
 <?php
-  // File classes/user/db/connection/mysql/forum.php
+  // File classes/user/db/connection/forum.php
 
   namespace Glue\User\DB;
 
-  class Connection_MySQL_Forum extends \Glue\DB\Connection_MySQL {
-    public function __construct() {
-      parent::__construct(
-          'mydb',       // Database name.
-          'myusername', // Username.
-          'mypassword'  // Password.
-        );
-    }
+  // Connection 'forum'
+  class Connection_Forum extends \Glue\DB\Connection_MySQL {
+    protected $username = 'myusername';
+    protected $password = 'mypassword';
+    protected $dbname   = 'mydb';
   }
 ?>
 {% endhighlight %}
 
-<p>Defining connections as classes this way allows you to define :</p>
-<ul>
-  <li>connection parameters by overriding the constructor,</li>
-  <li>specific behaviours by overriding methods, should you want for example to log queries that pass through it.</li>
-</ul>
-
-<h3>Registering a connection class in the connections array</h3>
-
-<p>Connection classes must be registered in the connections array, indexed by their identifiers, so that the library knows about them. An identifier is a name that can be used to refer to a database connection, for example to issue queries to it. This must be done in the Config class.</p>
-
-<p>To register the two connection classes above, you would do the following :</p>
+<p>If the properties must be initialized with something more complicated than a constant, you may instead redefine the functions that compute the default values of properties :</p>
 
 {% highlight php %}
 <?php
-  // File classes/user/db/config.php
+  // File classes/user/db/connection/forum.php
 
   namespace Glue\User\DB;
 
-  class Config extends \Glue\System\DB\Config {
-    protected function __construct() {
-      parent::__construct();
-	  
-	  // Options :
-      $this->connections = array(
-          'main'  => 'Glue\\DB\\Connection_SQLite_Main',
-          'forum' => 'Glue\\DB\\Connection_MySQL_Forum',
-        );
-	  
-    }
+  class Connection_Forum extends \Glue\DB\Connection_MySQL {
+    protected function default_username() { return 'my' . 'username'; }
+    protected function default_password() { return 'my' . 'password'; }
+    protected function default_dbname()   { return 'my' . 'db'; }
   }
 ?>
 {% endhighlight %}
 
-<p>The first connection in the connections array is the default that is used when no connection id is given.</p>
+<h3>Accessing database connections - connection identifiers</h3>
 
-<h2>Accessing database connections</h2>
-
-<p>Connections are accessed with the <span class="inline_code">DB::cn(&lt;connection id&gt;)</span> function. Connection instances are created upon first access. After that the same instance is always returned. No parameter means default connection.</p>
+<p>To get connection instances, you must use the <span class="inline_code">DB::cn(&lt;connection identifier&gt;)</span> function. Connection instances are created upon first access, after that the same instance is always returned (i.e. connection objects behave as singletons). No parameter means default connection.</p>
 
 {% highlight php %}
 <?php
   use Glue\DB\DB;
 
-  DB::cn('main')->exec("DELETE FROM mytable WHERE id = 10");
+  DB::cn('default')->exec("DELETE FROM mytable WHERE id = 10");
   
   // Is the same as :
   DB::cn()->exec("DELETE FROM mytable WHERE id = 10");
   
-  // Because 'main' is the first connection defined in the connections array.
+  // But not the same as :
+  DB::cn('forum')->exec("DELETE FROM mytable WHERE id = 10");
 ?>
 {% endhighlight %}
 
