@@ -21,15 +21,15 @@ title: Guide
 
 <p>Views are special <span class="inline_code">\Glue\DB\Table</span> objects. They behave just like tables, they show up in the introspection API and can be used in queries just the same. They have names and columns. However, unlike normal table objects, they are mapped to an underlying database table that may have a different name and different columns. That mapping is defined by creating a class that extends <span class="inline_code">\Glue\DB\Table</span>.</p>
 
-<p>The following example defines a <span class="inline_code">User(login, password)</span> view that maps to the underlying <span class="inline_code">Person(name, password)</span> database table.</p>
+<p>The following example defines a <span class="inline_code">User(login, password)</span> view on the default connection that maps to the underlying <span class="inline_code">Person(name, password)</span> database table.</p>
 
 {% highlight php %}
 <?php
-  // File classes/user/db/foo/bar.php
+  // File classes/user/db/table/default/user.php
   
   namespace Glue\User\DB;
   
-  class Table_User extends \Glue\DB\Table { // TODO changes this, should be Table_<connection id>_User
+  class Table_Default_User extends \Glue\DB\Table {
     
     protected function init_name() {
       return 'Person'; // Underlying table name.
@@ -44,7 +44,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>The name of the class tells the library that the view is named 'User'. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the 'name' column.</p>
+<p>The name of the class tells the library that the view is named 'User' and that it belongs to the default connection. Overriding the init_name() function tells the library the underlying table is Person and overriding get_column_alias sets up the alias for the 'name' column.</p>
 
 <h2>Using Views</h2>
 
@@ -56,10 +56,10 @@ title: Guide
   use Glue\DB\DB;
   
   // Actually returns data about the column 'name' of the database table 'Person'
-  $column = DB::table('User')->column('login');
+  $column = DB::cn()->table('user')->column('login');
   
   // Actually returns "SELECT `Person`.`name` FROM `Person`"
-  $sql = DB::select('User', $m)->columns($m->login)->root()->sql();
+  $sql = DB::select('user', $u)->columns($u->login)->root()->sql();
   
 ?>
 {% endhighlight %}
