@@ -43,7 +43,7 @@ abstract class Connection extends PDO {
 	protected $password;
 
 	/**
-	 * @var string Connection id.
+	 * @var string Options array passed to PDO constructor.
 	 */
 	protected $options;
 

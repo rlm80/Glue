@@ -57,16 +57,34 @@ class Test {
       return 'glusers';
     }
 
-    public function get_column_alias(\Glue\DB\Column $column) {
+    public function _get_column_alias(\Glue\DB\Column $column) {
       if ($column->name() === 'login')
         return 'name';
-      return parent::get_column_alias($column); // Any other column identifier is unchanged
+      return parent::_get_column_alias($column); // Any other column identifier is unchanged
     }
   }
 ?>
 EOD;
 		@mkdir($dir, 777, true);
 		file_put_contents($path, $code);
+		
+		// Connection definitions :
+		$dir	= \Glue\CLASSPATH_USER . 'db/connection/';
+		$path	= $dir . 'test.php';
+		$code = <<<'EOD'
+<?php
+
+  namespace Glue\User\DB;
+
+  class Connection_Test extends \Glue\DB\Connectio_MySQL {
+	protected $dbname = 'test';
+	protected $username = 'root';
+	protected $password = '';
+  }
+?>
+EOD;
+		@mkdir($dir, 777, true);
+		file_put_contents($path, $code);		
 	}
 
 	static private function drop_test_tables() {
@@ -80,6 +98,11 @@ EOD;
 		$dir	= \Glue\CLASSPATH_USER . 'db/table/';
 		$path	= $dir . 'glpersons.php';
 		@unlink($path);
+		
+		// Delete connection definition :
+		$dir	= \Glue\CLASSPATH_USER . 'db/connection/';
+		$path	= $dir . 'test.php';
+		@unlink($path);		
 	}
 
 	static private function test_introspection() {
@@ -96,18 +119,20 @@ EOD;
 		$tables = \Glue\DB\DB::cn()->tables();
 		$tests['tables'] = array(5, count($tables));
 
-		// Get table data :
+		// Table data :
 		$table = \Glue\DB\DB::cn()->table('glintro');
 
-		// Define tests :
+		// Name :
 		$tests['table name'] = array('glintro', $table->name());
 
+		// PK :		
 		$arr = array();
 		foreach($table->pk() as $pkc)
 			$arr[] = $pkc->name();
 		sort($arr);
 		$tests['table pk'] = array('a,b', implode(',', $arr));
 
+		// Columns :	
 		$c = $table->column('a');
 		$tests['a name'] = array('a', $c->name());
 		$tests['a type'] = array('int', strtolower($c->type()));
@@ -147,7 +172,27 @@ EOD;
 		$tests['d scale'] = array(2, $c->scale());
 		$tests['d default'] = array(45.0, $c->default());
 		$tests['d auto'] = array(false, $c->auto());
+		
+		// Views :
+		$v = \Glue\DB\DB::cn()->table('glpersons');
+		$tests['view name'] = array('glusers', $v->name());
+		$tests['view alias'] = array('glpersons', $v->alias());
+		$tests['view column name'] = array('login', $v->column('name')->name());
+		$tests['view column alias'] = array('name', $v->column('name')->alias());
+		
+		// Connection list :
+		$list = \Glue\DB\DB::connection_list();
+		sort($list);
+		$tests['connection list'] = array('default,test', implode(',', $list));
 
+		// Connection exists :
+		$tests['connection exists true'] = array(true, \Glue\DB\DB::connection_exists('test'));
+		$tests['connection exists false'] = array(false, \Glue\DB\DB::connection_exists('testtt'));
+
+		// Connections :
+		$connections = \Glue\DB\DB::connections();
+		$tests['connections'] = array(2, count($connections));
+		
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($expected, $real) = $data;

@@ -21,7 +21,7 @@ class DB {
 	/**
 	 * @var array Connection ids cache.
 	 */
-	static protected $connection_list = array();
+	static protected $connection_list;
 
 	/**
 	 * Default connection id.
@@ -70,7 +70,7 @@ class DB {
 		$connections	= array();
 		$list			= static::connection_list();
 		foreach ($list as $id)
-			$connections[$id] = static::cn($name);
+			$connections[$id] = static::cn($id);
 		return $connections;
 	}
 

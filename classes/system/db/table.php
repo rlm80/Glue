@@ -101,6 +101,15 @@ class Table {
 	public function name() {
 		return $this->name;
 	}
+	
+	/**
+	 * Returns the alias of this table.
+	 *
+	 * @return string
+	 */
+	public function alias() {
+		return $this->alias;
+	}	
 
 	/**
 	 * Returns the connection of this table.
@@ -154,14 +163,14 @@ class Table {
 	/**
 	 * Returns a column.
 	 *
-	 * @param string $name
+	 * @param string $alias
 	 *
 	 * @return \Glue\DB\Column
 	 */
-	public function column($name) {
-		if ( ! isset($this->columns[$name]))
-			throw new \Glue\DB\Exception("There is no column " . $name . " in table " . $this->name . " of connection " . $this->cnid . " .");
-		return $this->columns[$name];
+	public function column($alias) {
+		if ( ! isset($this->columns[$alias]))
+			throw new \Glue\DB\Exception("There is no column " . $alias . " in table " . $this->name . " of connection " . $this->cnid . " .");
+		return $this->columns[$alias];
 	}
 
 	/**

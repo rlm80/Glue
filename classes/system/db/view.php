@@ -147,7 +147,7 @@ class Table {
 	 *
 	 * @return string
 	 */
-	public function get_column_alias(\Glue\DB\Column $column) {
+	public function _get_column_alias(\Glue\DB\Column $column) {
 		return $column->dbcolumn();
 	}
 
