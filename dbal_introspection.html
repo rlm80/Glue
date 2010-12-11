@@ -54,6 +54,23 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<h3>Listing connections</h3>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+
+  // List connections :
+  $list         = DB::connection_list(); // Returns array of connection ids indexed by ids
+  $connections  = DB::connections();     // Returns array of connection objects indexed by ids
+  
+  // Checking existence of a connection :
+  $exists = DB::connection_exists('myconnection');
+
+?>
+{% endhighlight %}
+
 <h3>Listing tables</h3>
 
 {% highlight php %}
