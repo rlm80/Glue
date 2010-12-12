@@ -149,6 +149,7 @@ span.inline_code {
 	display:inline-block;
 	font-family:"consolas","lucida console","courrier new",courrier,monospace;
 	font-size:0.9em;
+  font-weight:normal;
 	height:1.1em;
 	line-height:1.1em;
 }
