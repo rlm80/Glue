@@ -57,7 +57,7 @@ abstract class Fragment {
 			$cn = \Glue\DB\DB::cn();
 
 		// Retrieve SQL from cache, or create it and add it to cache if it isn't there yet :
-		$hash = spl_object_hash($cn);
+		$hash = spl_object_hash($cn); // TODO use connection identifer instead !!
 		if ( ! isset($this->sql[$hash][$style]))
 			$this->sql[$hash][$style] = $this->compile($cn, $style);
 
