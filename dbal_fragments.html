@@ -3,18 +3,9 @@ layout: base
 title: Guide
 ---
 
-<h2>Query building</h2>
-
-<p>A query builder makes it possible to write queries as a sequence of function calls rather than by string manipulation. Such a system comes in handy if you want : </p>
-
-<ul>
-  <li>Database independance : you want your application to be portable across various database backends.</li>
-  <li>Dynamic queries : you need queries that are assembled at runtime according to some logic.</li>
-</ul>
-
 <h2>Fragments</h2>
 
-<p>Queries are represented as trees of objects called <b>fragments</b>.
+<p>Queries are represented as trees of objects called <b>fragments</b>.</p>
 
 <p>There is a fragment class for each piece that makes up an SQL query, for example boolean expressions, boolean operands, join expressions, order by clause and so on. All fragment classes inherit from <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment.php"><span class="inline_code">\Glue\DB\Fragment</span></a> which means that they all share some common attributes :</p>
 

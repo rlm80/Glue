@@ -1,0 +1,35 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Query builder</h2>
+
+<p>The point of a query builder is not to make writing queries easier or faster.</p>
+
+<p>A query builder makes it possible to write queries as a sequence of function calls rather than by string manipulation. Such a system comes in handy if you want : </p>
+
+<ul>
+  <li><b>Database independance</b> - you want your application to be portable across various database backends.</li>
+  <li><b>Dynamic queries</b> - you need queries that are assembled at runtime according to some logic.</li>
+</ul>
+
+<h3>Example</h3>
+
+{% highlight php %}
+<?php
+	$query = db::select('users', $u)
+                ->columns($u->login, $u->password)
+                ->where("$u->login LIKE ?", 'abc%')
+                ->orderby($u->login)
+                ->root();
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
