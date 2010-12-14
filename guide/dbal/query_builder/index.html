@@ -18,11 +18,17 @@ title: Guide
 
 {% highlight php %}
 <?php
+  // Creates query :
 	$query = db::select('users', $u)
                 ->columns($u->login, $u->password)
                 ->where("$u->login LIKE ?", 'abc%')
                 ->orderby($u->login)
                 ->root();
+                
+  // Generates query SQL according to default connection SQL dialect :
+  echo $query->sql();
+  
+  // prints "SELECT `users`.`login`, `users`.`password` FROM `users` WHERE `users`.`login` LIKE 'abc%' ORDER BY `users`.`login`"
 ?>
 {% endhighlight %}
 
