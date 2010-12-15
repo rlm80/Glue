@@ -110,15 +110,16 @@ title: Guide
 {% highlight sql %}
   SELECT *
   FROM
-    table1
-    LEFT OUTER JOIN table2 ON
-      c1 = c2 AND 
-      c3 = c4 // <---- You don't have to use a special keyword to mark the end of the ON clause here !
-                    // The parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
-                    // it must automatically end the boolean expression and return the control to the
-                    // join expression.
-    RIGHT OUTER JOIN table3 ON
-    // ...
+    "table1"
+    LEFT OUTER JOIN "table2" ON
+      "c1" = "c2" AND 
+      "c3" = "c4" -- You don't have to use a special keyword to mark the end of the ON clause here !
+                  -- The parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
+                  -- it must automatically end the boolean expression and return the control to parent,
+                  -- which is the join expression.
+    RIGHT OUTER JOIN "table3"
+    -- ...
+    ;
 {% endhighlight %}
 
 <h3>Example</h3>
@@ -136,9 +137,9 @@ title: Guide
       ->left('profiles', $p)
         ->on("$u->id = $p->id")                   // Returns ON clause : nested chaining.
           ->and("?", DB::bool("1=1")->or("2=2") ) // Nested functions.
-      ->left('posts', $po)            // No need to call ->end() : since ->left() isn't a valid function call
-                                      // on a boolean expression, control is automatically returned to the join
-                                      // expression.
+      ->left('posts', $po) // No need to call ->end() : since ->left() isn't a valid function call
+                           // on a boolean expression, control is automatically returned to the join
+                           // expression.
         ->on("$po->user_id = $u->id")
       ->root();
       
