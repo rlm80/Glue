@@ -3,7 +3,7 @@ layout: base
 title: Guide
 ---
 
-<p>This page describes some of the inner workings of the library. You may skip it if you just want to get to the point.</p>
+<p>This page describes some of the inner workings of the library that didn't fit anywhere else. You may skip it if you just want to get to the point but it's better to read it to get a better understanding of what you're doing.</p>
 
 <h2>Fragments</h2>
 
@@ -66,35 +66,51 @@ title: Guide
 
 {% highlight php %}
 <?php
+  
+  use \Glue\DB\DB;
+  
   // Chain of function calls, following the Fragment_Builder_Bool class API :
-  $fragment->init('1=1')->and('2=2')->or('3=3')->and("'test'='test'");
+  echo DB::bool('1=1')->and('2=2')->or('3=3')->and("'test'='test'")->root()->sql();
+  
+  // Prints "1=1 AND 2=2 OR 3=3 AND 'test' = 'test'"
 ?>
 {% endhighlight %}
 
-<h3>Nesting fluent interfaces</h3>
+<h2>Nesting fluent interfaces</h2>
 
 <p>A fluent interface provides a convenient way of initializing the properties of a single fragment. But we have to build trees of fragments. How can it be done in a single chain of function calls ?</p>
 
 <p>Three solutions to this problem have been used : <b>nested functions</b>, <b>wrappers</b> and <b>nested chaining</b>, the latter being the most widespread in the library.</p>
 
+<p>Nested functions :</p>
+
 {% highlight php %}
 <?php
-  // Nested functions :
   ParentFactory::create()
     ->addChild(
       ChildFactory::create()  // Function call nested inside another one
         ->setProp()
     )                         // Returns parent fragment.
     ->setProp();              // Keep on building parent fragment.
-    
-  // Wrappers :
+?>
+{% endhighlight %}
+
+<p>Wrappers :</p>
+
+{% highlight php %}
+<?php
   ParentFactory::create()
     ->addChild()      // Adds new child and returns parent fragment.
     ->childSetProp()  // Calls setProp() on the child that was just added and returns parent fragment
                       // => wrapper function for Child::setProp()
     ->setProp();      // Keep on building parent fragment.
-  
-  // Nested chaining :
+?>
+{% endhighlight %}
+
+<p>Nested chaining :</p>
+
+{% highlight php %}
+<?php
   ParentFactory::create()
     ->addChild()      // Here returns child fragment !
       ->setProp()
@@ -103,9 +119,11 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<h3>Simplified nested chaining</h3>
+
 <p>Nested chaining can be simplified by forwarding any unknown function call to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find an ancestor that supports the function. Thanks to this rule, calling <span class="inline_code">->end()</span> is almost always unneccessary.</p>
 
-<p>Although this may seem a little convoluted, it's actually very natural because languages work that way. Consider the following SQL query :</p>
+<p>Although this may seem a little convoluted, it's actually very natural because programming languages work that way. Consider the following SQL query :</p>
 
 {% highlight sql %}
   SELECT *
@@ -116,7 +134,7 @@ title: Guide
       "c3" = "c4" -- You don't have to use a special keyword to mark the end of the ON clause here !
                   -- The parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
                   -- it must automatically end the boolean expression and return the control to parent,
-                  -- which is the join expression.
+                  -- which is the join expression. This is simplified nested chaining.
     RIGHT OUTER JOIN "table3"
     -- ...
     ;
@@ -124,7 +142,7 @@ title: Guide
 
 <h3>Example</h3>
 
-<p>Here is a join expression that illustrates nested functions and nested chaining :</p>
+<p>Here is a join expression that illustrates nested functions and simplified nested chaining :</p>
 
 {% highlight php %}
 <?php
@@ -150,7 +168,9 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<h2>The ->root() function</h2>
 
+<p>The root function is defined on every fragment class. When called on fragment F, it returns the root of the fragment tree that F is a part of. This is important when you want to make sure to target the top of the fragment tree instead of the current fragment, for example to generate the SQL resulting of the whole tree.</p>
 
 
 
