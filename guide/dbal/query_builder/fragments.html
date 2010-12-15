@@ -103,12 +103,11 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Nested chaining can be simplified by forwarding any unknown function call to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find a ancestor fragment that supports the function. Thanks to this rule, calling ->end() is almost always unneccessary.</p>
+<p>Nested chaining can be simplified by forwarding any unknown function call to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find an ancestor that supports the function. Thanks to this rule, calling <span class="inline_code">->end()</span> is almost always unneccessary.</p>
 
 <p>Although this may seem a little convoluted, it's actually very natural because languages work that way. Consider the following SQL query :</p>
 
 {% highlight sql %}
-<?php
   SELECT *
   FROM
     table1
@@ -120,7 +119,6 @@ title: Guide
                     // join expression.
     RIGHT OUTER JOIN table3 ON
     // ...
-?>
 {% endhighlight %}
 
 <h3>Example</h3>
