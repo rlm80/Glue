@@ -24,9 +24,9 @@ title: Guide
   $fragment = new Fragment_Builder_Bool();
   
   // Builds boolean expression.
-  $fragment->init('1=1')  // Adds child fragment representig a boolean operand (Fragment_Operand_Bool).
-           ->and('2=2')   // Adds child fragment representig a boolean operand with AND connector.
-           ->or('3=?',3); // Adds child fragment representig a boolean operand with OR connector.
+  $fragment->init('1=1')  // Adds boolean operand (Fragment_Operand_Bool).
+           ->and('2=2')   // Adds boolean operand with AND connector.
+           ->or('3=?',3); // Adds boolean operand with OR connector.
   
   // Returns compiled SQL according to default connection SQL dialect.
   $sql = $fragment->sql();
@@ -73,9 +73,9 @@ title: Guide
 
 <h3>Nesting fluent interfaces</h3>
 
-<p>Parent fragments define a fluent interface through which their properties can be set, and children fragments can be added. These children fragments may also define their own fluent interfaces. Think for example of a join expression that may have ON boolean expressions among its children. How can such a tree of fragments be conveniently built without breaking fluency ?</p>
+<p>A fluent interface provides a convenient way of initializing the properties of a single fragment. But we have to build trees of fragments. How can it be done in a single chain of function calls ?</p>
 
-<p>There are three solutions to this problem. <b>Nested functions</b>, <b>wrappers</b> and <b>nested chaining</b> :</p>
+<p>Three solutions to this problem have been used : <b>nested functions</b>, <b>wrappers</b> and <b>nested chaining</b>, the latter being the most widespread in the library.</p>
 
 {% highlight php %}
 <?php
@@ -103,30 +103,27 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>There is no clear winner. One may be more convenient than another depending on the case. All three solutions have been used throughout the library, although nested chaining was the most widely used.</p>
+<p>Nested chaining can be simplified by forwarding any unknown function call to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find a ancestor fragment that supports the function. Thanks to this rule, calling ->end() is almost always unneccessary.</p>
 
-<p>Nested chaining can be simplified by forwarding any unknown call on the current fragment to its parent. This rule makes calling ->end() unneccessary 99% of the time. Function calls bubble up the fragment tree until they find a fragment where the call applies. So :</p>
+<p>Although this may seem a little convoluted, it's actually very natural because languages work that way. Consider the following SQL query :</p>
 
-{% highlight php %}
+{% highlight sql %}
 <?php
-  // The follwing code :
-  ParentFactory::create()
-    ->addChild()
-      ->setThis()
-      ->end()
-    ->setThat();
-    
-  // Can be simplified like this :
-  ParentFactory::create()
-    ->addChild()
-      ->setThis()
-    ->setThat();
-    
-  // ...because the library understand that since ->setThat() doesn't apply to the child fragment,
-  // it must automatically return the control to the parent fragment, no need to call ->end() explicitely.
+  SELECT *
+  FROM
+    table1
+    LEFT OUTER JOIN table2 ON
+      c1 = c2 AND 
+      c3 = c4 // <---- You don't have to use a special keyword to mark the end of the ON clause here !
+                    // The parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
+                    // it must automatically end the boolean expression and return the control to the
+                    // join expression.
+    RIGHT OUTER JOIN table3 ON
+    // ...
 ?>
 {% endhighlight %}
 
+<h3>Example</h3>
 
 <p>Here is a join expression that illustrates nested functions and nested chaining :</p>
 
@@ -139,16 +136,18 @@ title: Guide
   $join =
     DB::join('users', $u)
       ->left('profiles', $p)
-        ->on("$u->id = $p->id")
-          ->and("?",
-            DB::bool("1=1")->or("2=2")
-          )
-      ->left('posts', $po)
+        ->on("$u->id = $p->id")                   // Returns ON clause : nested chaining.
+          ->and("?", DB::bool("1=1")->or("2=2") ) // Nested functions.
+      ->left('posts', $po)            // No need to call ->end() : since ->left() isn't a valid function call
+                                      // on a boolean expression, control is automatically returned to the join
+                                      // expression.
         ->on("$po->user_id = $u->id")
       ->root();
       
   // Print SQL :
   echo $join->sql();
+  
+  // "users" LEFT OUTER JOIN "profiles" ON ("users"."id" = "profiles"."id" AND (1=1 OR 2=2)) LEFT OUTER JOIN posts ON ("posts"."user_id" = "users"."id")
 ?>
 {% endhighlight %}
 
