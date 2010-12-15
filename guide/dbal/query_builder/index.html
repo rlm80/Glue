@@ -7,7 +7,7 @@ title: Guide
 
 <p>The point of a query builder is not to make writing queries easier or faster.</p>
 
-<p>A query builder makes it possible to write queries as a sequence of function calls rather than by string manipulation. Such a system comes in handy if you want : </p>
+<p>A query builder makes it possible to write queries by calling PHP functions on a data structure representing a query, rather than by string manipulation. Such a system comes in handy if you want : </p>
 
 <ul>
   <li><b>Database independance</b> - you want your application to be portable across various database backends.</li>
@@ -25,7 +25,7 @@ title: Guide
                 ->orderby($u->login)
                 ->root();
                 
-  // Generates query SQL according to default connection SQL dialect :
+  // Generates SQL according to default connection dialect :
   echo $query->sql();
   
   // prints "SELECT `users`.`login`, `users`.`password` FROM `users` WHERE `users`.`login` LIKE 'abc%' ORDER BY `users`.`login`"
