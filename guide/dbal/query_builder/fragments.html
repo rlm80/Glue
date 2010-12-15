@@ -13,20 +13,18 @@ title: Guide
 
 <h3>Example</h3>
 
-<p>The following example builds of the query tree of a boolean expression :</p>
+<p>The following example builds the query tree of a boolean expression :</p>
 
 {% highlight php %}
 <?php
-  // A fragment that provides a fluent interface to build a boolean expression.
-  use \Glue\DB\Fragment_Builder_Bool;
-  
-  // Creates new fragment representing a boolean expression.
-  $fragment = new Fragment_Builder_Bool();
+
+  use \Glue\DB\DB;
   
   // Builds boolean expression.
-  $fragment->init('1=1')  // Adds boolean operand (Fragment_Operand_Bool).
-           ->and('2=2')   // Adds boolean operand with AND connector.
-           ->or('3=?',3); // Adds boolean operand with OR connector.
+  $fragment = DB::bool('1=1')  // Adds boolean operand (Fragment_Operand_Bool).
+                ->and('2=2')   // Adds boolean operand with AND connector.
+                ->or('3=?', 3) // Adds boolean operand with OR connector.
+                ->root();
   
   // Returns compiled SQL according to default connection SQL dialect.
   $sql = $fragment->sql();
@@ -82,7 +80,7 @@ title: Guide
 
 <p>Three solutions to this problem have been used : <b>nested functions</b>, <b>wrappers</b> and <b>nested chaining</b>, the latter being the most widespread in the library.</p>
 
-<p>Nested functions :</p>
+<h3>Nested functions</h3>
 
 {% highlight php %}
 <?php
@@ -95,7 +93,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Wrappers :</p>
+<h3>Wrappers</h3>
 
 {% highlight php %}
 <?php
@@ -107,7 +105,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Nested chaining :</p>
+<h3>Nested chaining</h3>
 
 {% highlight php %}
 <?php
