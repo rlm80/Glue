@@ -71,11 +71,11 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h3>Nested fluent interfaces</h3>
+<h3>Nesting fluent interfaces</h3>
 
-<p>Parent fragments define a fluent interface through which children fragments can be added. These children fragments may also define their own fluent interfaces. Think for example of a join expression that may have ON boolean expressions among its children. How can such a tree of fragments be conveniently built ?</p>
+<p>Parent fragments define a fluent interface through which their properties can be set, and children fragments can be added. These children fragments may also define their own fluent interfaces. Think for example of a join expression that may have ON boolean expressions among its children. How can such a tree of fragments be conveniently built without breaking fluency ?</p>
 
-<p>There are three solutions to this problem. Nested functions, wrappers and nested chaining :</p>
+<p>There are three solutions to this problem. <b>Nested functions</b>, <b>wrappers</b> and <b>nested chaining</b> :</p>
 
 {% highlight php %}
 <?php
@@ -96,7 +96,7 @@ title: Guide
   
   // Nested chaining :
   ParentFactory::create()
-    ->addChild()      // Returns child fragment !
+    ->addChild()      // Here returns child fragment !
       ->setProp()
       ->end()         // Returns control to parent fragment.
     ->setProp();      // Keep on building parent fragment.
@@ -105,27 +105,50 @@ title: Guide
 
 <p>There is no clear winner. One may be more convenient than another depending on the case. All three solutions have been used throughout the library, although nested chaining was the most widely used.</p>
 
-<p>Such is the case of join expressions :</p>
+<p>Nested chaining can be simplified by forwarding any unknown call on the current fragment to its parent. This rule makes calling ->end() unneccessary 99% of the time. Function calls bubble up the fragment tree until they find a fragment where the call applies. So :</p>
 
 {% highlight php %}
 <?php
-  // A fragment that provides a fluent interface to build a join expression.
-  use \Glue\DB\Fragment_Builder_Join;
+  // The follwing code :
+  ParentFactory::create()
+    ->addChild()
+      ->setThis()
+      ->end()
+    ->setThat();
+    
+  // Can be simplified like this :
+  ParentFactory::create()
+    ->addChild()
+      ->setThis()
+    ->setThat();
+    
+  // ...because the library understand that since ->setThat() doesn't apply to the child fragment,
+  // it must automatically return the control to the parent fragment, no need to call ->end() explicitely.
+?>
+{% endhighlight %}
+
+
+<p>Here is a join expression that illustrates nested functions and nested chaining :</p>
+
+{% highlight php %}
+<?php
+
+  use \Glue\DB\DB;
   
-  // Creates new fragment representing a join expression.
-  $join = new Fragment_Builder_Join();
-  
-  // Builds boolean expression.
-  $join->init('users', $u)
-         ->as('myusers')
-       ->left('profiles', $p)
-         ->on("$u->id = $p->id")
-           ->and("1=1")
-           ->or("2=3")
-          ->as('myprofiles')
-       ->left('posts', $po)
-         ->on("$po->user_id = $u->id");
-         ->as('myposts');
+  // Build fragment :
+  $join =
+    DB::join('users', $u)
+      ->left('profiles', $p)
+        ->on("$u->id = $p->id")
+          ->and("?",
+            DB::bool("1=1")->or("2=2")
+          )
+      ->left('posts', $po)
+        ->on("$po->user_id = $u->id")
+      ->root();
+      
+  // Print SQL :
+  echo $join->sql();
 ?>
 {% endhighlight %}
 
