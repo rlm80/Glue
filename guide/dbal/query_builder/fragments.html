@@ -72,15 +72,15 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h2>Nesting fluent interfaces</h2>
+<h2>Combining fluent interfaces</h2>
 
-<p>A fluent interface provides a convenient way of initializing the properties of a single fragment. But we have to build trees of fragments. How can it be done in a single chain of function calls ?</p>
+<p>A fluent interface provides a way of initializing the properties of a fragment in a single chain of function calls. But we have to build trees of fragments. Ideally this should also be done in a single chain of function calls. How can we assemble a tree of fragments, and initialize each new leaf we add by taking advantage of its own fluent interface, in a single chain of function calls ?</p>
 
-<p>Three solutions to this problem have been used : <b>nested functions</b>, <b>wrappers</b> and <b>nested chaining</b>, the latter being the most widespread in the library.</p>
+<p>Three solutions to this problem have been used : <b>nested functions</b>, <b>wrappers</b> and <b>nested chaining</b>, the latter being the norm and the other the exception.</p>
 
 <h3>Nested functions</h3>
 
-<p>TODO : describe this</p>
+<p>All functions return <span class="inline_code">$this</span>. The chain of function calls that builds the child is used as a parameter of a function that builds the parent.</p>
 
 {% highlight php %}
 <?php
@@ -95,7 +95,7 @@ title: Guide
 
 <h3>Wrappers</h3>
 
-<p>TODO : describe this</p>
+<p>All functions return <span class="inline_code">$this</span>. The interface of the child is reproduced at the parent level and the parent forward those calls to the last added child.</p>
 
 {% highlight php %}
 <?php
@@ -109,7 +109,7 @@ title: Guide
 
 <h3>Nested chaining</h3>
 
-<p>TODO : describe this</p>
+<p>Functions that set parent properties return <span class="inline_code">$this</span>, but functions that add a new child return the child. There is a function on the child that returns the parent so that we can keep working on it once we're finished building the child.</p>
 
 {% highlight php %}
 <?php
@@ -123,7 +123,7 @@ title: Guide
 
 <h3>Simplified nested chaining</h3>
 
-<p>Nested chaining can be simplified by forwarding any unknown function call to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find an ancestor that supports the function. Thanks to this rule, calling <span class="inline_code">->end()</span> is almost always unneccessary.</p>
+<p>Nested chaining can be simplified by forwarding any unknown function call on the child to the parent fragment. Function calls bubble up the fragment tree, starting from the current fragment, until they find an ancestor that supports the function. Thanks to this rule, calling <span class="inline_code">->end()</span> is almost always unneccessary.</p>
 
 <p>Although this may seem a little convoluted, it's actually very natural because programming languages work that way. Consider the following SQL query :</p>
 
@@ -134,9 +134,9 @@ title: Guide
     LEFT OUTER JOIN "table2" ON
       "c1" = "c2" AND 
       "c3" = "c4" -- You don't have to use a special keyword to mark the end of the ON clause here !
-                  -- The parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
+                  -- The SQL parser knows that since "RIGHT OUTER JOIN" is not a valid boolean operator,
                   -- it must automatically end the boolean expression and return the control to parent,
-                  -- which is the join expression. This is simplified nested chaining.
+                  -- which is the join expression. This is how simplified nested chaining works.
     RIGHT OUTER JOIN "table3"
     -- ...
     ;
@@ -144,7 +144,7 @@ title: Guide
 
 <h3>Example</h3>
 
-<p>Here is a join expression that illustrates nested functions and simplified nested chaining :</p>
+<p>Here is a join expression that illustrates nested functions, wrappers and simplified nested chaining :</p>
 
 {% highlight php %}
 <?php
@@ -155,6 +155,7 @@ title: Guide
   $join =
     DB::join('users', $u)
       ->left('profiles', $p)
+        ->as('prof')  // Wrapper.
         ->on("$u->id = $p->id")                   // Returns ON clause : nested chaining.
           ->and("?", DB::bool("1=1")->or("2=2") ) // Nested functions.
       ->left('posts', $po) // No need to call ->end() : since ->left() isn't a valid function call
