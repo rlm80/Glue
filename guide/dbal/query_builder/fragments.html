@@ -142,35 +142,6 @@ title: Guide
     ;
 {% endhighlight %}
 
-<h3>Example</h3>
-
-<p>Here is a join expression that illustrates nested functions, wrappers and simplified nested chaining :</p>
-
-{% highlight php %}
-<?php
-
-  use \Glue\DB\DB;
-  
-  // Build fragment :
-  $join =
-    DB::join('users', $u)
-      ->left('profiles', $p)
-        ->as('prof')  // Wrapper.
-        ->on("$u->id = $p->id")                   // Returns ON clause : nested chaining.
-          ->and("?", DB::bool("1=1")->or("2=2") ) // Nested functions.
-      ->left('posts', $po) // No need to call ->end() : since ->left() isn't a valid function call
-                           // on a boolean expression, control is automatically returned to the join
-                           // expression.
-        ->on("$po->user_id = $u->id")
-      ->root();
-      
-  // Print SQL :
-  echo $join->sql();
-  
-  // "users" LEFT OUTER JOIN "profiles" ON ("users"."id" = "profiles"."id" AND (1=1 OR 2=2)) LEFT OUTER JOIN posts ON ("posts"."user_id" = "users"."id")
-?>
-{% endhighlight %}
-
 <h2>The ->root() function</h2>
 
 <p>The root function is defined on every fragment class. When called on fragment F, it returns the root of the fragment tree that F is a part of. This is important when you want to make sure to target the top of the fragment tree instead of the current fragment, for example to generate the SQL resulting of the whole tree.</p>
