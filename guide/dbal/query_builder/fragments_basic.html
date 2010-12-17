@@ -33,9 +33,9 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>This fragment is mostly used internally. But there are two situations where it may come in handy to the user, which is why it has its own factory method (<span class="inline_code">DB::value()</span>) :</p>
+<p>This fragment may prove useful in two situations :</p>
 <ul>
-  <li>PDO doesn't support array parameters. This can be used to emulate it.</li>
+  <li>PDO doesn't support array parameters. This fragment can be used to emulate it.</li>
   <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
 </ul>
 
@@ -45,18 +45,23 @@ title: Guide
   use \Glue\DB\DB;
   
   // Emulates PDO array parameter :
-  $query = DB::select('users', $u)->where("$u->id IN ?", $values = DB::value());
+  $query = DB::select('users', $u)->where("$u->id IN ?", $param = DB::value());
   
-  // The $values fragment can be used as a parameter :
-  $values->value(array(1,2,3));
+  // Set parameter value and output query SQL :
+  $param->value(array(1,2,3));
   echo $query->sql(); // Prints "SELECT * FROM "users" WHERE "users"."id" IN (1,2,3);
   
-  $values->value(array(4,5,6));
+  // Set parameter value and output query SQL :
+  $param->value(array(4,5,6));
   echo $query->sql(); // Prints "SELECT * FROM "users" WHERE "users"."id" IN (4,5,6);  
 ?>
 {% endhighlight %}
 
 <h3>Template fragments</h3>
+
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/template.php"><span class="inline_code">\Glue\DB\Fragment_Template</span></a></p>
+
+<p>The goal of a query builder is to represent a query as a data structure so that it can be easily modified. However, there is little point in going as far as keeping track of the syntax tree of, say, an arithmetic expression. To cover such cases, template fragments are introduced : template fragments represent SQL expressions to be included as-is in the query, with optional placeholders for values or other fragments.</p>
 
 <h3>Boolean expressions</h3>
 
