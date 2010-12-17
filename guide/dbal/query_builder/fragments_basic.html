@@ -7,11 +7,54 @@ title: Guide
 
 <h2>Basic fragments</h2>
 
-<p>This page describes the most important fragment types from a user point of view, with the exception of queries.</p>
+<p>This page describes the most important fragment types that show up through the API (i.e. not those that are only used internally) with the exception of queries.</p>
 
 <h3>Value fragments</h3>
 
-<p>Class : <a class="external" href=""><span class="inline_code">https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/value.php</span></a></p>
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/value.php"><span class="inline_code">\Glue\DB\Fragment_Value</span></a></p>
+
+<p>This fragment represents a value in an SQL query. It can be of any PHP primitive types : integer, float, string, boolean, null or an array of elements belonging to any of those primitive types.</p>
+
+{% highlight php %}
+<?php
+
+  use \Glue\DB\DB;
+  
+  // Creation :
+  $f = DB::value("It's a test");
+  
+  // API usage :
+  $f->value();                    // Returns string "It's a test"
+  $f->value("It's another test"); // Sets value to "It's another test" and invalidates
+                                  // all users of the fragment to clear their caches.
+  
+  // Get SQL :
+  echo $f->sql();                 // Prints "'It''s another test'"  
+?>
+{% endhighlight %}
+
+<p>This fragment is mostly used internally. But there are two situations where it may come in handy to the user, which is why it has its own factory method (<span class="inline_code">DB::value()</span>) :</p>
+<ul>
+  <li>PDO doesn't support array parameters. This can be used to emulate it.</li>
+  <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
+</ul>
+
+{% highlight php %}
+<?php
+
+  use \Glue\DB\DB;
+  
+  // Emulates PDO array parameter :
+  $query = DB::select('users', $u)->where("$u->id IN ?", $values = DB::value());
+  
+  // The $values fragment can be used as a parameter :
+  $values->value(array(1,2,3));
+  echo $query->sql(); // Prints "SELECT * FROM "users" WHERE "users"."id" IN (1,2,3);
+  
+  $values->value(array(4,5,6));
+  echo $query->sql(); // Prints "SELECT * FROM "users" WHERE "users"."id" IN (4,5,6);  
+?>
+{% endhighlight %}
 
 <h3>Template fragments</h3>
 
