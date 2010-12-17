@@ -9,15 +9,13 @@ title: Guide
 
 <p>It works by representing the query internally as a data structure rather than a string, so that it can be easily modified. A convenient interface is provided to create and modify the data structure. Once the data structure is ready, it can be compiled into an SQL string according to the SQL dialect of the underlying RDBMS.</p>
 
-<h3>Query builder : what it is</h3>
+<h3>Query builder : the point</h3>
 
 <p>Such a system comes in handy if you need dynamic queries - queries that are assembled at runtime according to some logic. To some extent, it also provides database independence by automatically quoting values and identifiers, and generating the right SQL constructs for LIMIT and OFFSET for instance.</p>
 
-<h3>Query builder : what it is not</h3>
+<h3>Query builder : not the point</h3>
 
-<p>The point of a query builder is not to make writing queries easier or faster. Nothing will ever beat writing straight SQL for that.</p>
-
-<p>It is not the ultimate weapon to ensure database independence either. You're on your own when it comes to handling SQL function names and operators differences between various database vendors.</p>
+<p>The point of a query builder is not to make writing queries easier or faster. Nothing will ever beat writing straight SQL for that. It is not the ultimate weapon to ensure database independence either. You're on your own when it comes to handling SQL function names and operators differences between various database vendors.</p>
 
 <h3>Example</h3>
 
