@@ -7,7 +7,9 @@ title: Guide
 
 <h2>Basic fragments</h2>
 
-<p>This page describes the most important fragment types that show up through the API (i.e. not those that are only used internally) with the exception of queries.</p>
+<p>This page describes the most important fragment types that show up through the API with the exception of queries.</p>
+
+<p>Most of the time you don't have to instanciate these fragments yourself. However in more complex cases, you may have to create them explicitely and to include them into queries using <a href="/Glue/guide/dbal/query_builder/fragments.html#nested_functions">nested functions</a>. Factory methods are provided in the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class to make this possible.</p>
 
 <h3>Value fragments</h3>
 
@@ -119,12 +121,12 @@ title: Guide
     +-- Value  (SQL = "('tes','tas','tos')")
 </pre>
 
-<h4>Example 2 : replacement fragments</h4>
+<h4>Example 2 : replacement fragments and subqueries</h4>
 
 {% highlight php %}
 <?php
   
-  // Template with placeholder for a query :
+  // Subquery :
   $tpl = DB::template("17 IN ?", 
       DB::select('users', $u)->columns($u->id)->where("$u->login LIKE ?",
         $param = DB::value()
