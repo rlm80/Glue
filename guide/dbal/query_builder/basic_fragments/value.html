@@ -29,7 +29,7 @@ title: Guide
   
   // API usage :
   $f->value();                    // Returns string "It's a test"
-  $f->value("It's another test"); // Sets value to "It's another test"
+  $f->value("It's another test"); // Sets value to "It's another test" (returns $this)
   
   // Get SQL :
   echo $f->sql();                 // Prints "'It''s another test'"  

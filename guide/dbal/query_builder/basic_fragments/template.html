@@ -11,7 +11,7 @@ title: Guide
 
 <p>Queries are represented as data structures so that they can be easily modified. However, there is little point in going as far as keeping track of the syntax tree of, say, an arithmetic expression. To cover such cases, template fragments are introduced.</p>
 
-<p>Template fragments represent SQL templates to be included as-is in the query. The template may have '?' placeholders and you may supply a list of fragments to be used for replacements.</p>
+<p>Template fragments represent SQL templates to be included as-is in the query. The template may have '?' placeholders and you may supply to the constructor a list of fragments to be used for replacements.</p>
 
 <p>The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL output of each replacement fragment. If you supply constant values for replacements, they will be turned into Value fragments and thus quoted appropriately.</p> 
 
@@ -103,11 +103,6 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h3>Boolean expressions</h3>
-
-<h3>Alias fragments</h3>
-
-<h3>Join expressions</h3>
 
 
 
