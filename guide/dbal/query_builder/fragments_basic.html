@@ -19,6 +19,14 @@ title: Guide
 
 <p>The SQL output of a value fragment is the value properly quoted.</p>
 
+<p>This fragment may prove useful in two situations :</p>
+<ul>
+  <li>PDO doesn't support array parameters. This fragment can be used to emulate it.</li>
+  <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
+</ul>
+
+<h4>Interface</h4>
+
 {% highlight php %}
 <?php
   
@@ -34,11 +42,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>This fragment may prove useful in two situations :</p>
-<ul>
-  <li>PDO doesn't support array parameters. This fragment can be used to emulate it.</li>
-  <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
-</ul>
+<h4>Example : array parameters</h4>
 
 {% highlight php %}
 <?php
@@ -77,6 +81,25 @@ title: Guide
 <p>Template fragments represent SQL templates to be included as-is in the query. The template may have '?' placeholders and you may supply a list of fragments to be used for replacements.</p>
 
 <p>The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL output of each replacement fragment. If you supply constant values for replacements, they will be turned into Value fragments and thus quoted appropriately.</p> 
+
+<h4>Interface</h4>
+
+{% highlight php %}
+<?php
+  
+  // Creation :
+  $f = DB::template("1 < 5 + ?", 2);
+  
+  // API usage :
+  $f->template();                 // Returns string "1 < 5 + ?"
+  $f->template("1 < 6 + ?");      // Sets new template.
+  $f->replacements();             // Return replacement array.
+  $f->replacements(array(3));     // Sets replacement array.
+  
+  // Get SQL :
+  echo $f->sql();                 // Prints "1 < 6 + 3"  
+?>
+{% endhighlight %}
 
 <h4>Example 1 : constant replacements</h4>
 
