@@ -27,8 +27,7 @@ title: Guide
   
   // API usage :
   $f->value();                    // Returns string "It's a test"
-  $f->value("It's another test"); // Sets value to "It's another test" and invalidates
-                                  // all users of the fragment to clear their caches.
+  $f->value("It's another test"); // Sets value to "It's another test"
   
   // Get SQL :
   echo $f->sql();                 // Prints "'It''s another test'"  
@@ -77,7 +76,9 @@ title: Guide
 
 <p>Template fragments represent SQL templates to be included as-is in the query. The template may have '?' placeholders and you may supply a list of fragments to be used for replacements.</p>
 
-<p>The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL output of each replacement. If you supply constant values for replacements, they will be turned into Value fragments and thus quoted appropriately.</p> 
+<p>The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL output of each replacement fragment. If you supply constant values for replacements, they will be turned into Value fragments and thus quoted appropriately.</p> 
+
+<h4>Example 1 : constant replacements</h4>
 
 {% highlight php %}
 <?php
@@ -94,6 +95,8 @@ title: Guide
     +-- Value  (SQL = "'test'")
     +-- Value  (SQL = "('tes','tas','tos')")
 </pre>
+
+<h4>Example 2 : replacement fragments</h4>
 
 {% highlight php %}
 <?php
@@ -125,6 +128,24 @@ title: Guide
           +-- Template      (SQL = "`users`.`login` LIKE 'test%'")
             +-- Value       (SQL = "'test%'")    
 </pre>
+
+<h4>Example 3 : nested templates</h4>
+
+{% highlight php %}
+<?php
+  
+  // Template with placeholder for a query :
+  $query = DB::select('users', $u)->where("$u->id ? 20", $tpl = DB::template()); 
+
+  // Generate query with '<' operator :
+  $tpl->template('<');
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` < 20"
+  
+  // Generate query with '>=' operator :
+  $tpl->template('>=');
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` >= 20"   
+?>
+{% endhighlight %}
 
 <h3>Boolean expressions</h3>
 
