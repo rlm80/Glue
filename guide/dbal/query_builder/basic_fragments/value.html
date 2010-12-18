@@ -1,0 +1,85 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Value fragments</h2>
+
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/value.php"><span class="inline_code">\Glue\DB\Fragment_Value</span></a></p>
+
+<p>Factory : <span class="inline_code">DB::value()</span></a></p>
+
+<p>This fragment represents a value in an SQL query. It can be of any PHP primitive types : integer, float, string, boolean, null or an array of elements belonging to any of those primitive types.</p>
+
+<p>The SQL output of a value fragment is the value properly quoted.</p>
+
+<p>This fragment may prove useful in two situations :</p>
+<ul>
+  <li>PDO doesn't support array parameters. This fragment can be used to emulate it.</li>
+  <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
+</ul>
+
+<h3>Interface</h3>
+
+{% highlight php %}
+<?php
+  
+  // Creation :
+  $f = DB::value("It's a test");
+  
+  // API usage :
+  $f->value();                    // Returns string "It's a test"
+  $f->value("It's another test"); // Sets value to "It's another test"
+  
+  // Get SQL :
+  echo $f->sql();                 // Prints "'It''s another test'"  
+?>
+{% endhighlight %}
+
+<h3>Example : array parameters</h3>
+
+{% highlight php %}
+<?php
+  
+  // Emulates PDO array parameter :
+  $query = DB::select('users', $u)->where("$u->id IN ?", $param = DB::value());
+  
+  // Set parameter value and output query SQL :
+  $param->value(array(1,2,3));
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` IN (1,2,3)"
+  
+  // Set parameter value and output query SQL :
+  $param->value(array(4,5,6));
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` IN (4,5,6)"
+?>
+{% endhighlight %}
+
+<pre>
+  +-- Select query        (SQL = "SELECT * FROM `users` WHERE `users`.`id` IN (1,2,3)")
+    +-- Select list       (SQL = "*")
+    +-- From clause       (SQL = "`users`")
+    +-- Where clause      (SQL = "`users`.`id` IN (1,2,3)")
+      +-- Boolean operand (SQL = "`users`.`id` IN (1,2,3)")
+        +-- Template      (SQL = "`users`.`id` IN (1,2,3)")
+          +-- Value       (SQL = "(1,2,3)")
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

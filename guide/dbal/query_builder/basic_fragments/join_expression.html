@@ -1,0 +1,203 @@
+---
+layout: base
+title: Guide
+---
+
+<p>Prerequisites : <a href="/Glue/guide/dbal/query_builder/fragments.html">fragments : inner workings</a></p>
+
+<h2>Basic fragments</h2>
+
+<p>This page describes the most important fragment types that show up through the API with the exception of queries.</p>
+
+<p>Most of the time you don't have to instanciate these fragments yourself. However in more complex cases, you may have to create them explicitely and to include them into queries using <a href="/Glue/guide/dbal/query_builder/fragments.html#nested_functions">nested functions</a>. Factory methods are provided in the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class to make this possible.</p>
+
+<h3>Value fragments</h3>
+
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/value.php"><span class="inline_code">\Glue\DB\Fragment_Value</span></a></p>
+
+<p>Factory : <span class="inline_code">DB::value()</span></a></p>
+
+<p>This fragment represents a value in an SQL query. It can be of any PHP primitive types : integer, float, string, boolean, null or an array of elements belonging to any of those primitive types.</p>
+
+<p>The SQL output of a value fragment is the value properly quoted.</p>
+
+<p>This fragment may prove useful in two situations :</p>
+<ul>
+  <li>PDO doesn't support array parameters. This fragment can be used to emulate it.</li>
+  <li>Like any other fragment, it may be used in more than one query simultaneously. Changing the value of the fragment will automatically change the SQL output of all those queries.</li>
+</ul>
+
+<h4>Interface</h4>
+
+{% highlight php %}
+<?php
+  
+  // Creation :
+  $f = DB::value("It's a test");
+  
+  // API usage :
+  $f->value();                    // Returns string "It's a test"
+  $f->value("It's another test"); // Sets value to "It's another test"
+  
+  // Get SQL :
+  echo $f->sql();                 // Prints "'It''s another test'"  
+?>
+{% endhighlight %}
+
+<h4>Example : array parameters</h4>
+
+{% highlight php %}
+<?php
+  
+  // Emulates PDO array parameter :
+  $query = DB::select('users', $u)->where("$u->id IN ?", $param = DB::value());
+  
+  // Set parameter value and output query SQL :
+  $param->value(array(1,2,3));
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` IN (1,2,3)"
+  
+  // Set parameter value and output query SQL :
+  $param->value(array(4,5,6));
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` IN (4,5,6)"
+?>
+{% endhighlight %}
+
+<pre>
+  +-- Select query        (SQL = "SELECT * FROM `users` WHERE `users`.`id` IN (1,2,3)")
+    +-- Select list       (SQL = "*")
+    +-- From clause       (SQL = "`users`")
+    +-- Where clause      (SQL = "`users`.`id` IN (1,2,3)")
+      +-- Boolean operand (SQL = "`users`.`id` IN (1,2,3)")
+        +-- Template      (SQL = "`users`.`id` IN (1,2,3)")
+          +-- Value       (SQL = "(1,2,3)")
+</pre>
+
+<h3>Template fragments</h3>
+
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/template.php"><span class="inline_code">\Glue\DB\Fragment_Template</span></a></p>
+
+<p>Factory : <span class="inline_code">DB::template()</span></a></p>
+
+<p>Queries are represented as data structures so that they can be easily modified. However, there is little point in going as far as keeping track of the syntax tree of, say, an arithmetic expression. To cover such cases, template fragments are introduced.</p>
+
+<p>Template fragments represent SQL templates to be included as-is in the query. The template may have '?' placeholders and you may supply a list of fragments to be used for replacements.</p>
+
+<p>The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL output of each replacement fragment. If you supply constant values for replacements, they will be turned into Value fragments and thus quoted appropriately.</p> 
+
+<h4>Interface</h4>
+
+{% highlight php %}
+<?php
+  
+  // Creation :
+  $f = DB::template("1 < 5 + ?", 2);
+  
+  // API usage :
+  $f->template();                 // Returns string "1 < 5 + ?"
+  $f->template("1 < 6 + ?");      // Sets new template.
+  $f->replacements();             // Return replacement array.
+  $f->replacements(array(3));     // Sets replacement array.
+  
+  // Get SQL :
+  echo $f->sql();                 // Prints "1 < 6 + 3"  
+?>
+{% endhighlight %}
+
+<h4>Example 1 : constant replacements</h4>
+
+{% highlight php %}
+<?php
+  
+  // Template with placeholders and constant replacements :
+  $tpl = DB::template("SUBSTR(?, 1, 3) IN ?", 'test', array('tes', 'tas', 'tos'));
+  echo $tpl->sql(); // Prints "SUBSTR('test', 1, 3) IN ('tes','tas','tos')"
+  
+?>
+{% endhighlight %}
+
+<pre>
+  +-- Template (SQL = "SUBSTR('test', 1, 3) IN ('tes','tas','tos')")
+    +-- Value  (SQL = "'test'")
+    +-- Value  (SQL = "('tes','tas','tos')")
+</pre>
+
+<h4>Example 2 : replacement fragments and subqueries</h4>
+
+{% highlight php %}
+<?php
+  
+  // Subquery :
+  $tpl = DB::template("17 IN ?", 
+      DB::select('users', $u)->columns($u->id)->where("$u->login LIKE ?",
+        $param = DB::value()
+      )
+    );
+  
+  // Set parameter value and output SQL :
+  $param->value('test%');
+  echo $tpl->sql(); // Prints "17 IN (SELECT `users`.`id` FROM `users` WHERE `users`.`login` LIKE 'test%')";  
+  
+  // Set parameter value and output SQL :
+  $param->value('toast%');
+  echo $tpl->sql(); // Prints "17 IN (SELECT `users`.`id` FROM `users` WHERE `users`.`login` LIKE 'toast%')";    
+?>
+{% endhighlight %}
+
+<pre>
+  +-- Template (SQL = "17 IN (SELECT `users`.`id` FROM `users` WHERE `users`.`login` LIKE 'test%')")
+    +-- Select query (SQL = "SELECT `users`.`id` FROM `users` WHERE `users`.`login` LIKE 'test%')")
+      +-- Select list       (SQL = "`users`.`id`")
+      +-- From clause       (SQL = "`users`")
+      +-- Where clause      (SQL = "`users`.`login` LIKE 'test%'")
+        +-- Boolean operand (SQL = "`users`.`login` LIKE 'test%'")
+          +-- Template      (SQL = "`users`.`login` LIKE 'test%'")
+            +-- Value       (SQL = "'test%'")    
+</pre>
+
+<h4>Example 3 : nested templates</h4>
+
+{% highlight php %}
+<?php
+  
+  // Template with placeholder for a query :
+  $query = DB::select('users', $u)->where("$u->id ? 20", $tpl = DB::template()); 
+
+  // Generate query with '<' operator :
+  $tpl->template('<');
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` < 20"
+  
+  // Generate query with '>=' operator :
+  $tpl->template('>=');
+  echo $query->sql(); // Prints "SELECT * FROM `users` WHERE `users`.`id` >= 20"   
+?>
+{% endhighlight %}
+
+<h3>Boolean expressions</h3>
+
+<h3>Alias fragments</h3>
+
+<h3>Join expressions</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
