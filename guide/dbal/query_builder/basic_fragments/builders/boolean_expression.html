@@ -22,7 +22,9 @@ title: Guide
   <li>The same parameters as <span class="inline_code">DB::template()</span>, that is, a string followed by replacements (values or other fragments).</li>
 </ul>
 
-<p>The <span class="inline_code">->not()</span> method negates the expression.</p>
+<p>The <span class="inline_code">->not()</span> method negates the expression. The <span class="inline_code">->is_negated()</span> checks whether or not the expression is negated.</p>
+
+<p>All methods return <span class="inline_code">$this</span> so that they can be chained, except <span class="inline_code">->is_negated()</span> that returns boolean.</p>
 
 {% highlight php %}
 <?php
@@ -46,7 +48,7 @@ title: Guide
 {% highlight php %}
 <?php
   // In one step :
-  $f = DB::bool("1=1")->and( DB::bool("2=2")->or("3=3") )->and("4=4");
+  $f = DB::bool("1=1")->and(   DB::bool("2=2")->or("3=3")   )->and("4=4");
   
   // Or two steps :  
   $f = DB::bool("1=1")->and($b = DB::bool())->and("4=4");
@@ -59,20 +61,18 @@ title: Guide
 {% endhighlight %}
 
 <pre>
-  +-- Bool expr (SQL = "(1=1) AND ((2=2) OR (3=3)) AND (4=4)")
-    +-- Bool operand  (SQL = "(1=1)")
-      +-- Template    (SQL = "1=1")
-    +-- Bool operand  (SQL = "AND ((2=2) OR (3=3))")
-      +-- Bool expr  (SQL = "(2=2) OR (3=3)")
+  +-- Bool expr           (SQL = "(1=1) AND ((2=2) OR (3=3)) AND (4=4)")
+    +-- Bool operand      (SQL = "(1=1)")
+      +-- Template        (SQL = "1=1")
+    +-- Bool operand      (SQL = "AND ((2=2) OR (3=3))")
+      +-- Bool expr       (SQL = "(2=2) OR (3=3)")
         +-- Bool operand  (SQL = "(2=2)")
           +-- Template    (SQL = "2=2")
-        +-- Bool operand  (SQL = "(3=3)")
+        +-- Bool operand  (SQL = "OR (3=3)")
           +-- Template    (SQL = "3=3")
-    +-- Bool operand  (SQL = "(4=4)")
-      +-- Template    (SQL = "4=4")
+    +-- Bool operand      (SQL = "AND (4=4)")
+      +-- Template        (SQL = "4=4")
 </pre>
-
-
 
 
 
