@@ -14,8 +14,6 @@ class Fragment_Operand_Bool extends \Glue\DB\Fragment_Operand {
 	// Boolean operators :
 	const _AND		= 0;
 	const _OR		= 1;
-	const ANDNOT	= 2;
-	const ORNOT		= 3;
 
 	/**
 	 * Forwards call to given connection.

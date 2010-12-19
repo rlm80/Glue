@@ -297,8 +297,6 @@ abstract class Connection extends PDO {
 			switch ($operator) {
 				case \Glue\DB\Fragment_Operand_Bool::_AND :	$sql = 'AND ';		break;
 				case \Glue\DB\Fragment_Operand_Bool::_OR :	$sql = 'OR ';		break;
-				case \Glue\DB\Fragment_Operand_Bool::ANDNOT :	$sql = 'AND NOT ';	break;
-				case \Glue\DB\Fragment_Operand_Bool::ORNOT :	$sql = 'OR NOT ';	break;
 			}
 		}
 
@@ -434,7 +432,8 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	public function compile_builder_bool(\Glue\DB\Fragment_Builder_Bool $fragment) {
-		return $this->compile_builder($fragment, ' ');
+		$sql = $this->compile_builder($fragment, ' ');
+		return $fragment->is_negated() ? 'NOT (' . $sql . ')' : $sql;
 	}
 
 	/**
@@ -445,7 +444,7 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	public function compile_builder_bool_where(\Glue\DB\Fragment_Builder_Bool_Where $fragment) {
-		return $this->compile_builder($fragment, ' ');
+		return $this->compile_builder_bool($fragment, ' ');
 	}
 
 	/**
@@ -456,7 +455,7 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	public function compile_builder_bool_having(\Glue\DB\Fragment_Builder_Bool_Having $fragment) {
-		return $this->compile_builder($fragment, ' ');
+		return $this->compile_builder_bool($fragment, ' ');
 	}
 
 	/**

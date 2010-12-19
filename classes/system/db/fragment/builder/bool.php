@@ -4,6 +4,13 @@ namespace Glue\System\DB;
 
 /**
  * Fragment that represents a boolean expression.
+ * 
+ * A boolean expression is a list of boolean operands. A boolean operand is a fragment paired with a boolean
+ * operator (OR, AND). The whole expression can be negated.
+ * 
+ * The SQL output of a boolean expression is the SQL output of each of its operands put one after the other,
+ * preceded with NOT and surrounded with parentheses if the expression is negated. The SQL output of a boolean
+ * operand is its boolean operator followed by the SQL output of its fragment surrounded with parentheses.
  *
  * @package    Glue
  * @author     Régis Lemaigre
@@ -11,6 +18,11 @@ namespace Glue\System\DB;
  */
 
 class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
+	/**
+	 * @var boolean Whether or not this boolean expression should be negated.
+	 */
+	protected $not = false;
+	
 	/**
 	 * Initializes the expression with a first operand.
 	 *
@@ -48,30 +60,6 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	}
 
 	/**
-	 * Adds a boolean operand at the end of the expression, connecting it with
-	 * the OR NOT operator.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Bool
-	 */
-	public function ornot() {
-		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Operand_Bool::ORNOT);
-		return $this;
-	}
-
-	/**
-	 * Adds a boolean operand at the end of the expression, connecting it with
-	 * the AND NOT operator.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Bool
-	 */
-	public function andnot() {
-		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Operand_Bool::ANDNOT);
-		return $this;
-	}
-
-	/**
 	 * Adds an operand to the expression.
 	 *
 	 * @param array $args
@@ -95,6 +83,24 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		// Add operand :
 		$this->push($operand);
 	}
+	
+	/**
+	 * Negate expression.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Bool
+	 */
+	public function not() {
+		return $this->set_property('not', ! $this->not);
+	}
+	
+	/**
+	 * Returns whether or not expression is negated.
+	 *
+	 * @return boolean
+	 */
+	public function is_negated() {
+		return $this->not;
+	}	
 
 	/**
 	 * Forwards call to given connection.

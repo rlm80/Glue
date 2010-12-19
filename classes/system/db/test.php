@@ -24,7 +24,7 @@ class Test {
 		self::create_test_tables();
 		try {
 			self::test_introspection();
-			//self::test_fragments();
+			self::test_fragments();
 			//self::test_queries();
 		}
 		catch (\Exception $e) {
@@ -240,6 +240,10 @@ EOD;
 					db::template("? test ? template", "test'test", 10),
 					"'test\'test' test 10 template"
 				),
+			'template - nested' => array(
+					db::template("? test ?", db::template('toast'), db::template('toast')),
+					"toast test toast"
+				),
 			'boolean - simple' => array(
 					db::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf'))->root(),
 					"('test' = 'qsdf') OR ('test' IN ('azer','qsdf'))"
@@ -248,16 +252,24 @@ EOD;
 					db::bool(db::bool("1=1")->or("2=2"))->and("3=3")->root(),
 					"((1=1) OR (2=2)) AND (3=3)"
 				),
-			'table' => array(
+			'boolean - not' => array(
+					db::bool("1=1")->not(),
+					"NOT ((1=1))"
+				),		
+			'boolean - not not' => array(
+					db::bool("1=1")->not()->not(),
+					"(1=1)"
+				),								
+			/*'table' => array(
 					$t = db::alias('glusers', 'myalias'),
 					"`glusers` AS `myalias`"
 				),
 			'column' => array(
 					$t->login,
 					"`myalias`.`login`"
-				),
+				),*/
 		);
-
+/*
 		$get = new Fragment_Builder_SelectList(null);
 		$get
 			->and($t->login)
@@ -354,7 +366,7 @@ EOD;
 			$insert1,
 			"INSERT INTO `glusers` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
 		);
-
+*/
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;

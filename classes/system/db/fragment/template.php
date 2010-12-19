@@ -3,9 +3,14 @@
 namespace Glue\System\DB;
 
 /**
- * Fragment that is made of an SQL template with placeholders and an array of replacement fragments.
- *
- * TODO : renommer en Fragment_Expression ?
+ * Fragment that represents an SQL template to be included as-is in the query.
+ * 
+ * The template may have '?' placeholders and you may supply to the constructor an array of fragments to be
+ * used for replacements.
+ * 
+ * The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL
+ * output of each replacement fragment. If constant values are supplied for replacements, they will be turned
+ * into Value fragments and thus quoted appropriately. 
  *
  * @package    Glue
  * @author     Régis Lemaigre
@@ -21,7 +26,7 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	/**
 	 * @var array Replacements to be made in SQL template.
 	 */
-	protected $replacements;
+	protected $replacements = array();
 
 	/**
 	 * Constructor.
@@ -29,7 +34,7 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	 * @param string $template
 	 * @param array $replacements
 	 */
-	public function __construct($template, array $replacements = array()) {
+	public function __construct($template = '', array $replacements = array()) {
 		$this->template($template);
 		$this->replacements($replacements);
 	}
@@ -55,14 +60,13 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	 *
 	 * @return mixed
 	 */
-	public function replacements($replacements = null) {
+	public function replacements(array $replacements = array()) {
 		if (func_num_args() === 0)
 			return $this->replacements;
 		else {
 			// Unregister old replacements :
-			if (isset($this->replacements) && count($this->replacements) > 0)
-				foreach($this->replacements as $replacement)
-					$replacement->unregister_user($this);
+			foreach($this->replacements as $replacement)
+				$replacement->unregister_user($this);
 
 			// Set new replacements :
 			$this->replacements = array();
