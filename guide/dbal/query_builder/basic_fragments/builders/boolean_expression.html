@@ -1,0 +1,91 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Boolean expressions</h2>
+
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/fragment/builder/bool.php"><span class="inline_code">\Glue\DB\Fragment_Builder_Bool</span></a></p>
+
+<p>Factory : <span class="inline_code">DB::bool()</span></p>
+
+<p>This fragment represents a boolean expression, that is, a list of boolean operands. A boolean operand is a fragment paired with a boolean operator (OR, AND). The whole expression can be negated.</p>
+
+<p>The SQL output of a boolean expression is the SQL output of each of its operands put one after the other, preceded with NOT and surrounded with parentheses if the expression is negated. The SQL output of a boolean operand is its boolean operator followed by the SQL output of its fragment surrounded with parentheses.</p>
+
+<h3>Interface</h3>
+
+<p>The factory method and the <span class="inline_code">->or()</span> and <span class="inline_code">->and()</span> methods create a new boolean operand to be added at the end of the expression. They accept as parameter(s) either :</p>
+
+<ul>
+  <li>A fragment (any fragment).</li>
+  <li>The same parameters as <span class="inline_code">DB::template()</span>, that is, a string followed by replacements (values or other fragments).</li>
+</ul>
+
+<p>The <span class="inline_code">->not()</span> method negates the expression.</p>
+
+{% highlight php %}
+<?php
+  
+  // Creation :
+  $f = DB::bool("'abc' IN ?", array("abc","a'b'c"))->and("1=1")->or("1<>1");
+  
+  // Get SQL :
+  echo $f->sql(); // Prints "('abc' IN ('abc','a''b''c')) AND (1=1) OR (1<>1)"  
+  
+  // Negates expression :
+  echo $f->not();
+  
+  // Get SQL :
+  echo $f->sql(); // Prints "NOT (('abc' IN ('abc','a''b''c')) AND (1=1) OR (1<>1))"  
+?>
+{% endhighlight %}
+
+<h3>Example 1 : nested boolean expressions</h3>
+
+{% highlight php %}
+<?php
+  // In one step :
+  $f = DB::bool("1=1")->and( DB::bool("2=2")->or("3=3") )->and("4=4");
+  
+  // Or two steps :  
+  $f = DB::bool("1=1")->and($b = DB::bool())->and("4=4");
+  $b->init("2=2")->or("3=3");
+  
+  // Get SQL :
+  echo $f->sql(); // Prints "(1=1) AND ((2=2) OR (3=3)) AND (4=4)" 
+  
+?>
+{% endhighlight %}
+
+<pre>
+  +-- Bool expr (SQL = "(1=1) AND ((2=2) OR (3=3)) AND (4=4)")
+    +-- Bool operand  (SQL = "(1=1)")
+      +-- Template    (SQL = "1=1")
+    +-- Bool operand  (SQL = "AND ((2=2) OR (3=3))")
+      +-- Bool expr  (SQL = "(2=2) OR (3=3)")
+        +-- Bool operand  (SQL = "(2=2)")
+          +-- Template    (SQL = "2=2")
+        +-- Bool operand  (SQL = "(3=3)")
+          +-- Template    (SQL = "3=3")
+    +-- Bool operand  (SQL = "(4=4)")
+      +-- Template    (SQL = "4=4")
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
