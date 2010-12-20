@@ -33,7 +33,7 @@ class Fragment_Builder_SelectList extends \Glue\DB\Fragment_Builder {
 		// Build fragment :
 		if ($first instanceof \Glue\DB\Fragment_Column)
 			$fragment = new \Glue\DB\Fragment_Aliased_Column($first, $alias, count($this->children()));
-		elseif ($first instanceof Fragment)
+		elseif ($first instanceof \Glue\DB\Fragment)
 			$fragment = new \Glue\DB\Fragment_Aliased($first, $alias);
 		else
 			$fragment = new \Glue\DB\Fragment_Aliased(
