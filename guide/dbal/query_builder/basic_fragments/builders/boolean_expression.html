@@ -22,9 +22,9 @@ title: Guide
   <li>The same parameters as <span class="inline_code">DB::template()</span>, that is, a string followed by replacements (values or other fragments).</li>
 </ul>
 
-<p>The <span class="inline_code">->not()</span> method negates the expression. The <span class="inline_code">->is_negated()</span> checks whether or not the expression is negated.</p>
+<p>The <span class="inline_code">->not()</span> method toggles the expression negation. The <span class="inline_code">->negated()</span> method checks whether or not the expression is currently negated.</p>
 
-<p>All methods return <span class="inline_code">$this</span> so that they can be chained, except <span class="inline_code">->is_negated()</span> that returns boolean.</p>
+<p>All methods return <span class="inline_code">$this</span> so that they can be chained, except <span class="inline_code">->negated()</span> that returns boolean.</p>
 
 {% highlight php %}
 <?php
