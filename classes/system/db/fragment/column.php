@@ -4,7 +4,8 @@ namespace Glue\System\DB;
 
 /**
  * Fragment that represents a column of a specific table - alias pair and compiles into
- * a "<table_alias>.<column_name>" SQL string.
+ * a "<table_alias>.<column_name>" SQL string. Each column object is assigned a unique
+ * string identifier.
  *
  * @package    Glue
  * @author     Régis Lemaigre
@@ -16,16 +17,31 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	 * @var integer Return SQL without table qualifier.
 	 */
 	const STYLE_UNQUALIFIED	= 1;
+	
+	/**
+	 * @var integer Maximum column identifier attributed so far.
+	 */
+	static $maxid = 0;
 
+	/**
+	 * @var array Identifiers => column objects mapping.
+	 */
+	static $map = array();
+	
 	/**
 	 * @var \Glue\DB\Fragment_Aliased_Table
 	 */
 	protected $table_alias;
 
 	/**
-	 * @var \Glue\DB\Column
+	 * @var string Column name.
 	 */
 	protected $column;
+	
+	/**
+	 * @var string Unique identifier.
+	 */
+	protected $id;	
 
 	/**
 	 * Constructor.
@@ -33,9 +49,16 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	 * @param \Glue\DB\Fragment_Aliased_Table $table_alias
 	 * @param string $column
 	 */
-	public function __construct(\Glue\DB\Fragment_Aliased_Table $table_alias, $column) {
-		$this->table_alias	= $table_alias;
-		$this->column		= $table_alias->aliased()->table()->column($column);
+	protected function __construct(\Glue\DB\Fragment_Aliased_Table $table_alias, $column) {
+		// Set properties :
+		$this->set_property('table_alias', $table_alias);
+		$this->set_property('column', $column);
+		
+		// Assign unique identifier :
+		$this->id = '@' . static::$maxid ++ . '@';
+		
+		// Store in identifier => instances mapping array :
+		static::$map[$id] = $this;
 	}
 
 	/**
@@ -55,10 +78,15 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	public function table_alias() {
 		return $this->table_alias;
 	}
-
-	public function __toString() {
-		return $this->sql($this->column()->table()->db());
-	}
+	
+	/**
+	 * Unique identifier getter.
+	 *
+	 * @return string
+	 */
+	public function id() {
+		return $this->id;
+	}	
 
 	/**
 	 * Forwards call to given connection.
@@ -71,5 +99,16 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	protected function compile(\Glue\DB\Connection $cn, $style) {
 		// Forwards call to connection :
 		return $cn->compile_column($this, $style);
+	}
+	
+	/**
+	 * Get instances by id.
+	 * 
+	 * @param string $id
+	 * 
+	 * @return \Glue\DB\Fragment_Column 
+	 */
+	public static function get($id) {
+		return static::$map[$id];
 	}
 }

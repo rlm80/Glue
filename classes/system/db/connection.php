@@ -587,7 +587,8 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	public function compile_table(\Glue\DB\Fragment_Table $fragment) {
-		return $this->quote_identifier($fragment->table()->dbtable());
+		$table = $this->table($fragment->table());
+		return $this->quote_identifier($table->dbtable());
 	}
 
 	/**

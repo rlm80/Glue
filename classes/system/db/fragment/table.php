@@ -12,7 +12,7 @@ namespace Glue\System\DB;
 
 class Fragment_Table extends \Glue\DB\Fragment {
 	/**
-	 * @var \Glue\DB\Table Table.
+	 * @var string Table name.
 	 */
 	protected $table;
 
@@ -21,8 +21,8 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	 *
 	 * @param string $table_name
 	 */
-	public function __construct($table_name) {
-		$this->table = \Glue\DB\DB::table($table_name);
+	public function __construct($table) {
+		$this->table = $table;
 	}
 
 	/**
@@ -30,13 +30,11 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	 *
 	 * @return mixed
 	 */
-	public function table($table_name = null) {
+	public function table($table = null) {
 		if (func_num_args() === 0)
 			return $this->table;
-		else {
-			$table = \Glue\DB\DB::table($table_name);
+		else
 			return $this->set_property('table', $table);
-		}
 	}
 
 	/**
