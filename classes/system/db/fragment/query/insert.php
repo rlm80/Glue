@@ -27,11 +27,6 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	protected $columns;
 
 	/**
-	 * @var integer Last inserted id following the last call to execute().
-	 */
-	protected $last_insert_id;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param string $table_name Name of the table you're inserting rows into.
@@ -110,35 +105,6 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 				$this->columns->and($column);
 		}
 		return $this->columns;
-	}
-
-	/**
-	 * Returns database inferred from tables used in the query.
-	 *
-	 * @return \Glue\DB\Connection
-	 */
-	public function db() {
-		return $this->into()->aliased()->table()->db();
-	}
-
-	/**
-	 * Executes current query.
-	 *
-	 * @return \Glue\DB\Fragment_Query_Insert
-	 */
-	public function execute() {
-		$return = parent::execute();
-		$this->last_insert_id = (integer) $this->db()->lastInsertId();
-		return $return;
-	}
-
-	/**
-	 * Returns the last inserted id following the last call to execute().
-	 *
-	 * @return integer
-	 */
-	public function lastInsertId() {
-		return $this->last_insert_id;
 	}
 
 	/**

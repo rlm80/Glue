@@ -212,73 +212,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		else
 			return $this->set_property('offset', $offset);
 	}
-
-	/**
-	 * Returns database inferred from tables used in the query.
-	 *
-	 * @return \Glue\DB\Connection
-	 */
-	public function db() {
-		$op = $this->from();
-		while ($op instanceof \Glue\DB\Fragment_Builder_Join)
-			$op = $op->first()->operand();
-		return $op->aliased()->table()->db();
-	}
-
-	/**
-	 * Compiles this query into an SQL string and asks PDO to prepare it for execution. Returns
-	 * a PDOStatement object that can be executed multiple times. If you need to execute a statement
-	 * more than once, or if you need query parameters, this is the method of choice for security
-	 * and performance.
-	 *
-	 * @return \Glue\DB\Statement
-	 */
-	public function prepare(array $driver_options = array()) {
-		// Prepare statement :
-		$stmt = parent::prepare($driver_options);
-		$stmt->setFetchMode(PDO::FETCH_BOUND);
-
-		// Bind columns :
-		$this->bind($stmt, true);
-
-		// Return statement :
-		return $stmt;
-	}
-
-	/**
-	 * Executes current query.
-	 *
-	 * @return \Glue\DB\Statement
-	 */
-	public function execute() {
-		// Execute query and get statement :
-		$cn = $this->db();
-		$sql = $this->sql($cn);
-		$stmt = $cn->query($sql);
-		$stmt->setFetchMode(PDO::FETCH_BOUND);
-
-		// Bind columns :
-		$this->bind($stmt, false);
-
-		// Return statement :
-		return $stmt;
-	}
-
-	/**
-	 * Set up bindings between columns fetched by given statement and table alias objects
-	 * of this query.
-	 *
-	 * @param \Glue\DB\Statement $stmt
-	 */
-	protected function bind(\Glue\DB\Statement $stmt, $delayed) {
-		$index = 0;
-		foreach($this->columns()->children() as $child) {
-			$index ++;
-			if ($child instanceof \Glue\DB\Fragment_Aliased_Column)
-				$child->bind($stmt, $index, $delayed);
-		}
-	}
-
+	
 	/**
 	 * Forwards call to given connection.
 	 *

@@ -28,11 +28,6 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	protected $column;
 
 	/**
-	 * @var array Value of column in current row of data.
-	 */
-	protected $value;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param \Glue\DB\Fragment_Aliased_Table $table_alias
@@ -53,15 +48,6 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Value getter.
-	 *
-	 * @return mixed
-	 */
-	public function value() {
-		return $this->value;
-	}
-
-	/**
 	 * Table alias getter.
 	 *
 	 * @return \Glue\DB\Fragment_Aliased_Table
@@ -72,29 +58,6 @@ class Fragment_Column extends \Glue\DB\Fragment {
 
 	public function __toString() {
 		return $this->sql($this->column()->table()->db());
-	}
-
-	/**
-	 * Binds $this->value to column $alias at index $index of statement $stmt.
-	 *
-	 * @param \Glue\DB\Statement $stmt
-	 * @param string $alias
-	 * @param integer $index
-	 * @param boolean $delayed
-	 */
-	public function bind(\Glue\DB\Statement $stmt, $alias, $index, $delayed) {
-		// Bind column :
-		if ($delayed)
-			$stmt->bindColumnDelayed($index, $this->value);
-		else
-			$stmt->bindColumn($index, $this->value);
-
-		// Bind formatters :
-		$formatter = $this->column()->formatter();
-		$stmt->bindFormatter($alias, $formatter);
-		$stmt->bindFormatter($index, $formatter);
-
-		return $this;
 	}
 
 	/**

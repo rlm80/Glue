@@ -163,18 +163,6 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * Returns database inferred from tables used in the query.
-	 *
-	 * @return \Glue\DB\Connection
-	 */
-	public function db() {
-		$op = $this->from();
-		while ($op instanceof \Glue\DB\Fragment_Builder_Join)
-			$op = $op->first()->operand();
-		return $op->aliased()->table()->db();
-	}
-
-	/**
 	 * Forwards call to given connection.
 	 *
 	 * @param \Glue\DB\Connection $cn
