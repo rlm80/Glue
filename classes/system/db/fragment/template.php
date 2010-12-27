@@ -49,8 +49,23 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	public function template($template = null) {
 		if (func_num_args() === 0)
 			return $this->template;
-		else
-			return $this->set_property('template', $template);
+		else {
+			// Locate columns identifiers and remove old dependencies :
+			if (preg_match_all('/@\d+@/', $this->template, $matches))
+				foreach($matches as $id)
+					\Glue\DB\Fragment_Column::get($id)->unregister_user($this);
+
+			// Replace template :
+			$this->set_property('template', $template);
+			
+			// Locate columns identifiers and add new dependencies :
+			if (preg_match_all('/@\d+@/', $this->template, $matches))
+				foreach($matches as $id)
+					\Glue\DB\Fragment_Column::get($id)->register_user($this);
+					
+			// Return $this for chainability :
+			return $this;
+		}
 	}
 
 	/**
@@ -67,24 +82,21 @@ class Fragment_Template extends \Glue\DB\Fragment {
 			// Unregister old replacements :
 			foreach($this->replacements as $replacement)
 				$replacement->unregister_user($this);
-
-			// Set new replacements :
-			$this->replacements = array();
-			foreach($replacements as $replacement) {
-				// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
-				if ( ! $replacement instanceof \Glue\DB\Fragment)
-					$replacement = new \Glue\DB\Fragment_Value($replacement);
-
-				// Set up dependency :
+					
+			// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
+			$new = array();
+			foreach($replacements as $replacement)
+				$new[] = $replacement instanceof \Glue\DB\Fragment ? $replacement :	new \Glue\DB\Fragment_Value($replacement);
+			$replacements = $new;
+				
+			// Replace replacements :
+			$this->set_property('replacements', $replacement);
+				
+			// Register new replacements :
+			foreach($this->replacements as $replacement)
 				$replacement->register_user($this);
-
-				// Add replacement :
-				$this->replacements[] = $replacement;
-			}
-
-			// Invalidate :
-			$this->invalidate();
-
+				
+			// Return $this for chainability :
 			return $this;
 		}
 	}
@@ -98,7 +110,21 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	 * @return string
 	 */
 	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_template($this, $style);
+		// Replace column ids by columns SQL in template :
+		$template = preg_replace_callback(
+			'/@\d+@/',
+			function ($matches) use ($cn, $style) { // closure
+				$id = $matches[0];
+				return \Glue\DB\Fragment_Column::get($matches[0])->sql($cn, $style);
+			},
+			$this->template
+		);
+		
+		// Make replacements :
+		$sql = '';
+		foreach (explode('?', $template) as $index => $part)
+			$sql .= $part . (isset($replacements[$index]) ? $replacements[$index]->sql($cn, $style) : '');
+			
+		return $sql;
 	}
 }

@@ -369,6 +369,25 @@ abstract class Connection extends PDO {
 		// Return SQL :
 		return $sql;
 	}
+	
+	/**
+	 * Compiles Fragment_Alias fragments into an SQL string.
+	 *
+	 * @param \Glue\DB\Fragment_Alias $fragment
+	 *
+	 * @return string
+	 */
+	public function compile_alias(\Glue\DB\Fragment_Alias $fragment) {
+		// Get data from fragment :
+		$table	= $this->table($fragment->table())->dbtable();
+		$alias	= $fragment->alias();
+
+		// Generate fragment SQL :
+		$sql = $this->quote_identifier($table) . ' AS ' . $this->quote_identifier($alias);
+
+		// Return SQL :
+		return $sql;
+	}	
 
 	/**
 	 * Compiles Fragment_Builder fragments into an SQL string.
@@ -589,34 +608,6 @@ abstract class Connection extends PDO {
 	public function compile_table(\Glue\DB\Fragment_Table $fragment) {
 		$table = $this->table($fragment->table());
 		return $this->quote_identifier($table->dbtable());
-	}
-
-	/**
-	 * Compiles Fragment_Template fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Template $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_template(\Glue\DB\Fragment_Template $fragment) {
-		// Get data from fragment :
-		$template		= $fragment->template();
-		$replacements	= $fragment->replacements();
-
-		// Break appart template :
-		$parts = explode('?', $template);
-		if (count($parts) !== count($replacements) + 1)
-			throw new \Glue\DB\Exception("Number of placeholders different from number of replacements for " . $template);
-
-		// Make replacements :
-		$max = count($replacements);
-		$sql = $parts[0];
-		for($i = 0; $i < $max; $i++) {
-			$sql .= $replacements[$i]->sql($this);
-			$sql .= $parts[$i + 1];
-		}
-
-		return $sql;
 	}
 
 	/**
