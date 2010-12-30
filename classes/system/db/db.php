@@ -13,6 +13,10 @@ namespace Glue\System\DB;
  */
 
 class DB {
+	// Order by constants :
+	const ASC	= 0;
+	const DESC	= 1;
+		
 	/**
 	 * @var array Connection instances cache.
 	 */
@@ -104,20 +108,6 @@ class DB {
 	}
 
 	/**
-	 * Returns the virtual table identified by $table_name.
-	 *
-	 * Subsequent calls to this function with the same parameter will return the same
-	 * virtual table instance, instead of creating a new one.
-	 *
-	 * @param string $table_name
-	 *
-	 * @return \Glue\DB\Table
-	 */
-	public static function table($table_name) {
-		return \Glue\DB\Table::get($table_name);
-	}
-
-	/**
 	 * Returns a select query object.
 	 *
 	 * @param string $table_name Name of the main table you're selecting from (= first table in the from clause).
@@ -187,15 +177,13 @@ class DB {
 	/**
 	 * Returns a new table fragment.
 	 *
-	 * @param string $table_name
+	 * @param string $table
 	 * @param string $alias
 	 *
 	 * @return \Glue\DB\Fragment_Table
 	 */
-	public static function alias($table_name, $alias = null) {  // TODO : would it be possible to rename this "table" and define
-																// a toString method in the table fragments ? so that the aliasing
-																// system may still be used with custom queries
-		return new \Glue\DB\Fragment_Aliased_Table($table_name, $alias);
+	public static function table($table, $alias = null) {
+		return new \Glue\DB\Fragment_Table($table, $alias);
 	}
 
 	/**
@@ -227,23 +215,16 @@ class DB {
 	/**
 	 * Returns a new join fragment.
 	 *
-	 * @param string $table_name
-	 * @param string $alias
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return mixed
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public static function join($table_name = null, &$alias = null) {
+	public static function join($table = 0, &$obj = null) {
 		$f = new \Glue\DB\Fragment_Builder_Join();
-		if (func_num_args() > 0) {
-			$args = func_get_args();
-			return $f->init($table_name, $alias);
-		}
+		if (func_num_args() > 0)
+			return $f->init($table, $alias);
 		else
 			return $f;
 	}
-
-	/**
-	 * We need to define this so that PHP doesn't think the function db() is the constructor.
-	 */
-	private function __construct() {}
 }

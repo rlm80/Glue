@@ -260,15 +260,27 @@ EOD;
 					db::bool("1=1")->not()->not(),
 					"(1=1)"
 				),								
-			/*'table' => array(
-					$t = db::alias('glusers', 'myalias'),
+			'table' => array(
+					$t = db::table('glusers', 'myalias'),
 					"`glusers` AS `myalias`"
 				),
-			'column' => array(
-					$t->login,
-					"`myalias`.`login`"
-				),*/
+			'template - columns' => array(
+					db::template("$t->id < $t->password qsdf"),
+					"`myalias`.`id` < `myalias`.`password` qsdf"
+				),
 		);
+		
+		$orderby = new Fragment_Builder_Orderby();
+		$orderby
+			->asc($t->login)
+			->asc($t->password)
+			->desc($t->login)
+			->desc('?', 'test');
+		$tests['orderby'] = array(
+			$orderby,
+			"`myalias`.`login` ASC, `myalias`.`password` ASC, `myalias`.`login` DESC, ('test') DESC"
+		);
+				
 /*
 		$get = new Fragment_Builder_SelectList(null);
 		$get
@@ -283,42 +295,30 @@ EOD;
 			$get,
 			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
 		);
-
-		$orderby = new Fragment_Builder_Orderby(null);
-		$orderby
-			->and($t->login)
-			->and($t->password)
-			->and($t->login)->asc()
-			->and('?', 'test')->desc()
-			->root();
-		$tests['orderby'] = array(
-			$orderby,
-			"`myalias`.`login`, `myalias`.`password`, `myalias`.`login` ASC, ('test') DESC"
-		);
-
-		$join = db::join('glusers')->as('t1')
-					->left('glprofiles')->as('t2')->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
-					->right('glposts')->as('t3')->on('1=1')->root();
+*/
+		$join = db::join(db::table('glusers','t1'))
+					->left(db::table('glprofiles','t2'))->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
+					->right(db::table('glposts','t3'))->on('1=1')->root();
 		$tests['join simple'] = array(
 			$join,
 			"`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)"
 		);
 
-		$join2 = db::join('glusers')->as('t3')
+		$join2 = db::join(db::table('glusers','t3'))
 					->left($join)->on('5=5')->root();
 		$tests['join nested'] = array(
 			$join2,
 			"`glusers` AS `t3` LEFT OUTER JOIN (`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)) ON (5=5)"
 		);
 
-		$alias = db::alias('glusers','myalias');
-		$join3 = db::join('glprofiles')->as('t3')
+		$alias = db::table('glusers','myalias');
+		$join3 = db::join(db::table('glprofiles','t3'))
 					->left($alias)->on('1=1')->root();
 		$tests['join alias'] = array(
 			$join3,
 			"`glprofiles` AS `t3` LEFT OUTER JOIN `glusers` AS `myalias` ON (1=1)"
 		);
-
+/*
 		$select1 = db::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->root();
 		$tests['query select basic'] = array(
 			$select1,

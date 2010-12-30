@@ -3,14 +3,18 @@
 namespace Glue\System\DB;
 
 /**
- * Fragment that represents an operand in an expression.
+ * Fragment that represents an operand in a boolean expression.
  *
  * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-abstract class Fragment_Operand extends \Glue\DB\Fragment {
+class Fragment_Item_Bool extends \Glue\DB\Fragment_Item {
+	// Boolean operators :
+	const _AND		= 0;
+	const _OR		= 1;
+	
 	/**
 	 * @var integer Operator.
 	 */
@@ -28,8 +32,8 @@ abstract class Fragment_Operand extends \Glue\DB\Fragment {
 	 * @param integer $operator Null means first operand.
 	 */
 	public function __construct(\Glue\DB\Fragment $operand, $operator = null) {
-		$this->operand($operand);
 		$this->operator($operator);
+		$this->operand($operand);
 	}
 
 	/**
@@ -58,5 +62,29 @@ abstract class Fragment_Operand extends \Glue\DB\Fragment {
 			return $this->operand;
 		else
 			return $this->set_property('operand', $operand);
+	}	
+
+	/**
+	 * Forwards call to given connection.
+	 *
+	 * @param \Glue\DB\Connection $cn
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Initialize SQL with operator :
+		$sql = '';
+		if (isset($this->operator)) {
+			switch ($this->operator) {
+				case \Glue\DB\Fragment_Item_Bool::_AND :	$sql = 'AND ';		break;
+				case \Glue\DB\Fragment_Item_Bool::_OR :		$sql = 'OR ';		break;
+			}
+		}
+
+		// Operand :
+		$sql .= '(' . $this->operand->sql($cn, $style) . ')';
+
+		return $sql;
 	}
 }

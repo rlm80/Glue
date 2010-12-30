@@ -76,4 +76,31 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	public function children() {
 		return $this->children;
 	}
+	
+	/**
+	 * Forwards call to given connection.
+	 *
+	 * @param \Glue\DB\Connection $cn
+	 * @param integer $style
+	 *
+	 * @return string
+	 */
+	protected function compile(\Glue\DB\Connection $cn, $style) {
+		// Generate children fragment SQL strings :
+		$sqls = array();
+		foreach ($this->children() as $child)
+			$sqls[] = $child->sql($cn, $style);
+
+		// Return SQL :
+		return implode($this->connector(), $sqls);
+	}	
+	
+	/**
+	 * Returns connector string to connect children fragments with in generated SQL.
+	 *
+ 	 * @return string
+	 */
+	protected function connector() {
+		return ' ';
+	}	
 }

@@ -52,7 +52,7 @@ class Fragment_Template extends \Glue\DB\Fragment {
 		else {
 			// Locate columns identifiers and remove old dependencies :
 			if (preg_match_all('/@\d+@/', $this->template, $matches))
-				foreach($matches as $id)
+				foreach($matches[0] as $id)
 					\Glue\DB\Fragment_Column::get($id)->unregister_user($this);
 
 			// Replace template :
@@ -60,7 +60,7 @@ class Fragment_Template extends \Glue\DB\Fragment {
 			
 			// Locate columns identifiers and add new dependencies :
 			if (preg_match_all('/@\d+@/', $this->template, $matches))
-				foreach($matches as $id)
+				foreach($matches[0] as $id)
 					\Glue\DB\Fragment_Column::get($id)->register_user($this);
 					
 			// Return $this for chainability :
@@ -79,18 +79,18 @@ class Fragment_Template extends \Glue\DB\Fragment {
 		if (func_num_args() === 0)
 			return $this->replacements;
 		else {
-			// Unregister old replacements :
-			foreach($this->replacements as $replacement)
-				$replacement->unregister_user($this);
-					
 			// Turn replacements that aren't fragments into value fragments (SQL = quoted value) :
 			$new = array();
 			foreach($replacements as $replacement)
 				$new[] = $replacement instanceof \Glue\DB\Fragment ? $replacement :	new \Glue\DB\Fragment_Value($replacement);
 			$replacements = $new;
+			
+			// Unregister old replacements :
+			foreach($this->replacements as $replacement)
+				$replacement->unregister_user($this);			
 				
 			// Replace replacements :
-			$this->set_property('replacements', $replacement);
+			$this->set_property('replacements', $replacements);
 				
 			// Register new replacements :
 			foreach($this->replacements as $replacement)
@@ -114,7 +114,6 @@ class Fragment_Template extends \Glue\DB\Fragment {
 		$template = preg_replace_callback(
 			'/@\d+@/',
 			function ($matches) use ($cn, $style) { // closure
-				$id = $matches[0];
 				return \Glue\DB\Fragment_Column::get($matches[0])->sql($cn, $style);
 			},
 			$this->template
@@ -123,8 +122,8 @@ class Fragment_Template extends \Glue\DB\Fragment {
 		// Make replacements :
 		$sql = '';
 		foreach (explode('?', $template) as $index => $part)
-			$sql .= $part . (isset($replacements[$index]) ? $replacements[$index]->sql($cn, $style) : '');
-			
+			$sql .= $part . (isset($this->replacements[$index]) ? $this->replacements[$index]->sql($cn, $style) : '');
+		
 		return $sql;
 	}
 }

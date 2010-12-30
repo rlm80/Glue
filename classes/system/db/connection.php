@@ -280,72 +280,6 @@ abstract class Connection extends PDO {
 	/* ***************************************************************************************************** */
 
 	/**
-	 * Compiles Fragment_Operand_Bool fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Operand_Bool $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_operand_bool(\Glue\DB\Fragment_Operand_Bool $fragment) {
-		// Get data from fragment :
-		$operator	= $fragment->operator();
-		$operand	= $fragment->operand();
-
-		// Initialize SQL with operator :
-		$sql = '';
-		if (isset($operator)) {
-			switch ($operator) {
-				case \Glue\DB\Fragment_Operand_Bool::_AND :	$sql = 'AND ';		break;
-				case \Glue\DB\Fragment_Operand_Bool::_OR :	$sql = 'OR ';		break;
-			}
-		}
-
-		// Operand :
-		$sql .= '(' . $operand->sql($this) . ')';
-
-		return $sql;
-	}
-
-	/**
-	 * Compiles Fragment_Operand_Join fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Operand_Join $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_operand_join(\Glue\DB\Fragment_Operand_Join $fragment) {
-		// Get data from fragment :
-		$operator	= $fragment->operator();
-		$operand	= $fragment->operand();
-		$on			= $fragment->on();
-
-		// Initialize SQL with operator :
-		$sql = '';
-		if (isset($operator)) {
-			switch ($operator) {
-				case \Glue\DB\Fragment_Operand_Join::INNER_JOIN :		$sql .= 'INNER JOIN ';			break;
-				case \Glue\DB\Fragment_Operand_Join::RIGHT_OUTER_JOIN :	$sql .= 'RIGHT OUTER JOIN ';	break;
-				case \Glue\DB\Fragment_Operand_Join::LEFT_OUTER_JOIN :	$sql .= 'LEFT OUTER JOIN ';		break;
-			}
-		}
-
-		// Add operand SQL :
-		$sqlop = $operand->sql($this);
-		if ( ! $operand instanceof \Glue\DB\Fragment_Aliased_Table)
-			$sqlop	= '(' . $sqlop . ')';
-		$sql .= $sqlop;
-
-		// Add on SQL :
-		if (isset($operator)) {
-			$sqlon = $on->sql($this);
-			$sql .= ' ON ' . $sqlon;
-		}
-
-		// Return SQL :
-		return $sql;
-	}
-
-	/**
 	 * Compiles Fragment_Aliased fragments into an SQL string.
 	 *
 	 * @param \Glue\DB\Fragment_Aliased $fragment
@@ -371,15 +305,15 @@ abstract class Connection extends PDO {
 	}
 	
 	/**
-	 * Compiles Fragment_Alias fragments into an SQL string.
+	 * Compiles Fragment_Table fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Alias $fragment
+	 * @param \Glue\DB\Fragment_Table $fragment
 	 *
 	 * @return string
 	 */
-	public function compile_alias(\Glue\DB\Fragment_Alias $fragment) {
+	public function compile_table(\Glue\DB\Fragment_Table $fragment) {
 		// Get data from fragment :
-		$table	= $this->table($fragment->table())->dbtable();
+		$table	= $this->table($fragment->table())->name();
 		$alias	= $fragment->alias();
 
 		// Generate fragment SQL :
@@ -441,18 +375,6 @@ abstract class Connection extends PDO {
 	 */
 	public function compile_builder_groupby(\Glue\DB\Fragment_Builder_Groupby $fragment) {
 		return $this->compile_builder($fragment, ', ');
-	}
-
-	/**
-	 * Compiles Fragment_Builder_Bool fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Builder_Bool $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_builder_bool(\Glue\DB\Fragment_Builder_Bool $fragment) {
-		$sql = $this->compile_builder($fragment, ' ');
-		return $fragment->is_negated() ? 'NOT (' . $sql . ')' : $sql;
 	}
 
 	/**
@@ -579,35 +501,21 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	public function compile_column(\Glue\DB\Fragment_Column $fragment, $style) {
-		// Get column :
-		$column = $fragment->column()->dbcolumn();
+		// Get column real name in database :
+		$column = $this->table($fragment->table_alias()->table())->column($fragment->column())->name();
 
 		// Generate SQL :
-		if ($style === \Glue\DB\Fragment_Column::STYLE_UNQUALIFIED) {
+		if ($style === \Glue\DB\Fragment_Column::STYLE_UNQUALIFIED) { // TODO voir si il ne faudra pas plutôt faire des classes de fragments différentes plutôt que d'introduire des styles...
 			// Don't prepend table alias :
 			$sql = $this->quote_identifier($column);
 		}
 		else {
 			// Prepend table alias :
-			$as = $fragment->table_alias()->as();
-			if (empty($as))
-				$as = $fragment->table_alias()->aliased()->table()->dbtable();
-			$sql = $this->quote_identifier($as) . '.' . $this->quote_identifier($column);
+			$alias = $fragment->table_alias()->alias();
+			$sql = $this->quote_identifier($alias) . '.' . $this->quote_identifier($column);
 		}
 
 		return $sql;
-	}
-
-	/**
-	 * Compiles Fragment_Column fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Table $fragment
-	 *
-	 * @return string
-	 */
-	public function compile_table(\Glue\DB\Fragment_Table $fragment) {
-		$table = $this->table($fragment->table());
-		return $this->quote_identifier($table->dbtable());
 	}
 
 	/**

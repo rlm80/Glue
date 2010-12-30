@@ -29,7 +29,7 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	static $map = array();
 	
 	/**
-	 * @var \Glue\DB\Fragment_Aliased_Table
+	 * @var \Glue\DB\Fragment_Table
 	 */
 	protected $table_alias;
 
@@ -49,7 +49,7 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	 * @param \Glue\DB\Fragment_Aliased_Table $table_alias
 	 * @param string $column
 	 */
-	protected function __construct(\Glue\DB\Fragment_Aliased_Table $table_alias, $column) {
+	public function __construct(\Glue\DB\Fragment_Table $table_alias, $column) {
 		// Set properties :
 		$this->set_property('table_alias', $table_alias);
 		$this->set_property('column', $column);
@@ -58,7 +58,7 @@ class Fragment_Column extends \Glue\DB\Fragment {
 		$this->id = '@' . static::$maxid ++ . '@';
 		
 		// Store in identifier => instances mapping array :
-		static::$map[$id] = $this;
+		static::$map[$this->id] = $this;
 	}
 
 	/**
@@ -71,9 +71,9 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Table alias getter.
+	 * Table fragment getter.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Table
 	 */
 	public function table_alias() {
 		return $this->table_alias;
@@ -100,6 +100,17 @@ class Fragment_Column extends \Glue\DB\Fragment {
 		// Forwards call to connection :
 		return $cn->compile_column($this, $style);
 	}
+	
+	/**
+	 * Returns true if a column with such an id exists, false otherwise.
+	 * 
+	 * @param string $id
+	 * 
+	 * @return boolean
+	 */
+	public static function exists($id) {
+		return isset(static::$map[$id]);
+	}	
 	
 	/**
 	 * Get instances by id.

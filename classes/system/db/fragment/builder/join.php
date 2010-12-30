@@ -14,72 +14,70 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Initializes the expression with a first operand.
 	 *
-	 * @param mixed $operand Right operand of the join. It may be any fragment, or simply a table name.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with the actual fragment that will constitute the right operand of the join.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public function init($operand, &$alias = null) { // TODO REMOVE init functions and ignore first operator if no fragment yet
+	public function init($table, &$obj = null) {
 		$this->reset();
-		return $this->add($operand, null, $alias);
+		return $this->add($table, null, $obj);
 	}
 
 	/**
 	 * Adds an operand to the expression, using an inner join.
 	 *
-	 * @param mixed $operand Right operand of the join. It may be any fragment, or simply a table name.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with the actual fragment that will constitute the right operand of the join.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public function inner($operand, &$alias = null) {
-		return $this->add($operand, \Glue\DB\Fragment_Operand_Join::INNER_JOIN, $alias);
+	public function inner($table, &$obj = null) {
+		return $this->add($table, \Glue\DB\Fragment_Item_Join::INNER_JOIN, $obj);
 	}
 
 	/**
 	 * Adds an operand to the expression, using a left outer join.
 	 *
-	 * @param mixed $operand Right operand of the join. It may be any fragment, or simply a table name.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with the actual fragment that will constitute the right operand of the join.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public function left($operand, &$alias = null) {
-		return $this->add($operand, \Glue\DB\Fragment_Operand_Join::LEFT_OUTER_JOIN, $alias);
+	public function left($table, &$obj = null) {
+		return $this->add($table, \Glue\DB\Fragment_Item_Join::LEFT_OUTER_JOIN, $obj);
 	}
 
 	/**
 	 * Adds an operand to the expression, using a right outer join.
 	 *
-	 * @param mixed $operand Right operand of the join. It may be any fragment, or simply a table name.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with the actual fragment that will constitute the right operand of the join.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public function right($operand, &$alias = null) {
-		return $this->add($operand, \Glue\DB\Fragment_Operand_Join::RIGHT_OUTER_JOIN, $alias);
+	public function right($table, &$obj = null) {
+		return $this->add($table, \Glue\DB\Fragment_Item_Join::RIGHT_OUTER_JOIN, $obj);
 	}
 
 	/**
 	 * Adds an operand to the expression.
 	 *
-	 * @param \Glue\DB\Fragment $operand Table name, aliased table fragment or join fragment.
+	 * @param mixed $table $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
 	 * @param integer $operator Operator.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
+	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the actual table-alias object.
 	 *
-	 * @return \Glue\DB\Fragment_Aliased_Table
+	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	protected function add($operand, $operator, &$alias) {
-		// Operand is a table name ? Turn it into an aliased table fragment :
-		if (is_string($operand))
-			$operand = new \Glue\DB\Fragment_Aliased_Table($operand);
+	protected function add($table, $operator, &$obj) {
+		// Operand is a table name ? Turn it into an table fragment :
+		$table = is_string($table) ? new \Glue\DB\Fragment_Table($table) : $table;
 
-		// Assign operand to $alias parameter :
-		if ($operand instanceof \Glue\DB\Fragment_Aliased_Table)
-			$alias = $operand;
+		// Assign operand to $obj parameter :
+		$obj = $table;
 
 		// Build fragment :
-		$fragment = new \Glue\DB\Fragment_Operand_Join($operand, $operator);
+		$fragment = new \Glue\DB\Fragment_Item_Join($table, $operator);
 
 		// Give fragment context :
 		$fragment->context($this);
@@ -89,18 +87,5 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 
 		// Return fragment :
 		return $fragment;
-	}
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_builder_join($this, $style);
 	}
 }

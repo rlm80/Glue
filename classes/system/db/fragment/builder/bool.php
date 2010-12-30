@@ -21,7 +21,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	/**
 	 * @var boolean Whether or not this boolean expression should be negated.
 	 */
-	protected $not = false;
+	protected $negated = false;
 	
 	/**
 	 * Initializes the expression with a first operand.
@@ -43,7 +43,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 */
 	public function _or() {
 		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Operand_Bool::_OR);
+		$this->add($args, \Glue\DB\Fragment_Item_Bool::_OR);
 		return $this;
 	}
 
@@ -55,7 +55,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 */
 	public function _and() {
 		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Operand_Bool::_AND);
+		$this->add($args, \Glue\DB\Fragment_Item_Bool::_AND);
 		return $this;
 	}
 
@@ -70,15 +70,15 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		$values	= $args;
 		$first	= array_shift($values);
 
-		// Build fragment :
+		// Build fragment : TODO maybe try to shorten this a bit
 		if ($first instanceof \Glue\DB\Fragment)
 			$fragment = $first;
 		else
 			$fragment = new \Glue\DB\Fragment_Template($first, $values);
-		$operand = new \Glue\DB\Fragment_Operand_Bool($fragment, $operator);
+		$operand = new \Glue\DB\Fragment_Item_Bool($fragment, $operator);
 
 		// Give fragment a context :
-		$operand->context($this);
+		$operand->context($this); // TODO remove all this after nested chaining is dealt with....
 
 		// Add operand :
 		$this->push($operand);
@@ -90,7 +90,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function not() {
-		return $this->set_property('not', ! $this->not);
+		return $this->set_property('negated', ! $this->negated);
 	}
 	
 	/**
@@ -98,20 +98,20 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 *
 	 * @return boolean
 	 */
-	public function is_negated() {
-		return $this->not;
+	public function negated() {
+		return $this->negated;
 	}	
 
 	/**
-	 * Forwards call to given connection.
+	 * Forwards call to given connection. TODO change all these comments
 	 *
 	 * @param \Glue\DB\Connection $cn
 	 * @param integer $style
 	 *
 	 * @return string
 	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_builder_bool($this, $style);
+	public function compile(\Glue\DB\Connection $cn, $style) {
+		$sql = parent::compile($cn, $style);
+		return $this->negated() ? 'NOT (' . $sql . ')' : $sql;
 	}
 }
