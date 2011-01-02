@@ -16,6 +16,11 @@ class DB {
 	// Order by constants :
 	const ASC	= 0;
 	const DESC	= 1;
+	
+	// Join operators :
+	const LEFT	= 0;
+	const RIGHT	= 1;
+	const INNER	= 2;	
 		
 	/**
 	 * @var array Connection instances cache.
@@ -191,7 +196,7 @@ class DB {
 	 *
 	 * @return \Glue\DB\Fragment_Template
 	 */
-	public static function template() {
+	public static function tpl() {
 		$values		= func_get_args();
 		$template	= array_shift($values);
 		return new \Glue\DB\Fragment_Template($template, $values);

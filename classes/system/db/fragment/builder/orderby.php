@@ -12,8 +12,8 @@ namespace Glue\System\DB;
 
 class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	/**
-	 * Adds an element at the end of the list by ascending order. You may pass any fragment, or a column
-	 * identifier, or a template with question marks as placeholders, followed by their replacements.
+	 * Adds an element at the end of the list by ascending order. You may pass a column identifier,
+	 * a fragment or a template with question marks as placeholders followed by their replacements.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Orderby
 	 */
@@ -24,8 +24,8 @@ class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	}
 	
 	/**
-	 * Adds an element at the end of the list by ascending order. You may pass any fragment, or a column
-	 * identifier, or a template with question marks as placeholders, followed by their replacements.
+	 * Adds an element at the end of the list by ascending order. You may pass a column identifier,
+	 * a fragment or a template with question marks as placeholders followed by their replacements.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Orderby
 	 */
@@ -36,8 +36,8 @@ class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	}	
 	
 	/**
-	 * Adds an element at the end of the list by order in last parameter. You may pass any fragment,
-	 * or a column identifier, or a template with question marks as placeholders, followed by their replacements.
+	 * Adds an element at the end of the list by order in last parameter. You may pass a column identifier,
+	 * a fragment or a template with question marks as placeholders followed by their replacements.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Orderby
 	 */
@@ -65,22 +65,10 @@ class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 		else 
 			$fragment = new \Glue\DB\Fragment_Item_Orderby(new \Glue\DB\Fragment_Template($first, $args), $order);
 
-		// Give fragment a context :
-		$fragment->context($this);
-
 		// Add fragment :
 		$this->push($fragment);
 
 		// Return fragment :
 		return $fragment;
-	}
-	
-	/**
-	 * Returns connector string to connect children fragments with in generated SQL.
-	 *
- 	 * @return string
-	 */
-	protected function connector() {
-		return ', ';
 	}
 }

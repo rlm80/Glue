@@ -46,8 +46,10 @@ class Fragment_Item_Bool extends \Glue\DB\Fragment_Item {
 	public function operator($operator = null) {
 		if (func_num_args() === 0)
 			return $this->operator;
-		else
-			return $this->set_property('operator', $operator);
+		else {
+			$this->operator = $operator;
+			return $this;
+		}
 	}
 
 	/**
@@ -60,31 +62,9 @@ class Fragment_Item_Bool extends \Glue\DB\Fragment_Item {
 	public function operand(\Glue\DB\Fragment $operand = null) {
 		if (func_num_args() === 0)
 			return $this->operand;
-		else
-			return $this->set_property('operand', $operand);
-	}	
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Initialize SQL with operator :
-		$sql = '';
-		if (isset($this->operator)) {
-			switch ($this->operator) {
-				case \Glue\DB\Fragment_Item_Bool::_AND :	$sql = 'AND ';		break;
-				case \Glue\DB\Fragment_Item_Bool::_OR :		$sql = 'OR ';		break;
-			}
+		else {
+			$this->operand = $operand;
+			return $this;
 		}
-
-		// Operand :
-		$sql .= '(' . $this->operand->sql($cn, $style) . ')';
-
-		return $sql;
 	}
 }

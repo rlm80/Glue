@@ -40,20 +40,9 @@ class Fragment_Value extends \Glue\DB\Fragment {
 	public function value($value = null) {
 		if (func_num_args() === 0)
 			return $this->value;
-		else
-			return $this->set_property('value', $value);
-	}
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_value($this, $style);
+		else {
+			$this->value = $value;
+			return $this;
+		}
 	}
 }

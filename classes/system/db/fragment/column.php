@@ -51,13 +51,13 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	 */
 	public function __construct(\Glue\DB\Fragment_Table $table_alias, $column) {
 		// Set properties :
-		$this->set_property('table_alias', $table_alias);
-		$this->set_property('column', $column);
+		$this->table_alias	= $table_alias;
+		$this->column		= $column;
 		
 		// Assign unique identifier :
 		$this->id = '@' . static::$maxid ++ . '@';
 		
-		// Store in identifier => instances mapping array :
+		// Store in [identifier => instances] mapping array :
 		static::$map[$this->id] = $this;
 	}
 
@@ -87,19 +87,6 @@ class Fragment_Column extends \Glue\DB\Fragment {
 	public function id() {
 		return $this->id;
 	}	
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_column($this, $style);
-	}
 	
 	/**
 	 * Returns true if a column with such an id exists, false otherwise.

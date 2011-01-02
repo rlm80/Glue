@@ -58,8 +58,10 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	public function table($table = null) {
 		if (func_num_args() === 0)
 			return $this->table;
-		else
-			return $this->set_property('table', $table);
+		else {
+			$this->table = $table;
+			return $this;
+		}
 	}	
 
 	/**
@@ -72,8 +74,10 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	public function alias($alias = null) {
 		if (func_num_args() === 0)
 			return $this->alias;
-		else
-			return $this->set_property('alias', $alias);
+		else {
+			$this->alias = $alias;
+			return $this;
+		}
 	}
 	
 	/**
@@ -98,19 +102,6 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	 */
 	public function __get($column) {
 		return $this->column($column)->id();
-	}	
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_table($this, $style);
 	}
 	
 	/**

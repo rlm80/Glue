@@ -233,23 +233,23 @@ EOD;
 					"NULL"
 				),
 			'template - no replacements' => array(
-					db::template("test template"),
+					db::tpl("test template"),
 					"test template"
 				),
 			'template - two replacements' => array(
-					db::template("? test ? template", "test'test", 10),
+					db::tpl("? test ? template", "test'test", 10),
 					"'test\'test' test 10 template"
 				),
 			'template - nested' => array(
-					db::template("? test ?", db::template('toast'), db::template('toast')),
-					"toast test toast"
+					db::tpl("? test ? ?", db::tpl('toast'), db::tpl('toast'), 10),
+					"toast test toast 10"
 				),
 			'boolean - simple' => array(
-					db::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf'))->root(),
+					db::bool("'test' = ?", "qsdf")->or("'test' IN ?", array('azer', 'qsdf')),
 					"('test' = 'qsdf') OR ('test' IN ('azer','qsdf'))"
 				),
 			'boolean - nested' => array(
-					db::bool(db::bool("1=1")->or("2=2"))->and("3=3")->root(),
+					db::bool(db::bool("1=1")->or("2=2"))->and("3=3"),
 					"((1=1) OR (2=2)) AND (3=3)"
 				),
 			'boolean - not' => array(
@@ -263,49 +263,35 @@ EOD;
 			'table' => array(
 					$t = db::table('glusers', 'myalias'),
 					"`glusers` AS `myalias`"
-				),
+				), 
 			'template - columns' => array(
-					db::template("$t->id < $t->password qsdf"),
+					db::tpl("$t->id < $t->password qsdf"),
 					"`myalias`.`id` < `myalias`.`password` qsdf"
 				),
 		);
 		
-		$orderby = new Fragment_Builder_Orderby();
+		$orderby = new \Glue\DB\Fragment_Builder_Orderby();
 		$orderby
 			->asc($t->login)
 			->asc($t->password)
 			->desc($t->login)
-			->desc('?', 'test');
+			->desc('?', 'test')
+			->orderby($t->login, \Glue\DB\DB::DESC);
 		$tests['orderby'] = array(
 			$orderby,
-			"`myalias`.`login` ASC, `myalias`.`password` ASC, `myalias`.`login` DESC, ('test') DESC"
+			"`myalias`.`login` ASC, `myalias`.`password` ASC, `myalias`.`login` DESC, ('test') DESC, `myalias`.`login` DESC"
 		);
 				
-/*
-		$get = new Fragment_Builder_SelectList(null);
-		$get
-			->and($t->login)
-			->and($t->password)
-			->and($t->login)->as('mylogin')
-			->and($t->login)
-			->and('?', 'test')
-			->and('?', 'test')
-			->root();
-		$tests['get'] = array(
-			$get,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
-		);
-*/
 		$join = db::join(db::table('glusers','t1'))
 					->left(db::table('glprofiles','t2'))->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
-					->right(db::table('glposts','t3'))->on('1=1')->root();
+					->right(db::table('glposts','t3'))->on('1=1');
 		$tests['join simple'] = array(
 			$join,
 			"`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)"
 		);
 
 		$join2 = db::join(db::table('glusers','t3'))
-					->left($join)->on('5=5')->root();
+					->left($join)->on('5=5');
 		$tests['join nested'] = array(
 			$join2,
 			"`glusers` AS `t3` LEFT OUTER JOIN (`glusers` AS `t1` LEFT OUTER JOIN `glprofiles` AS `t2` ON ('test1'='test2') OR (2=2) AND (3=3) RIGHT OUTER JOIN `glposts` AS `t3` ON (1=1)) ON (5=5)"
@@ -313,55 +299,70 @@ EOD;
 
 		$alias = db::table('glusers','myalias');
 		$join3 = db::join(db::table('glprofiles','t3'))
-					->left($alias)->on('1=1')->root();
+					->left($alias)->on('1=1');
 		$tests['join alias'] = array(
 			$join3,
 			"`glprofiles` AS `t3` LEFT OUTER JOIN `glusers` AS `myalias` ON (1=1)"
 		);
-/*
-		$select1 = db::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5")->root();
+		
+		/*
+		$get = new \Glue\DB\Fragment_Builder_SelectList(null);
+		$get
+			->and($t->login)
+			->and($t->password)
+			->and($t->login)->as('mylogin')
+			->and($t->login)
+			->and('?', 'test')
+			->and('?', 'test')
+			;
+		$tests['get'] = array(
+			$get,
+			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
+		);		
+
+		$select1 = db::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5");
 		$tests['query select basic'] = array(
 			$select1,
 			"SELECT * FROM `glusers` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
 		);
 
-		$select2 = db::select('glusers', $u)->as('myusers')->where("$u->login = 'mylogin'")->root();
+		$select2 = db::select('glusers', $u)->as('myusers')->where("$u->login = 'mylogin'");
 		$tests['query select alias'] = array(
 			$select2,
 			"SELECT * FROM `glusers` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
-		$select3 = db::select('glusers', $a)->left('glusers', $b)->as('myusers')->on("$a->login = $b->login")->root();
+		$select3 = db::select('glusers', $a)->left('glusers', $b)->as('myusers')->on("$a->login = $b->login");
 		$tests['query select no alias'] = array(
 			$select3,
 			"SELECT * FROM `glusers` LEFT OUTER JOIN `glusers` AS `myusers` ON (`glusers`.`login` = `myusers`.`login`)"
 		);
 
-		$select4 = db::select('glusers', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20)->root();
+		$select4 = db::select('glusers', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20);
 		$tests['query select limit offset'] = array(
 			$select4,
 			"SELECT * FROM `glusers` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = db::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->columns($a->login)->and($a->password)->root();
+		$select5 = db::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->columns($a->login)->and($a->password);
 		$tests['query select group by having'] = array(
 			$select5,
 			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `glusers` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
 		);
 
-		$delete1 = db::delete('glusers', $a)->where("$a->login = 'test'")->root();
+		$delete1 = db::delete('glusers', $a)->where("$a->login = 'test'");
 		$tests['query delete'] = array(
 			$delete1,
 			"DELETE FROM `glusers` WHERE (`glusers`.`login` = 'test')"
 		);
 
-		$update1 = db::update('glusers', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->root();
+		$update1 = db::update('glusers', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'");
 		$tests['query update'] = array(
 			$update1,
 			"UPDATE `glusers` SET `glusers`.`login` = 'test', `glusers`.`password` = 'test' WHERE (`glusers`.`login` = 'test')"
 		);
 
-		$insert1 = db::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2)->root();
+		$insert1 = db::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2);
 		$tests['query insert'] = array(
 			$insert1,
 			"INSERT INTO `glusers` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"

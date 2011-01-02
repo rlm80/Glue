@@ -23,8 +23,6 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	 */
 	protected function push(\Glue\DB\Fragment $fragment) {
 		$this->children[] = $fragment;
-		$fragment->register_user($this);
-		$this->invalidate();
 	}
 
 	/**
@@ -52,8 +50,6 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	 */
 	public function pop() {
 		$fragment = array_pop($this->children);
-		$fragment->unregister_user($this);
-		$this->invalidate();
 		return $this;
 	}
 
@@ -63,8 +59,7 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	 * @return \Glue\DB\Fragment_Builder
 	 */
 	public function reset() {
-		while (count($this->children) > 0)
-			$this->pop();
+		$this->children = array();
 		return $this;
 	}
 
@@ -73,34 +68,7 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	 *
  	 * @return array
 	 */
-	public function children() {
+	public function &children() {
 		return $this->children;
-	}
-	
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Generate children fragment SQL strings :
-		$sqls = array();
-		foreach ($this->children() as $child)
-			$sqls[] = $child->sql($cn, $style);
-
-		// Return SQL :
-		return implode($this->connector(), $sqls);
-	}	
-	
-	/**
-	 * Returns connector string to connect children fragments with in generated SQL.
-	 *
- 	 * @return string
-	 */
-	protected function connector() {
-		return ' ';
 	}	
 }

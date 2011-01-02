@@ -12,7 +12,7 @@ namespace Glue\System\DB;
 
 class Fragment_Item_Orderby extends \Glue\DB\Fragment_Item {
 	/**
-	 * @var \Glue\DB\Fragment Column to be ordered.
+	 * @var \Glue\DB\Fragment Fragment to be ordered.
 	 */
 	protected $ordered;
 
@@ -42,8 +42,10 @@ class Fragment_Item_Orderby extends \Glue\DB\Fragment_Item {
 	public function ordered(\Glue\DB\Fragment $ordered = null) {
 		if (func_num_args() === 0)
 			return $this->ordered;
-		else
-			return $this->set_property('ordered', $ordered);
+		else {
+			$this->ordered = $ordered;
+			return $this;
+		}
 	}	
 
 	/**
@@ -52,7 +54,8 @@ class Fragment_Item_Orderby extends \Glue\DB\Fragment_Item {
 	 * @return \Glue\DB\Fragment_Item_Orderby
 	 */
 	public function asc() {
-		return $this->order(\Glue\DB\DB::ASC);
+		$this->order(\Glue\DB\DB::ASC);
+		return $this;
 	}
 
 	/**
@@ -61,7 +64,8 @@ class Fragment_Item_Orderby extends \Glue\DB\Fragment_Item {
 	 * @return \Glue\DB\Fragment_Item_Orderby
 	 */
 	public function desc() {
-		return $this->order(\Glue\DB\DB::DESC);
+		$this->order(\Glue\DB\DB::DESC);
+		return $this;
 	}
 
 	/**
@@ -74,34 +78,9 @@ class Fragment_Item_Orderby extends \Glue\DB\Fragment_Item {
 	public function order($order = null) {
 		if (func_num_args() === 0)
 			return $this->order;
-		else
-			return $this->set_property('order', $order);
-	}
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Generate fragment SQL :
-		$sql = $this->ordered->sql($cn, $style);
-		if ( ! $this->ordered instanceof \Glue\DB\Fragment_Column)
-			$sql = '(' . $sql . ')';
-
-		// Add ordering :
-		if (isset($this->order)) {
-			switch ($this->order) {
-				case \Glue\DB\DB::ASC :		$sql .= ' ASC';		break;
-				case \Glue\DB\DB::DESC :	$sql .= ' DESC';	break;
-				default : throw new \Exception("Unknown order constant : " . $this->order);
-			}
+		else {
+			$this->order = $order;
+			return $this;
 		}
-
-		// Return SQL :
-		return $sql;
 	}
 }

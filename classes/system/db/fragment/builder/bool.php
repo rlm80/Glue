@@ -77,9 +77,6 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 			$fragment = new \Glue\DB\Fragment_Template($first, $values);
 		$operand = new \Glue\DB\Fragment_Item_Bool($fragment, $operator);
 
-		// Give fragment a context :
-		$operand->context($this); // TODO remove all this after nested chaining is dealt with....
-
 		// Add operand :
 		$this->push($operand);
 	}
@@ -90,7 +87,8 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function not() {
-		return $this->set_property('negated', ! $this->negated);
+		$this->negated = ! $this->negated;
+		return $this;
 	}
 	
 	/**
@@ -100,18 +98,16 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 */
 	public function negated() {
 		return $this->negated;
-	}	
-
-	/**
-	 * Forwards call to given connection. TODO change all these comments
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	public function compile(\Glue\DB\Connection $cn, $style) {
-		$sql = parent::compile($cn, $style);
-		return $this->negated() ? 'NOT (' . $sql . ')' : $sql;
 	}
+	
+	/*
+	 * Sets up aliases for _or(), _and(). Required because
+	 * keywords aren't valid function names in PHP.
+	 */
+	public function __call($name, $args) {
+		if ($name === 'or')
+			return call_user_func_array(array($this, '_or'), $args);
+		elseif ($name === 'and')
+			return call_user_func_array(array($this, '_and'), $args);
+	}	
 }
