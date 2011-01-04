@@ -3,14 +3,71 @@
 namespace Glue\System\DB;
 
 /**
- * Fragment that provides a fluent interface to build a select list.
+ * Fragment that represents a select list.
  *
  * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
  */
 
-class Fragment_Builder_SelectList extends \Glue\DB\Fragment_Builder {
+class Fragment_Builder_Select extends \Glue\DB\Fragment_Builder {
+	/**
+	 * Adds a list of columns to the select list, making sure they aren't included twice.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Select
+	 */
+	public function colin() {
+		$params	= func_get_args();
+		foreach($params as $param)
+			$this->add_column(\Glue\DB\Fragment_Column::get($param));
+		return $this;
+	}
+
+	/**
+	 * Adds a column to the select list with the default alias, making sure it isn't included twice.
+	 *
+	 * @param \Glue\DB\Fragment_Column $column
+	 */
+	protected function add_column(\Glue\DB\Fragment_Column $column) {
+		// Look for column in current list and return if found :
+		foreach($this->children as $child) {
+			if($child->selected() === $column && $child->alias() === $column->id())
+				return;
+		}
+
+		// Add column :
+		$this->push(new \Glue\DB\Fragment_Item_Select($column, $column->id()));
+	}
+
+	/**
+	 * Removes a list of columns from the select list.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Select
+	 */
+	public function colout() {
+		$params	= func_get_args();
+		foreach($params as $param)
+			$this->remove_column(\Glue\DB\Fragment_Column::get($param));
+		return $this;
+	}
+
+	/**
+	 * Adds a column to the select list with the default alias, making sure it isn't included twice.
+	 *
+	 * @param \Glue\DB\Fragment_Column $column
+	 */
+	protected function remove_column(\Glue\DB\Fragment_Column $column) {
+		// Look for column in current list :
+		$new = array();
+		foreach($this->children as $child) {
+			if($child->selected() === $column && $child->alias() === $column->id())
+				return;
+		}
+
+		// Add column :
+		$this->push(new \Glue\DB\Fragment_Item_Select($column, $column->id()));
+	}
+
 	/**
 	 * Adds an element at the end of the select list. You may pass any fragment, or a string template
 	 * with question marks as placeholders, followed by their replacement values or fragments.
