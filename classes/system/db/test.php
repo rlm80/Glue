@@ -67,7 +67,7 @@ class Test {
 EOD;
 		@mkdir($dir, 777, true);
 		file_put_contents($path, $code);
-		
+
 		// Connection definitions :
 		$dir	= \Glue\CLASSPATH_USER . 'db/connection/';
 		$path	= $dir . 'test.php';
@@ -84,7 +84,7 @@ EOD;
 ?>
 EOD;
 		@mkdir($dir, 777, true);
-		file_put_contents($path, $code);		
+		file_put_contents($path, $code);
 	}
 
 	static private function drop_test_tables() {
@@ -98,11 +98,11 @@ EOD;
 		$dir	= \Glue\CLASSPATH_USER . 'db/table/';
 		$path	= $dir . 'glpersons.php';
 		@unlink($path);
-		
+
 		// Delete connection definition :
 		$dir	= \Glue\CLASSPATH_USER . 'db/connection/';
 		$path	= $dir . 'test.php';
-		@unlink($path);		
+		@unlink($path);
 	}
 
 	static private function test_introspection() {
@@ -125,14 +125,14 @@ EOD;
 		// Name :
 		$tests['table name'] = array('glintro', $table->name());
 
-		// PK :		
+		// PK :
 		$arr = array();
 		foreach($table->pk() as $pkc)
 			$arr[] = $pkc->name();
 		sort($arr);
 		$tests['table pk'] = array('a,b', implode(',', $arr));
 
-		// Columns :	
+		// Columns :
 		$c = $table->column('a');
 		$tests['a name'] = array('a', $c->name());
 		$tests['a type'] = array('int', strtolower($c->type()));
@@ -172,14 +172,14 @@ EOD;
 		$tests['d scale'] = array(2, $c->scale());
 		$tests['d default'] = array(45.0, $c->default());
 		$tests['d auto'] = array(false, $c->auto());
-		
+
 		// Views :
 		$v = \Glue\DB\DB::cn()->table('glpersons');
 		$tests['view name'] = array('glusers', $v->name());
 		$tests['view alias'] = array('glpersons', $v->alias());
 		$tests['view column name'] = array('login', $v->column('name')->name());
 		$tests['view column alias'] = array('name', $v->column('name')->alias());
-		
+
 		// Connection list :
 		$list = \Glue\DB\DB::connection_list();
 		sort($list);
@@ -192,7 +192,7 @@ EOD;
 		// Connections :
 		$connections = \Glue\DB\DB::connections();
 		$tests['connections'] = array(2, count($connections));
-		
+
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($expected, $real) = $data;
@@ -255,21 +255,21 @@ EOD;
 			'boolean - not' => array(
 					db::bool("1=1")->not(),
 					"NOT ((1=1))"
-				),		
+				),
 			'boolean - not not' => array(
 					db::bool("1=1")->not()->not(),
 					"(1=1)"
-				),								
+				),
 			'table' => array(
 					$t = db::table('glusers', 'myalias'),
 					"`glusers` AS `myalias`"
-				), 
+				),
 			'template - columns' => array(
 					db::tpl("$t->id < $t->password qsdf"),
 					"`myalias`.`id` < `myalias`.`password` qsdf"
 				),
 		);
-		
+
 		$orderby = new \Glue\DB\Fragment_Builder_Orderby();
 		$orderby
 			->asc($t->login)
@@ -281,7 +281,7 @@ EOD;
 			$orderby,
 			"`myalias`.`login` ASC, `myalias`.`password` ASC, `myalias`.`login` DESC, ('test') DESC, `myalias`.`login` DESC"
 		);
-				
+
 		$join = db::join(db::table('glusers','t1'))
 					->left(db::table('glprofiles','t2'))->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
 					->right(db::table('glposts','t3'))->on('1=1');
@@ -304,22 +304,16 @@ EOD;
 			$join3,
 			"`glprofiles` AS `t3` LEFT OUTER JOIN `glusers` AS `myalias` ON (1=1)"
 		);
-		
-		/*
-		$get = new \Glue\DB\Fragment_Builder_SelectList(null);
-		$get
-			->and($t->login)
-			->and($t->password)
-			->and($t->login)->as('mylogin')
-			->and($t->login)
-			->and('?', 'test')
-			->and('?', 'test')
-			;
-		$tests['get'] = array(
-			$get,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
-		);		
 
+
+		$select = new \Glue\DB\Fragment_Builder_Select();
+		$select->columns($t->login, $t->password);
+		$tests['select'] = array(
+			$select,
+			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
+		);
+
+/*
 		$select1 = db::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5");
 		$tests['query select basic'] = array(
 			$select1,
