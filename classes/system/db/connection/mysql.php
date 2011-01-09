@@ -229,6 +229,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	 * @return
 	 */
 	public function quote_identifier($identifier) {
+		$identifier = strtr($identifier, array('`' => '``'));
 		return '`' . $identifier . '`';
 	}
 }

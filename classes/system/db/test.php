@@ -232,14 +232,18 @@ EOD;
 					db::value(null),
 					"NULL"
 				),
-			'template - no replacements' => array(
+			'template - simple' => array(
 					db::tpl("test template"),
 					"test template"
 				),
-			'template - two replacements' => array(
-					db::tpl("? test ? template", "test'test", 10),
-					"'test\'test' test 10 template"
-				),
+			'template - complex' => array(
+					db::tpl("test `q'sdf``a'zer``` testtest 'q`sdf''a`zer'''"),
+					"test `q'sdf``a'zer``` testtest 'q`sdf\\'a`zer\\''"
+				),	
+			'template - complex with replacements' => array(
+					db::tpl("? test ? `q'?sd!f``a'zer``` test ! test ? 'q`sdf''a`zer''' !", 'a', 'b', 'c', 'd', array('e','f')),
+					"'a' test 'b' `q'?sd!f``a'zer``` test `c` test 'd' 'q`sdf\\'a`zer\\'' `e`.`f`"
+				),								
 			'template - nested' => array(
 					db::tpl("? test ? ?", db::tpl('toast'), db::tpl('toast'), 10),
 					"toast test toast 10"
@@ -270,18 +274,6 @@ EOD;
 				),
 		);
 
-		$orderby = new \Glue\DB\Fragment_Builder_Orderby();
-		$orderby
-			->asc($t->login)
-			->asc($t->password)
-			->desc($t->login)
-			->desc('?', 'test')
-			->orderby($t->login, \Glue\DB\DB::DESC);
-		$tests['orderby'] = array(
-			$orderby,
-			"`myalias`.`login` ASC, `myalias`.`password` ASC, `myalias`.`login` DESC, ('test') DESC, `myalias`.`login` DESC"
-		);
-
 		$join = db::join(db::table('glusers','t1'))
 					->left(db::table('glprofiles','t2'))->on('?=?', 'test1', 'test2')->or('2=2')->and('3=3')
 					->right(db::table('glposts','t3'))->on('1=1');
@@ -305,21 +297,38 @@ EOD;
 			"`glprofiles` AS `t3` LEFT OUTER JOIN `glusers` AS `myalias` ON (1=1)"
 		);
 
+		$orderby = new \Glue\DB\Fragment_Builder_Orderby();
+		$orderby
+			->orderby($t->login, array($t->password, \Glue\DB\DB::DESC))
+			->orderby($t->email);
+		$tests['orderby'] = array(
+			$orderby,
+			"(`myalias`.`login`) ASC, (`myalias`.`password`) DESC, (`myalias`.`email`) ASC"
+		);
+		
+		$groupby = new \Glue\DB\Fragment_Builder_Groupby();
+		$groupby
+			->groupby($t->login, DB::tpl("$t->password || 'qsdf'"))
+			->groupby($t->email);
+		$tests['groupby'] = array(
+			$groupby,
+			"(`myalias`.`login`), (`myalias`.`password` || 'qsdf'), (`myalias`.`email`)"
+		);		
 
 		$select = new \Glue\DB\Fragment_Builder_Select();
-		$select->columns($t->login, $t->password);
+		$select->columns($t->login, DB::tpl($t->password))->columns(array($t->email, 'myemail'))->columns($t->login);
 		$tests['select'] = array(
 			$select,
-			"`myalias`.`login` AS `login`, `myalias`.`password` AS `password`, `myalias`.`login` AS `mylogin`, `myalias`.`login` AS `login3`, ('test') AS `computed`, ('test') AS `computed2`"
+			"(`myalias`.`login`) AS ```myalias``.``login```, (`myalias`.`password`), (`myalias`.`email`) AS `myemail`"
 		);
 
-/*
-		$select1 = db::select('glusers')->as('test')->where("1=1")->and("2=2")->or("3=3")->andnot("4=4")->ornot("5=5");
+
+		$select1 = db::select(db::table('glusers','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3");
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT * FROM `glusers` AS `test` WHERE (1=1) AND (2=2) OR (3=3) AND NOT (4=4) OR NOT (5=5)"
+			"SELECT * FROM `glusers` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
 		);
-
+/*
 		$select2 = db::select('glusers', $u)->as('myusers')->where("$u->login = 'mylogin'");
 		$tests['query select alias'] = array(
 			$select2,

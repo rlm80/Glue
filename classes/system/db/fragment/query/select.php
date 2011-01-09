@@ -2,29 +2,27 @@
 
 namespace Glue\System\DB;
 
-use \PDO;
-
 /**
- * Fragment that represents a get query.
+ * Fragment that represents a select query.
  *
- * @package GlueDB
+ * @package Glue
  * @author Régis Lemaigre
  * @license MIT
  */
 
 class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var \Glue\DB\Fragment_Builder_SelectList Select list.
+	 * @var \Glue\DB\Fragment_Builder_Select Select list.
 	 */
-	protected $columns;
+	protected $select;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Join_From From clause.
+	 * @var \Glue\DB\Fragment_Builder_Join From clause.
 	 */
 	protected $from;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Bool_Where Where clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool Where clause.
 	 */
 	protected $where;
 
@@ -34,7 +32,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	protected $groupby;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Bool_Having Having clause.
+	 * @var \Glue\DB\Fragment_Builder_Bool Having clause.
 	 */
 	protected $having;
 
@@ -57,136 +55,192 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Init children fragments :
-		$this->columns	= new \Glue\DB\Fragment_Builder_SelectList();
-		$this->from		= new \Glue\DB\Fragment_Builder_Join_From();
-		$this->where	= new \Glue\DB\Fragment_Builder_Bool_Where();
+		$this->select	= new \Glue\DB\Fragment_Builder_Select();
+		$this->from		= new \Glue\DB\Fragment_Builder_Join();
+		$this->where	= new \Glue\DB\Fragment_Builder_Bool();
 		$this->groupby	= new \Glue\DB\Fragment_Builder_Groupby();
-		$this->having	= new \Glue\DB\Fragment_Builder_Bool_Having();
+		$this->having	= new \Glue\DB\Fragment_Builder_Bool();
 		$this->orderby	= new \Glue\DB\Fragment_Builder_Orderby();
-
-		// Set up dependecies :
-		$this->columns->register_user($this);
-		$this->from->register_user($this);
-		$this->where->register_user($this);
-		$this->groupby->register_user($this);
-		$this->having->register_user($this);
-		$this->orderby->register_user($this);
-
-		// Set up contexts :
-		$this->columns->context($this);
-		$this->from->context($this);
-		$this->where->context($this);
-		$this->groupby->context($this);
-		$this->having->context($this);
-		$this->orderby->context($this);
 	}
 
 	/**
-	 * Returns the select list, initializing it with given parameters if any.
+	 * With parameters, returns $this and add columns to the select list : @see \Glue\DB\Fragment_Builder_Select::columns()
+	 * Without parameters : returns select list builder.
 	 *
-	 * I.e. "$query->columns(...)" is the same as "$query->columns()->and(...)".
-	 *
-	 * @return \Glue\DB\Fragment_Builder_SelectList
+	 * @return \Glue\DB\Fragment_Query_Select
 	 */
 	public function columns() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->columns->reset();
-			return call_user_func_array(array($this->columns, 'and'), $args);
+			call_user_func_array(array($this->select, 'columns'), $args);
+			return $this;
 		}
 		else
-			return $this->columns;
+			return $this->select;
 	}
-
+	
 	/**
-	 * Returns the from clause, initializing it with given parameters if any.
+	 * With parameters, returns $this and add columns to the groupby list : @see \Glue\DB\Fragment_Builder_Groupby::groupby()
+	 * Without parameters : returns groupby list builder.
 	 *
-	 * I.e. "$query->from(...)" is the same as "$query->from()->init(...)".
-	 *
-	 * @param mixed $operand Table name, aliased table fragment or join fragment.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Initialiazed with an aliased table fragment that may be used later on to refer to columns.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Join
-	 */
-	public function from($operand = null, &$alias = null) {
-		if (func_num_args() > 0) {
-			$this->from->reset();
-			return $this->from->init($operand, $alias);
-		}
-		return $this->from;
-	}
-
-	/**
-	 * Returns the where clause, initializing it with given parameters if any.
-	 *
-	 * I.e. "$query->where(...)" is the same as "$query->where()->init(...)".
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Bool_Where
-	 */
-	public function where() {
-		if (func_num_args() > 0) {
-			$args = func_get_args();
-			$this->where->reset();
-			return call_user_func_array(array($this->where, 'init'), $args);
-		}
-		else
-			return $this->where;
-	}
-
-	/**
-	 * Returns the group by clause, initializing it with given parameters if any.
-	 *
-	 * I.e. "$query->groupby(...)" is the same as "$query->groupby()->and(...)".
-	 *
-	 * @return \Glue\DB\Fragment_Builder_List_Groupby
+	 * @return \Glue\DB\Fragment_Query_Select
 	 */
 	public function groupby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->groupby->reset();
-			return call_user_func_array(array($this->groupby, 'and'), $args);
+			call_user_func_array(array($this->groupby, 'groupby'), $args);
+			return $this;
 		}
 		else
 			return $this->groupby;
 	}
-
+	
 	/**
-	 * Returns the group by clause, initializing it with given parameters if any.
+	 * With parameters, returns $this and add columns to the orderby list : @see \Glue\DB\Fragment_Builder_Orderby::orderby()
+	 * Without parameters : returns orderby list builder.
 	 *
-	 * I.e. "$query->having(...)" is the same as "$query->having()->init(...)".
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Bool_Having
-	 */
-	public function having() {
-		if (func_num_args() > 0) {
-			$args = func_get_args();
-			$this->having->reset();
-			return call_user_func_array(array($this->having, 'init'), $args);
-		}
-		else
-			return $this->having;
-	}
-
-	/**
-	 * Returns the order by clause, initializing it with given parameters if any.
-	 *
-	 * I.e. "$query->orderby(...)" is the same as "$query->orderby()->and(...)".
-	 *
-	 * @return \Glue\DB\Fragment_Builder_List_Orderby
+	 * @return \Glue\DB\Fragment_Query_Select
 	 */
 	public function orderby() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->orderby->reset();
-			return call_user_func_array(array($this->orderby, 'and'), $args);
+			call_user_func_array(array($this->orderby, 'orderby'), $args);
+			return $this;
 		}
 		else
 			return $this->orderby;
+	}		
+
+	/**
+	 * With parameters, initialize the from clause and returns $this : @see \Glue\DB\Fragment_Builder_Join::init()
+	 * Without parameters : returns from clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function from($table = null, &$obj = null) {
+		if (func_num_args() > 0) {
+			$this->from->init($table, $obj);
+			return $this;
+		}
+		else
+			return $this->from;
 	}
 
 	/**
-	 * Limit getter/setter.
+	 * With parameters, initialize the from clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
+	 * Without parameters : returns where clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function where() {
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			call_user_func_array(array($this->where, 'init'), $args);
+			return $this;
+		}
+		else
+			return $this->where;
+	}
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function andwhere() {
+		$args = func_get_args();
+		call_user_func_array(array($this->where, 'and'), $args);
+		return $this;
+	}
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function orwhere() {
+		$args = func_get_args();
+		call_user_func_array(array($this->where, 'or'), $args);
+		return $this;
+	}	
+
+	/**
+	 * With parameters, initialize the having clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
+	 * Without parameters : returns where clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function having() {
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			call_user_func_array(array($this->having, 'init'), $args);
+			return $this;
+		}
+		else
+			return $this->having;
+	}
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function andhaving() {
+		$args = func_get_args();
+		call_user_func_array(array($this->having, 'and'), $args);
+		return $this;
+	}
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function orhaving() {
+		$args = func_get_args();
+		call_user_func_array(array($this->having, 'or'), $args);
+		return $this;
+	}		
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::init() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function on() {
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			call_user_func_array(array($this->from, 'on'), $args);
+			return $this;
+		}
+		else
+			return $this->from->on();
+	}	
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function andon() {
+		$args = func_get_args();
+		call_user_func_array(array($this->from, 'and'), $args);
+		return $this;
+	}
+	
+	/**
+	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function oron() {
+		$args = func_get_args();
+		call_user_func_array(array($this->from, 'or'), $args);
+		return $this;
+	}	
+
+	/**
+	 * Limit getter / setter (+ return $this).
 	 *
 	 * @param integer $limit
 	 *
@@ -196,11 +250,11 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		if (func_num_args() === 0)
 			return $this->limit;
 		else
-			return $this->set_property('limit', $limit);
+			return $this->limit = $limit;
 	}
 
 	/**
-	 * Offset getter/setter.
+	 * Offset getter / setter (+ return $this).
 	 *
 	 * @param integer $offset
 	 *
@@ -210,19 +264,6 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		if (func_num_args() === 0)
 			return $this->offset;
 		else
-			return $this->set_property('offset', $offset);
-	}
-	
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_query_select($this, $style);
-	}
+			return $this->offset = $offset;
+	}	
 }

@@ -14,14 +14,9 @@ namespace Glue\System\DB;
 
 class Fragment_Table extends \Glue\DB\Fragment {
 	/**
-	 * @var array Maximum attributed ids, by table name.
+	 * @var array Maximum attributed ids for aliases, by table name.
 	 */
 	static protected $maxids = array();
-	
-	/**
-	 * @var array Column fragments cache.
-	 */
-	protected $columns = array();
 		
 	/**
 	 * @var string Table.
@@ -81,27 +76,17 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	}
 	
 	/**
-	 * Returns child column fragment.
-	 * 
-	 * @param string $column
-	 * 
-	 * @return \Glue\DB\Fragment_Column
-	 */
-	public function column($column) {
-		 if ( ! isset($this->columns[$column]))
-			$this->columns[$column] = new \Glue\DB\Fragment_Column($this, $column);
-		return $this->columns[$column];
-	}
-	
-	/**
-	 * Returns identifier of given child column fragment.
+	 * Returns identifier of given column quoted for inclusion in a template.
 	 *
 	 * @param string $column
 	 *
 	 * @return string
 	 */
 	public function __get($column) {
-		return $this->column($column)->id();
+		return \Glue\DB\DB::quote_identifier(array(
+			empty($this->alias) ? $this->table : $this->alias,
+			$column
+		));
 	}
 	
 	/**

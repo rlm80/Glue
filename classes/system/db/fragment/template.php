@@ -3,14 +3,7 @@
 namespace Glue\System\DB;
 
 /**
- * Fragment that represents an SQL template to be included as-is in the query.
- * 
- * The template may have '?' placeholders and you may supply to the constructor an array of fragments to be
- * used for replacements.
- * 
- * The SQL output of a template fragment is the template, where each placeholder has been replaced by the SQL
- * output of each replacement fragment. If constant values are supplied for replacements, they will be turned
- * into Value fragments and thus quoted appropriately. 
+ * Fragment that represents a pseudo-SQL template to be included in the query.
  *
  * @package    Glue
  * @author     Régis Lemaigre
@@ -19,12 +12,12 @@ namespace Glue\System\DB;
 
 class Fragment_Template extends \Glue\DB\Fragment {
 	/**
-	 * @var string SQL template with placeholders for values that need to be quoted.
+	 * @var string Pseudo-SQL template.
 	 */
 	protected $template;
 
 	/**
-	 * @var array Replacements to be made in SQL template.
+	 * @var array Replacements to be made in pseudo-SQL template.
 	 */
 	protected $replacements = array();
 

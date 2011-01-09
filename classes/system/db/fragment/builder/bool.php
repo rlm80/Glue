@@ -24,39 +24,42 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	protected $negated = false;
 	
 	/**
-	 * Initializes the expression with a first operand.
+	 * Resets the expression and initializes it with a first operand.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function init() {
 		$this->reset();
 		$args = func_get_args();
-		$this->add($args, null);
-		return $this;
+		return $this->add($args, null);
 	}
 
 	/**
 	 * Use ->or() instead of this. Adds a boolean operand at the end of the expression, connecting it with
-	 * the OR operator.
+	 * the OR operator. When called on an empty expression, the operator is ignored.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function _or() {
 		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Item_Bool::_OR);
-		return $this;
+		return $this->add(
+			$args,
+			$this->is_empty() ? null : \Glue\DB\Fragment_Item_Bool::_OR
+		);
 	}
 
 	/**
 	 * Use ->and() instead of this. Adds a boolean operand at the end of the expression, connecting it with
-	 * the AND operator.
+	 * the AND operator. When called on an empty expression, the operator is ignored.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Bool
 	 */
 	public function _and() {
 		$args = func_get_args();
-		$this->add($args, \Glue\DB\Fragment_Item_Bool::_AND);
-		return $this;
+		return $this->add(
+			$args,
+			$this->is_empty() ? null : \Glue\DB\Fragment_Item_Bool::_AND
+		);
 	}
 
 	/**
@@ -70,15 +73,15 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		$values	= $args;
 		$first	= array_shift($values);
 
-		// Build fragment : TODO maybe try to shorten this a bit
-		if ($first instanceof \Glue\DB\Fragment)
-			$fragment = $first;
-		else
-			$fragment = new \Glue\DB\Fragment_Template($first, $values);
-		$operand = new \Glue\DB\Fragment_Item_Bool($fragment, $operator);
-
-		// Add operand :
-		$this->push($operand);
+		// Add new operand :
+		$this->push(
+			new \Glue\DB\Fragment_Item_Bool(
+				is_string($first) ? new \Glue\DB\Fragment_Template($first, $values) : $first,
+				$operator
+			)
+		);
+		
+		return $this;
 	}
 	
 	/**

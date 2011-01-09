@@ -215,7 +215,7 @@ class DB {
 		}
 		else
 			return $f;
-	}
+	}		
 
 	/**
 	 * Returns a new join fragment.
@@ -232,4 +232,81 @@ class DB {
 		else
 			return $f;
 	}
+	
+	/**
+	 * Returns a new order by fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Orderby
+	 */
+	public static function orderby() {
+		$f = new \Glue\DB\Fragment_Builder_Orderby();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'orderby'), $args);
+		}
+		else
+			return $f;
+	}	
+
+	/**
+	 * Returns a new group by fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Groupby
+	 */
+	public static function groupby() {
+		$f = new \Glue\DB\Fragment_Builder_Groupby();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'groupby'), $args);
+		}
+		else
+			return $f;
+	}	
+	
+	/**
+	 * Quotes a string literal for inclusion in a template.
+	 * 
+	 * @param string $str
+	 * 
+	 * @return string
+	 */
+	public static function quote($str) {
+		return "'" . strtr($str, array("'" => "''")) . "'";
+	}
+	
+	/**
+	 * Takes a string literal quoted for inclusion in a template and returns the unquoted string.
+	 * 
+	 * @param string $str
+	 * 
+	 * @return string
+	 */
+	public static function unquote($str) {
+		return strtr(substr($str, 1, -1), array("''" => "'"));
+	}
+	
+	/**
+	 * Quotes an identifier for inclusion in a template.
+	 * 
+	 * @param mixed $str Array or string.
+	 * 
+	 * @return string
+	 */
+	public static function quote_identifier($str) {
+		if (is_array($str))
+			return implode('.', array_map('\Glue\DB\DB::quote_identifier', $str));
+		else
+			return "`" . strtr($str, array("`" => "``")) . "`";
+	}
+	
+	/**
+	 * Takes an identifier quoted for inclusion in a template and returns the unquoted string.
+	 * 
+	 * @param string $str
+	 * 
+	 * @return string
+	 */
+	public static function unquote_identifier($str) {
+		return strtr(substr($str, 1, -1), array("``" => "`"));
+	}	
 }

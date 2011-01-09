@@ -12,63 +12,36 @@ namespace Glue\System\DB;
 
 class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	/**
-	 * Adds an element at the end of the list by ascending order. You may pass a column identifier,
-	 * a fragment or a template with question marks as placeholders followed by their replacements.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Orderby
-	 */
-	public function asc() {
-		$args = func_get_args();
-		$this->add($args, \Glue\DB\DB::ASC);
-		return $this;
-	}
-	
-	/**
-	 * Adds an element at the end of the list by ascending order. You may pass a column identifier,
-	 * a fragment or a template with question marks as placeholders followed by their replacements.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Orderby
-	 */
-	public function desc() {
-		$args = func_get_args();
-		$this->add($args, \Glue\DB\DB::DESC);
-		return $this;
-	}	
-	
-	/**
-	 * Adds an element at the end of the list by order in last parameter. You may pass a column identifier,
-	 * a fragment or a template with question marks as placeholders followed by their replacements.
+	 * Adds a list of columns to the order by list.
+	 * 
+	 * A parameter can be :
+	 * - a string (default order = asc),
+	 * - a fragment (default order = asc),
+	 * - an array(string, order),
+	 * - an array(fragment, order).
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Orderby
 	 */
 	public function orderby() {
-		$args = func_get_args();
-		$order = array_pop($args);
-		$this->add($args, $order);
+		// Get array of columns :
+		$columns = func_get_args();
+		
+		// Add columns one by one :
+		foreach($columns as $column) {
+			// Split :
+			if (is_array($column)) {
+				$col	= is_string($column[0]) ? new \Glue\DB\Fragment_Template($column[0]) : $column[0];
+				$order	= $column[1];
+			}
+			else {
+				$col	= is_string($column) ? new \Glue\DB\Fragment_Template($column) : $column;
+				$order	= \Glue\DB\DB::ASC; 
+			}
+						
+			// Add column :
+			$this->push(new \Glue\DB\Fragment_Item_Orderby($col, $order));
+		}
+		
 		return $this;
-	}		
-	
-	/**
-	 * Adds an element at the end of the list.
-	 *
-	 * @return \Glue\DB\Fragment_Item_Orderby
-	 */
-	protected function add($args, $order = null) {
-		// Split params :
-		$first = array_shift($args);
-
-		// Build fragment :
-		if ($first instanceof \Glue\DB\Fragment)
-			$fragment = new \Glue\DB\Fragment_Item_Orderby($first, $order);
-		elseif (\Glue\DB\Fragment_Column::exists($first))
-			$fragment = new \Glue\DB\Fragment_Item_Orderby(\Glue\DB\Fragment_Column::get($first), $order);
-		else 
-			$fragment = new \Glue\DB\Fragment_Item_Orderby(new \Glue\DB\Fragment_Template($first, $args), $order);
-
-		// Add fragment :
-		$this->push($fragment);
-
-		// Return fragment :
-		return $fragment;
 	}
 }

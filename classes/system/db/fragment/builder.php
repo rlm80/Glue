@@ -23,25 +23,7 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 	 */
 	protected function push(\Glue\DB\Fragment $fragment) {
 		$this->children[] = $fragment;
-	}
-
-	/**
-	 * Returns last fragment pushed, or false if there is no such fragment.
-	 *
-	 * @return \Glue\DB\Fragment
-	 */
-	public function last() {
-		return end($this->children);
-	}
-
-	/**
-	 * Returns first fragment pushed, or false if there is no such fragment.
-	 *
-	 * @return \Glue\DB\Fragment
-	 */
-	public function first() {
-		return reset($this->children);
-	}
+	}	
 
 	/**
 	 * Removes the last child at the end of the children list.
@@ -62,6 +44,33 @@ abstract class Fragment_Builder extends \Glue\DB\Fragment {
 		$this->children = array();
 		return $this;
 	}
+	
+	/**
+	 * Returns true if there is no children, false otherwise.
+	 *
+	 * @return boolean
+	 */
+	public function is_empty() {
+		return empty($this->children);
+	}	
+	
+	/**
+	 * Returns first fragment pushed, or false if there is no such fragment.
+	 *
+	 * @return \Glue\DB\Fragment
+	 */
+	public function first() {
+		return reset($this->children);
+	}	
+	
+	/**
+	 * Returns last fragment pushed, or false if there is no such fragment.
+	 *
+	 * @return \Glue\DB\Fragment
+	 */
+	public function last() {
+		return end($this->children);
+	}	
 
 	/**
 	 * Returns children fragments.
