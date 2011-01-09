@@ -239,11 +239,11 @@ EOD;
 			'template - complex' => array(
 					db::tpl("test `q'sdf``a'zer``` testtest 'q`sdf''a`zer'''"),
 					"test `q'sdf``a'zer``` testtest 'q`sdf\\'a`zer\\''"
-				),	
+				),
 			'template - complex with replacements' => array(
 					db::tpl("? test ? `q'?sd!f``a'zer``` test ! test ? 'q`sdf''a`zer''' !", 'a', 'b', 'c', 'd', array('e','f')),
 					"'a' test 'b' `q'?sd!f``a'zer``` test `c` test 'd' 'q`sdf\\'a`zer\\'' `e`.`f`"
-				),								
+				),
 			'template - nested' => array(
 					db::tpl("? test ? ?", db::tpl('toast'), db::tpl('toast'), 10),
 					"toast test toast 10"
@@ -305,7 +305,7 @@ EOD;
 			$orderby,
 			"(`myalias`.`login`) ASC, (`myalias`.`password`) DESC, (`myalias`.`email`) ASC"
 		);
-		
+
 		$groupby = new \Glue\DB\Fragment_Builder_Groupby();
 		$groupby
 			->groupby($t->login, DB::tpl("$t->password || 'qsdf'"))
@@ -313,7 +313,7 @@ EOD;
 		$tests['groupby'] = array(
 			$groupby,
 			"(`myalias`.`login`), (`myalias`.`password` || 'qsdf'), (`myalias`.`email`)"
-		);		
+		);
 
 		$select = new \Glue\DB\Fragment_Builder_Select();
 		$select->columns($t->login, DB::tpl($t->password))->columns(array($t->email, 'myemail'))->columns($t->login);
@@ -323,36 +323,38 @@ EOD;
 		);
 
 
-		$select1 = db::select(db::table('glusers','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3");
+		$select1 = db::select(array('users','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3");
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT * FROM `glusers` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
+			"SELECT * FROM `users` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
 		);
-/*
-		$select2 = db::select('glusers', $u)->as('myusers')->where("$u->login = 'mylogin'");
+
+		$select2 = db::select(array('users','myusers'), $u)->where("$u->login = 'mylogin'");
 		$tests['query select alias'] = array(
 			$select2,
-			"SELECT * FROM `glusers` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
+			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
-		$select3 = db::select('glusers', $a)->left('glusers', $b)->as('myusers')->on("$a->login = $b->login");
+		$select3 = db::select(array('users', null), $a)
+						->left(array('users', 'myusers'), $b)
+						->on("$a->login = $b->login");
 		$tests['query select no alias'] = array(
 			$select3,
-			"SELECT * FROM `glusers` LEFT OUTER JOIN `glusers` AS `myusers` ON (`glusers`.`login` = `myusers`.`login`)"
+			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
 		);
 
-		$select4 = db::select('glusers', $a)->as('myusers')->orderby($a->login)->asc()->limit(30)->offset(20);
+		$select4 = db::select(array('users', 'myusers'), $a)->orderby($a->login)->limit(30)->offset(20);
 		$tests['query select limit offset'] = array(
 			$select4,
-			"SELECT * FROM `glusers` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
+			"SELECT * FROM `users` AS `myusers` ORDER BY (`myusers`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
-		$select5 = db::select('glusers', $a)->as('myusers')->groupby($a->login)->and($a->password)->having("count(*) > 1")->orderby($a->login)->and($a->password)->columns($a->login)->and($a->password);
+		$select5 = db::select(array('users', 'myusers'), $a)->groupby($a->login, $a->password)->having("count(*) > 1")->orderby($a->login, $a->password)->columns($a->login, $a->password);
 		$tests['query select group by having'] = array(
 			$select5,
-			"SELECT `myusers`.`login` AS `login`, `myusers`.`password` AS `password` FROM `glusers` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
+			"SELECT (`myusers`.`login`) AS ```myusers``.``login```, (`myusers`.`password`) AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY (`myusers`.`login`), (`myusers`.`password`) HAVING (count(*) > 1) ORDER BY (`myusers`.`login`) ASC, (`myusers`.`password`) ASC"
 		);
-
+/*
 		$delete1 = db::delete('glusers', $a)->where("$a->login = 'test'");
 		$tests['query delete'] = array(
 			$delete1,

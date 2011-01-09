@@ -78,7 +78,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		else
 			return $this->select;
 	}
-	
+
 	/**
 	 * With parameters, returns $this and add columns to the groupby list : @see \Glue\DB\Fragment_Builder_Groupby::groupby()
 	 * Without parameters : returns groupby list builder.
@@ -94,7 +94,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		else
 			return $this->groupby;
 	}
-	
+
 	/**
 	 * With parameters, returns $this and add columns to the orderby list : @see \Glue\DB\Fragment_Builder_Orderby::orderby()
 	 * Without parameters : returns orderby list builder.
@@ -109,7 +109,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		}
 		else
 			return $this->orderby;
-	}		
+	}
 
 	/**
 	 * With parameters, initialize the from clause and returns $this : @see \Glue\DB\Fragment_Builder_Join::init()
@@ -117,13 +117,46 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	 *
 	 * @return \Glue\DB\Fragment_Query_Select
 	 */
-	public function from($table = null, &$obj = null) {
+	public function from($table = null, &$operand = null) {
 		if (func_num_args() > 0) {
-			$this->from->init($table, $obj);
+			$this->from->init($table, $operand);
 			return $this;
 		}
 		else
 			return $this->from;
+	}
+
+	/**
+	 * Fowards call to from clause : @see \Glue\DB\Fragment_Builder_Join::left()
+	 * Without parameters : returns from clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function left($table, &$operand = null) {
+		$this->from->left($table, $operand);
+		return $this;
+	}
+
+	/**
+	 * Fowards call to from clause : @see \Glue\DB\Fragment_Builder_Join::right()
+	 * Without parameters : returns from clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function right($table, &$operand = null) {
+		$this->from->right($table, $operand);
+		return $this;
+	}
+
+	/**
+	 * Fowards call to from clause : @see \Glue\DB\Fragment_Builder_Join::inner()
+	 * Without parameters : returns from clause.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function inner($table, &$operand = null) {
+		$this->from->inner($table, $operand);
+		return $this;
 	}
 
 	/**
@@ -141,7 +174,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		else
 			return $this->where;
 	}
-	
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
 	 *
@@ -152,7 +185,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		call_user_func_array(array($this->where, 'and'), $args);
 		return $this;
 	}
-	
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
 	 *
@@ -162,7 +195,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		$args = func_get_args();
 		call_user_func_array(array($this->where, 'or'), $args);
 		return $this;
-	}	
+	}
 
 	/**
 	 * With parameters, initialize the having clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
@@ -179,7 +212,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		else
 			return $this->having;
 	}
-	
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
 	 *
@@ -190,7 +223,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		call_user_func_array(array($this->having, 'and'), $args);
 		return $this;
 	}
-	
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
 	 *
@@ -200,8 +233,8 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		$args = func_get_args();
 		call_user_func_array(array($this->having, 'or'), $args);
 		return $this;
-	}		
-	
+	}
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::init() + return $this.
 	 *
@@ -215,8 +248,8 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		}
 		else
 			return $this->from->on();
-	}	
-	
+	}
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::and() + return $this.
 	 *
@@ -227,7 +260,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		call_user_func_array(array($this->from, 'and'), $args);
 		return $this;
 	}
-	
+
 	/**
 	 * @see \Glue\DB\Fragment_Builder_Bool::or() + return $this.
 	 *
@@ -237,7 +270,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		$args = func_get_args();
 		call_user_func_array(array($this->from, 'or'), $args);
 		return $this;
-	}	
+	}
 
 	/**
 	 * Limit getter / setter (+ return $this).
@@ -249,8 +282,10 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	public function limit($limit = null) {
 		if (func_num_args() === 0)
 			return $this->limit;
-		else
-			return $this->limit = $limit;
+		else {
+			$this->limit = $limit;
+			return $this;
+		}
 	}
 
 	/**
@@ -263,7 +298,9 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	public function offset($offset = null) {
 		if (func_num_args() === 0)
 			return $this->offset;
-		else
-			return $this->offset = $offset;
-	}	
+		else {
+			$this->offset = $offset;
+			return $this;
+		}
+	}
 }

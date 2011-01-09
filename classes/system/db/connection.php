@@ -303,7 +303,7 @@ abstract class Connection extends PDO {
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Orderby)
 				return $this->compile_item_orderby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Groupby)
-				return $this->compile_item_groupby($fragment);				
+				return $this->compile_item_groupby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Select)
 				return $this->compile_item_select($fragment);
 			else
@@ -320,7 +320,7 @@ abstract class Connection extends PDO {
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Orderby)
 				return $this->compile_builder_orderby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Groupby)
-				return $this->compile_builder_groupby($fragment);				
+				return $this->compile_builder_groupby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Select)
 				return $this->compile_builder_select($fragment);
 			else
@@ -395,8 +395,8 @@ abstract class Connection extends PDO {
 		// Get data from fragment :
 		$template		= $fragment->template();
 		$replacements	= $fragment->replacements();
-		
-		// Split template according to inline string litterals and identifiers 
+
+		// Split template according to inline string litterals and identifiers :
 		$matches = preg_split("/((?:'(?:(?:''|[^'])*)')|(?:`(?:(?:``|[^`])*)`))/", $template, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Loop over matches and generate SQL :
@@ -405,13 +405,13 @@ abstract class Connection extends PDO {
 		for($i = 0; $i < count($matches); $i++) {
 			// Get string :
 			$part = $matches[$i];
-			
+
 			// Tell apart delimiters from pieces :
 			if ($i % 2 === 0) {
 				// In-between string, we must make replacements :
 				$sql .= preg_replace_callback(
 					'/[?!]/',
-					function($matches) use ($cn, &$replacements) {
+					function ($matches) use ($cn, &$replacements) {
 						$replacement = array_shift($replacements);
 						if ($matches[0] === '?') {
 							// Value :
@@ -438,8 +438,8 @@ abstract class Connection extends PDO {
 				if ($part[0] === "'")	// String litteral :
 					$sql .= $this->quote(\Glue\DB\DB::unquote($part));
 				else					// Identifier :
-					$sql .= $this->quote_identifier(\Glue\DB\DB::unquote_identifier($part));      
-			}    
+					$sql .= $this->quote_identifier(\Glue\DB\DB::unquote_identifier($part));
+			}
 		}
 
 		return $sql;
@@ -454,11 +454,13 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_table(\Glue\DB\Fragment_Table $fragment) {
 		// Get data from fragment :
-		$table	= $this->table($fragment->table())->name();
+		$table	= $fragment->table();
 		$alias	= $fragment->alias();
 
 		// Generate fragment SQL :
-		$sql = $this->quote_identifier($table) . ' AS ' . $this->quote_identifier($alias);
+		$sql = $this->quote_identifier($table);
+		if ( ! empty($alias))
+			$sql .= ' AS ' . $this->quote_identifier($alias);
 
 		// Return SQL :
 		return $sql;
@@ -577,7 +579,7 @@ abstract class Connection extends PDO {
 		// Return SQL :
 		return $sql;
 	}
-	
+
 	/**
 	 * Compiles Fragment_Item_Groupby fragments into an SQL string.
 	 *
@@ -594,7 +596,7 @@ abstract class Connection extends PDO {
 
 		// Return SQL :
 		return $sql;
-	}	
+	}
 
 	/**
 	 * Compiles Fragment_Item_Select fragments into an SQL string.

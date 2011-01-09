@@ -6,7 +6,7 @@ namespace Glue\System\DB;
  * Fragment that represents a table with its alias in a FROM clause and compiles into "table AS alias".
  *
  * TODO describe access to column ids
- * 
+ *
  * @package    Glue
  * @author     Régis Lemaigre
  * @license    MIT
@@ -17,7 +17,7 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	 * @var array Maximum attributed ids for aliases, by table name.
 	 */
 	static protected $maxids = array();
-		
+
 	/**
 	 * @var string Table.
 	 */
@@ -36,13 +36,14 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	 */
 	public function __construct($table, $alias = null) {
 		// Autogenerate alias if none given :
-		$alias = isset($alias) ? $alias : static::genalias($table);
-		
+		if (func_num_args() === 1)
+			$alias = static::genalias($table);
+
 		// Set properties :
 		$this->table($table);
 		$this->alias($alias);
 	}
-	
+
 	/**
 	 * Table getter/setter.
 	 *
@@ -57,7 +58,7 @@ class Fragment_Table extends \Glue\DB\Fragment {
 			$this->table = $table;
 			return $this;
 		}
-	}	
+	}
 
 	/**
 	 * Alias getter/setter.
@@ -74,7 +75,7 @@ class Fragment_Table extends \Glue\DB\Fragment {
 			return $this;
 		}
 	}
-	
+
 	/**
 	 * Returns identifier of given column quoted for inclusion in a template.
 	 *
@@ -88,12 +89,12 @@ class Fragment_Table extends \Glue\DB\Fragment {
 			$column
 		));
 	}
-	
+
 	/**
 	 * Generate unique alias for table $table.
-	 * 
+	 *
 	 * @param $table
-	 * 
+	 *
 	 * @return string
 	 */
 	static protected function genalias($table) {
@@ -101,5 +102,5 @@ class Fragment_Table extends \Glue\DB\Fragment {
 		$alias = $table . '_' . $id;
 		static::$maxids[$table] = $id;
 		return $alias;
-	}	
+	}
 }

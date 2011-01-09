@@ -14,83 +14,88 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Initializes the expression with a first operand.
 	 *
-	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
-	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the join operand.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
-	public function init($table, &$obj = null) {
+	public function init($table, &$operand = null) {
 		$this->reset();
-		return $this->add($table, null, $obj);
+		return $this->add($table, null, $operand);
 	}
 
 	/**
 	 * Adds an operand to the expression, using an inner join. When called on an empty expression, the operator is ignored.
 	 *
-	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
-	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the join operand.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
-	public function inner($table, &$obj = null) {
+	public function inner($table, &$operand = null) {
 		return $this->add(
-			$table, 
-			$this->is_empty() ? null : \Glue\DB\DB::INNER, 
-			$obj
+			$table,
+			$this->is_empty() ? null : \Glue\DB\DB::INNER,
+			$operand
 		);
 	}
 
 	/**
 	 * Adds an operand to the expression, using a left outer join. When called on an empty expression, the operator is ignored.
 	 *
-	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
-	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the join operand.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
-	public function left($table, &$obj = null) {
+	public function left($table, &$operand = null) {
 		return $this->add(
-			$table, 
-			$this->is_empty() ? null : \Glue\DB\DB::LEFT, 
-			$obj
+			$table,
+			$this->is_empty() ? null : \Glue\DB\DB::LEFT,
+			$operand
 		);
 	}
 
 	/**
 	 * Adds an operand to the expression, using a right outer join. When called on an empty expression, the operator is ignored.
 	 *
-	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
-	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the join operand.
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
-	public function right($table, &$obj = null) {
+	public function right($table, &$operand = null) {
 		return $this->add(
-			$table, 
-			$this->is_empty() ? null : \Glue\DB\DB::RIGHT, 
-			$obj
+			$table,
+			$this->is_empty() ? null : \Glue\DB\DB::RIGHT,
+			$operand
 		);
 	}
 
 	/**
 	 * Adds an operand to the expression.
 	 *
-	 * @param mixed $table $table Right operand of the join. It may be a table name, a table-alias object or any fragment (most likely a join fragment for nested joins).
+	 * @param mixed $table $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
 	 * @param integer $operator Operator.
-	 * @param \Glue\DB\Fragment_Table $obj Initialiazed with the join operand.
-	 * 
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
+	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
 	protected function add($table, $operator, &$operand) {
 		// Build operand :
-		$operand = is_string($table) ? new \Glue\DB\Fragment_Table($table) : $table;
+		if (is_string($table))
+			$operand = new \Glue\DB\Fragment_Table($table);
+		elseif (is_array($table))
+			$operand = new \Glue\DB\Fragment_Table($table[0], $table[1]);
+		else
+			$operand = $table;
 
 		// Add fragment :
 		$this->push(new \Glue\DB\Fragment_Item_Join($operand, $operator));
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Initializes last on clause with given parameters and return $this. If no parameters
 	 * given, returns last on clause.
@@ -128,9 +133,9 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 		call_user_func_array(array($this->on(), '_and'), $args);
 		return $this;
 	}
-	
+
 	/**
-	 * Fowards to last on clause.
+	 * Fowards to last on clause. TODO useful ?
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
 	 */
@@ -138,7 +143,7 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 		$this->on()->not();
 		return $this;
 	}
-	
+
 	/*
 	 * Sets up aliases for _or(), _and(). Required because
 	 * keywords aren't valid function names in PHP.
@@ -148,5 +153,5 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 			return call_user_func_array(array($this, '_or'), $args);
 		elseif ($name === 'and')
 			return call_user_func_array(array($this, '_and'), $args);
-	}		
+	}
 }
