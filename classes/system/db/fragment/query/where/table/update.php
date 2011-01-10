@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license MIT
  */
 
-class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
+class Fragment_Query_Where_Table_Update extends \Glue\DB\Fragment_Query_Where {
 	/**
 	 * @var \Glue\DB\Fragment_Builder_Setlist Set list.
 	 */

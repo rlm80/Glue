@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license MIT
  */
 
-class Fragment_Query_Delete extends \Glue\DB\Fragment_Query {
+class Fragment_Query_Where_Table_Delete extends \Glue\DB\Fragment_Query_Where {
 	/**
 	 * @var \Glue\DB\Fragment_Aliased_Table Table to delete rows from.
 	 */

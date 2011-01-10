@@ -354,6 +354,19 @@ EOD;
 			$select5,
 			"SELECT (`myusers`.`login`) AS ```myusers``.``login```, (`myusers`.`password`) AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY (`myusers`.`login`), (`myusers`.`password`) HAVING (count(*) > 1) ORDER BY (`myusers`.`login`) ASC, (`myusers`.`password`) ASC"
 		);
+
+		$select5 = db::select(array('users', 'myusers'), $a)->groupby($a->login, $a->password)->having("count(*) > 1")->orderby($a->login, $a->password)->columns($a->login, $a->password);
+		$tests['query select group by having'] = array(
+			$select5,
+			"SELECT (`myusers`.`login`) AS ```myusers``.``login```, (`myusers`.`password`) AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY (`myusers`.`login`), (`myusers`.`password`) HAVING (count(*) > 1) ORDER BY (`myusers`.`login`) ASC, (`myusers`.`password`) ASC"
+		);
+
+		$select6 = db::select(array('users', 'a'), $a)->left(array('users', 'b'), $b)->on("1=1")->andon("2=2")->right(array('users', 'c'), $c)->on("3=3")->oron("4=4");
+		$tests['query select andon oron'] = array(
+			$select6,
+			"SELECT * FROM `users` AS `a` LEFT OUTER JOIN `users` AS `b` ON (1=1) AND (2=2) RIGHT OUTER JOIN `users` AS `c` ON (3=3) OR (4=4)"
+		);
+
 /*
 		$delete1 = db::delete('glusers', $a)->where("$a->login = 'test'");
 		$tests['query delete'] = array(

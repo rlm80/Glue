@@ -16,12 +16,13 @@ class DB {
 	// Order by constants :
 	const ASC	= 0;
 	const DESC	= 1;
-	
+
 	// Join operators :
 	const LEFT	= 0;
 	const RIGHT	= 1;
-	const INNER	= 2;	
-		
+	const INNER	= 2;
+	const COMMA	= 3;
+
 	/**
 	 * @var array Connection instances cache.
 	 */
@@ -113,59 +114,60 @@ class DB {
 	}
 
 	/**
-	 * Returns a select query object.
+	 * Returns a new select query object and forwards parameters to Fragment_Query_Where_Select::from().
 	 *
-	 * @param string $table_name Name of the main table you're selecting from (= first table in the from clause).
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param mixed $table
+	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Select
+	 * @return \Glue\DB\Fragment_Query_Where_Select
 	 */
-	public static function select($table_name = null, &$alias = null) {
-		$f = new \Glue\DB\Fragment_Query_Select();
+	public static function select($table = null, &$operand = null) {
+		$f = new \Glue\DB\Fragment_Query_Where_Select();
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			return $f->from($table_name, $alias);
+			return $f->from($table, $operand);
 		}
 		else
 			return $f;
 	}
 
 	/**
-	 * Returns an update query object.
+	 * Returns a new update query object and forwards parameters to Fragment_Query_Where_Update::table().
 	 *
-	 * @param string $table_name Name of the main table you're updating (= first table in the update clause).
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param mixed $table
+	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Update
+	 * @return \Glue\DB\Fragment_Query_Where_Table_Update
 	 */
-	public static function update($table_name, &$alias = null) {
-		$query = new \Glue\DB\Fragment_Query_Update();
-		$query->from($table_name, $alias);
-		return $query->from();
+	public static function update($table, &$operand = null) {
+		$query = new \Glue\DB\Fragment_Query_Where_Table_Update();
+		return $query->table($table, $operand);
 	}
 
 	/**
-	 * Returns a delete query object.
+	 * Returns a new update query object and forwards parameters to Fragment_Query_Where_Delete::table().
 	 *
-	 * @param string $table_name Name of the table you're deleting from.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param mixed $table
+	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Delete
+	 * @return \Glue\DB\Fragment_Query_Where_Table_Delete
 	 */
-	public static function delete($table_name, &$alias = null) {
-		return new \Glue\DB\Fragment_Query_Delete($table_name, $alias);
+	public static function delete($table, &$operand = null) {
+		$query = new \Glue\DB\Fragment_Query_Where_Table_Delete();
+		return $query->table($table, $operand);
 	}
 
 	/**
 	 * Returns a insert query object.
 	 *
-	 * @param string $table_name Name of the table you're inserting data into.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
+	 * @param mixed $table
+	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Insert
+	 * @return \Glue\DB\Fragment_Query_Where_Table_Insert
 	 */
-	public static function insert($table_name, &$alias = null) {
-		return new \Glue\DB\Fragment_Query_Insert($table_name, $alias);
+	public static function insert($table, &$operand = null) {
+		$query = new \Glue\DB\Fragment_Query_Where_Table_Insert();
+		return $query->table($table, $operand);
 	}
 
 	/**
@@ -215,7 +217,7 @@ class DB {
 		}
 		else
 			return $f;
-	}		
+	}
 
 	/**
 	 * Returns a new join fragment.
@@ -232,7 +234,7 @@ class DB {
 		else
 			return $f;
 	}
-	
+
 	/**
 	 * Returns a new order by fragment.
 	 *
@@ -246,7 +248,7 @@ class DB {
 		}
 		else
 			return $f;
-	}	
+	}
 
 	/**
 	 * Returns a new group by fragment.
@@ -261,35 +263,35 @@ class DB {
 		}
 		else
 			return $f;
-	}	
-	
+	}
+
 	/**
 	 * Quotes a string literal for inclusion in a template.
-	 * 
+	 *
 	 * @param string $str
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function quote($str) {
 		return "'" . strtr($str, array("'" => "''")) . "'";
 	}
-	
+
 	/**
 	 * Takes a string literal quoted for inclusion in a template and returns the unquoted string.
-	 * 
+	 *
 	 * @param string $str
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function unquote($str) {
 		return strtr(substr($str, 1, -1), array("''" => "'"));
 	}
-	
+
 	/**
 	 * Quotes an identifier for inclusion in a template.
-	 * 
+	 *
 	 * @param mixed $str Array or string.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function quote_identifier($str) {
@@ -298,15 +300,15 @@ class DB {
 		else
 			return "`" . strtr($str, array("`" => "``")) . "`";
 	}
-	
+
 	/**
 	 * Takes an identifier quoted for inclusion in a template and returns the unquoted string.
-	 * 
+	 *
 	 * @param string $str
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function unquote_identifier($str) {
 		return strtr(substr($str, 1, -1), array("``" => "`"));
-	}	
+	}
 }

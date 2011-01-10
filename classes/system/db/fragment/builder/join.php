@@ -73,6 +73,22 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	}
 
 	/**
+	 * Adds an operand to the expression, using a comma join. When called on an empty expression, the operator is ignored.
+	 *
+	 * @param mixed $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
+	 * @param \Glue\DB\Fragment_Table $operand Initialiazed with the join operand.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Join
+	 */
+	public function comma($table, &$operand = null) {
+		return $this->add(
+			$table,
+			$this->is_empty() ? null : \Glue\DB\DB::COMMA,
+			$operand
+		);
+	}
+
+	/**
 	 * Adds an operand to the expression.
 	 *
 	 * @param mixed $table $table Right operand of the join. It may be a table name, a table-alias array or any fragment (most likely a join fragment for nested joins).
@@ -84,9 +100,9 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	protected function add($table, $operator, &$operand) {
 		// Build operand :
 		if (is_string($table))
-			$operand = new \Glue\DB\Fragment_Table($table);
+			$operand = db::table($table);
 		elseif (is_array($table))
-			$operand = new \Glue\DB\Fragment_Table($table[0], $table[1]);
+			$operand = db::table($table[0], $table[1]);
 		else
 			$operand = $table;
 

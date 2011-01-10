@@ -294,8 +294,6 @@ abstract class Connection extends PDO {
 		elseif ($fragment instanceof \Glue\DB\Fragment_Column)
 			return $this->compile_column($fragment);
 		elseif ($fragment instanceof \Glue\DB\Fragment_Item) {
-
-			// Items :
 			if ($fragment instanceof \Glue\DB\Fragment_Item_Bool)
 				return $this->compile_item_bool($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Join)
@@ -308,11 +306,8 @@ abstract class Connection extends PDO {
 				return $this->compile_item_select($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
-
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Builder) {
-
-			// Builders :
 			if ($fragment instanceof \Glue\DB\Fragment_Builder_Bool)
 				return $this->compile_builder_bool($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Join)
@@ -325,42 +320,21 @@ abstract class Connection extends PDO {
 				return $this->compile_builder_select($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
-
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Query) {
-
-			// Queries :
-			if ($fragment instanceof \Glue\DB\Fragment_Query_Select)
-				return $this->compile_query_select($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Delete)
-				return $this->compile_query_delete($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Update)
-				return $this->compile_query_update($fragment);
+			if ($fragment instanceof \Glue\DB\Fragment_Query_Where) {
+				if ($fragment instanceof \Glue\DB\Fragment_Query_Where_Select)
+					return $this->compile_query_where_select($fragment);
+				elseif ($fragment instanceof \Glue\DB\Fragment_Query_Where_Delete)
+					return $this->compile_query_where_delete($fragment);
+				elseif ($fragment instanceof \Glue\DB\Fragment_Query_Where_Update)
+					return $this->compile_query_where_update($fragment);
+			}
 			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Insert)
 				return $this->compile_query_insert($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
-
 		}
-			/*
-		elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Setlist)
-			return $this->compile_builder_setlist($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Rowlist)
-			return $this->compile_builder_rowlist($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Columns)
-			return $this->compile_builder_columns($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Query_Select)
-			return $this->compile_query_select($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Query_Delete)
-			return $this->compile_query_delete($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Query_Update)
-			return $this->compile_query_update($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Query_Insert)
-			return $this->compile_query_insert($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Assignment)
-			return $this->compile_assignment($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Row)
-			return $this->compile_row($fragment);*/
 		else
 			throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 	}
@@ -531,6 +505,7 @@ abstract class Connection extends PDO {
 				case \Glue\DB\DB::INNER :	$sql .= 'INNER JOIN ';			break;
 				case \Glue\DB\DB::RIGHT :	$sql .= 'RIGHT OUTER JOIN ';	break;
 				case \Glue\DB\DB::LEFT :	$sql .= 'LEFT OUTER JOIN ';		break;
+				case \Glue\DB\DB::COMMA :	$sql .= ', ';					break;
 			}
 		}
 
@@ -748,7 +723,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_select(\Glue\DB\Fragment_Query_Select $fragment) {
+	protected function compile_query_where_select(\Glue\DB\Fragment_Query_Where_Select $fragment) {
 		// Get data from fragment :
 		$selectsql	= $this->compile($fragment->columns());
 		$fromsql	= $this->compile($fragment->from());
