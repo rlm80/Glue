@@ -373,10 +373,10 @@ EOD;
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
-		$update1 = db::update('users', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
+		$update1 = db::update('users', $a)->set($a->login, 'test')->set($a->password, 'test')->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = 'test', `password` = 'test' WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
 /*

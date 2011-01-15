@@ -113,7 +113,7 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	}
 
 	/**
-	 * Initializes last on clause with given parameters and return $this. If no parameters
+	 * Adds item to last on clause with AND connector and returns $this. If no parameters
 	 * given, returns last on clause.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Join
@@ -123,10 +123,20 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 			return $this->last()->on();
 		else {
 			$args = func_get_args();
-			call_user_func_array(array($this->last()->on(), 'init'), $args);
-			return $this;
+			return call_user_func_array(array($this, '_and'), $args);
 		}
 	}
+	
+	/**
+	 * Fowards to last on clause.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Join
+	 */
+	public function _and() {
+		$args = func_get_args();
+		call_user_func_array(array($this->last()->on(), '_and'), $args);
+		return $this;
+	}	
 
 	/**
 	 * Fowards to last on clause.
@@ -135,28 +145,7 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 	 */
 	public function _or() {
 		$args = func_get_args();
-		call_user_func_array(array($this->on(), '_or'), $args);
-		return $this;
-	}
-
-	/**
-	 * Fowards to last on clause.
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Join
-	 */
-	public function _and() {
-		$args = func_get_args();
-		call_user_func_array(array($this->on(), '_and'), $args);
-		return $this;
-	}
-
-	/**
-	 * Fowards to last on clause. TODO useful ?
-	 *
-	 * @return \Glue\DB\Fragment_Builder_Join
-	 */
-	public function not() {
-		$this->on()->not();
+		call_user_func_array(array($this->last()->on(), '_or'), $args);
 		return $this;
 	}
 

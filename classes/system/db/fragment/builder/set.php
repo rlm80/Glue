@@ -21,8 +21,8 @@ class Fragment_Builder_Set extends \Glue\DB\Fragment_Builder {
 	 */
 	public function set($column, $to) {
 		$this->push(new \Glue\DB\Fragment_Item_Set(
-			$column	instanceof \Glue\DB\Fragment ? $column	: \Glue\DB\DB::tpl($column),
-			$to		instanceof \Glue\DB\Fragment ? $to		: \Glue\DB\DB::val($to)
+			$column,
+			$to instanceof \Glue\DB\Fragment ? $to : \Glue\DB\DB::val($to)
 		));
 		return $this;
 	}

@@ -93,7 +93,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * With parameters, initialize the from clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
+	 * With parameters, adds item to the from clause, connecting it with AND and returns $this : @see \Glue\DB\Fragment_Builder_Bool::and()
 	 * Without parameters : returns where clause.
 	 *
 	 * @return \Glue\DB\Fragment_Query_Update
@@ -101,8 +101,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->where, 'init'), $args);
-			return $this;
+			return call_user_func_array(array($this, 'andwhere'), $args);
 		}
 		else
 			return $this->where;

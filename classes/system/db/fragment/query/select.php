@@ -139,15 +139,15 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * @see \Glue\DB\Fragment_Builder_Bool::init() + return $this.
+	 * With parameters, adds item to the last on clause, connecting it with AND and returns $this : @see \Glue\DB\Fragment_Builder_Bool::and()
+	 * Without parameters : returns last on clause.
 	 *
 	 * @return \Glue\DB\Fragment_Query_Select
 	 */
 	public function on() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->from, 'on'), $args);
-			return $this;
+			return call_user_func_array(array($this, 'andon'), $args);
 		}
 		else
 			return $this->from->on();
@@ -176,7 +176,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * With parameters, initialize the from clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
+	 * With parameters, adds item to the from clause, connecting it with AND and returns $this : @see \Glue\DB\Fragment_Builder_Bool::and()
 	 * Without parameters : returns where clause.
 	 *
 	 * @return \Glue\DB\Fragment_Query_Select
@@ -184,8 +184,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	public function where() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->where, 'init'), $args);
-			return $this;
+			return call_user_func_array(array($this, 'andwhere'), $args);
 		}
 		else
 			return $this->where;
@@ -212,25 +211,9 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		call_user_func_array(array($this->where, '_or'), $args);
 		return $this;
 	}
-
+	
 	/**
-	 * With parameters, returns $this and add columns to the groupby list : @see \Glue\DB\Fragment_Builder_Groupby::groupby()
-	 * Without parameters : returns groupby list builder.
-	 *
-	 * @return \Glue\DB\Fragment_Query_Select
-	 */
-	public function groupby() {
-		if (func_num_args() > 0) {
-			$args = func_get_args();
-			call_user_func_array(array($this->groupby, 'groupby'), $args);
-			return $this;
-		}
-		else
-			return $this->groupby;
-	}
-
-	/**
-	 * With parameters, initialize the having clause and returns $this : @see \Glue\DB\Fragment_Builder_Bool::init()
+	 * With parameters, adds item to the having clause, connecting it with AND and returns $this : @see \Glue\DB\Fragment_Builder_Bool::and()
 	 * Without parameters : returns where clause.
 	 *
 	 * @return \Glue\DB\Fragment_Query_Select
@@ -238,8 +221,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	public function having() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			call_user_func_array(array($this->having, 'init'), $args);
-			return $this;
+			return call_user_func_array(array($this, 'andhaving'), $args);
 		}
 		else
 			return $this->having;
@@ -265,6 +247,22 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 		$args = func_get_args();
 		call_user_func_array(array($this->having, '_or'), $args);
 		return $this;
+	}	
+
+	/**
+	 * With parameters, returns $this and add columns to the groupby list : @see \Glue\DB\Fragment_Builder_Groupby::groupby()
+	 * Without parameters : returns groupby list builder.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function groupby() {
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			call_user_func_array(array($this->groupby, 'groupby'), $args);
+			return $this;
+		}
+		else
+			return $this->groupby;
 	}
 
 	/**

@@ -373,7 +373,7 @@ abstract class Connection extends PDO {
 		$replacements	= $fragment->replacements();
 
 		// Split template according to inline string litterals and identifiers :
-		$matches = preg_split("/((?:'(?:(?:''|[^'])*)')|(?:`(?:(?:``|[^`])*)`))/", $template, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$matches = preg_split("/('(?:''|[^'])*'|`(?:``|[^`])*`)/", $template, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Loop over matches and generate SQL :
 		$cn = $this;
@@ -607,10 +607,15 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_item_set(\Glue\DB\Fragment_Item_Set $fragment) {
 		// Get data from fragment :
-		$setsql	= $this->compile($fragment->set());
+		$set	= $fragment->set();
 		$tosql	= $this->compile($fragment->to());
+		
+		// Extract column from set string :
+		if ( ! preg_match("/`(?:``|[^`])*`$/", $set, $matches))
+			throw new Exception("Malformed column pseudo-SQL");
+		$column = \Glue\DB\DB::unquote_identifier($matches[0]);
 
-		return $columnsql . ' = ' . $tosql;
+		return $this->quote_identifier($column) . ' = ' . $tosql;
 	}
 
 	/**
@@ -801,15 +806,15 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_query_update(\Glue\DB\Fragment_Query_Update $fragment) {
 		// Get data from fragment :
-		$setlistsql	= $fragment->set()->sql($this);
-		$fromsql	= $fragment->from()->sql($this);
-		$wheresql	= $fragment->where()->sql($this);
-		$orderbysql	= $fragment->orderby()->sql($this);
+		$setsql		= $this->compile($fragment->set());
+		$tablesql	= $this->compile($fragment->table());
+		$wheresql	= $this->compile($fragment->where());
+		$orderbysql	= $this->compile($fragment->orderby());
 		$limit		= $fragment->limit();
 		$offset		= $fragment->offset();
 
 		// Mandatory :
-		$sql = 'UPDATE ' . $fromsql . ' SET ' . $setlistsql;
+		$sql = 'UPDATE ' . $tablesql . ' SET ' . $setsql;
 
 		// Optional :
 		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;

@@ -12,7 +12,7 @@ namespace Glue\System\DB;
 
 class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	/**
-	 * @var \Glue\DB\Fragment Left side of the assignment.
+	 * @var string Column name.
 	 */
 	protected $set;
 
@@ -24,10 +24,10 @@ class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	/**
 	 * Constructor.
 	 *
-	 * @param \Glue\DB\Fragment $set
+	 * @param string $set
 	 * @param \Glue\DB\Fragment $to
 	 */
-	public function __construct(\Glue\DB\Fragment $set, \Glue\DB\Fragment $to) {
+	public function __construct($set, \Glue\DB\Fragment $to) {
 		$this->set($set);
 		$this->to($to);
 	}
@@ -35,11 +35,11 @@ class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	/**
 	 * Left side of the assignment getter/setter.
 	 *
-	 * @param \Glue\DB\Fragment $set
+	 * @param string $set
 	 *
 	 * @return \Glue\DB\Fragment_Item_Set
 	 */
-	public function set(\Glue\DB\Fragment $set = null) {
+	public function set($set = null) {
 		if (func_num_args() === 0)
 			return $this->set;
 		else {
@@ -55,7 +55,7 @@ class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	 *
 	 * @return \Glue\DB\Fragment_Item_Set
 	 */
-	public function set(\Glue\DB\Fragment $to = null) {
+	public function to(\Glue\DB\Fragment $to = null) {
 		if (func_num_args() === 0)
 			return $this->to;
 		else {
