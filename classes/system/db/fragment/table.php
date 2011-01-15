@@ -91,6 +91,16 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	}
 
 	/**
+	 * Returns quoted alias for inclusion in pseudo-SQL string.
+	 *
+	 * Useful for columns that aren't valid PHP identifiers and so cannot be included in pseudo-SQL
+	 * with $u->col .
+	 */
+	public function __toString() {
+		return \Glue\DB\DB::quote_identifier(empty($this->alias) ? $this->table : $this->alias);
+	}
+
+	/**
 	 * Generate unique alias for table $table.
 	 *
 	 * @param $table

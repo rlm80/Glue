@@ -209,27 +209,27 @@ EOD;
 	static private function test_fragments() {
 		$tests = array(
 			'value - string'	=> array(
-					db::value("test'test"),
+					db::val("test'test"),
 					"'test\'test'"
 				),
 			'value - integer' 	=> array(
-					db::value(10),
+					db::val(10),
 					"10"
 				),
 			'value - array'	=> array(
-					db::value(array("test'test", 10)),
+					db::val(array("test'test", 10)),
 					"('test\'test',10)"
 				),
 			'value - float'		=> array(
-					db::value(10.5),
+					db::val(10.5),
 					"10.5"
 				),
 			'value - boolean'	=> array(
-					db::value(false),
+					db::val(false),
 					"FALSE"
 				),
 			'value - null'		=> array(
-					db::value(null),
+					db::val(null),
 					"NULL"
 				),
 			'template - simple' => array(
@@ -367,19 +367,19 @@ EOD;
 			"SELECT * FROM `users` AS `a` LEFT OUTER JOIN `users` AS `b` ON (1=1) AND (2=2) RIGHT OUTER JOIN `users` AS `c` ON (3=3) OR (4=4)"
 		);
 
-/*
-		$delete1 = db::delete('glusers', $a)->where("$a->login = 'test'");
+		$delete1 = db::delete('users', $a)->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query delete'] = array(
 			$delete1,
-			"DELETE FROM `glusers` WHERE (`glusers`.`login` = 'test')"
+			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
-		$update1 = db::update('glusers', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'");
+		$update1 = db::update('users', $a)->set($a->login, 'test')->and($a->password, 'test')->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `glusers` SET `glusers`.`login` = 'test', `glusers`.`password` = 'test' WHERE (`glusers`.`login` = 'test')"
+			"UPDATE `users` SET `users`.`login` = 'test', `users`.`password` = 'test' WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
+/*
 		$insert1 = db::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2);
 		$tests['query insert'] = array(
 			$insert1,

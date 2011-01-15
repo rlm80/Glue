@@ -304,6 +304,8 @@ abstract class Connection extends PDO {
 				return $this->compile_item_groupby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Select)
 				return $this->compile_item_select($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Set)
+				return $this->compile_item_set($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
@@ -318,18 +320,18 @@ abstract class Connection extends PDO {
 				return $this->compile_builder_groupby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Select)
 				return $this->compile_builder_select($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Set)
+				return $this->compile_builder_set($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Query) {
-			if ($fragment instanceof \Glue\DB\Fragment_Query_Where) {
-				if ($fragment instanceof \Glue\DB\Fragment_Query_Where_Select)
-					return $this->compile_query_where_select($fragment);
-				elseif ($fragment instanceof \Glue\DB\Fragment_Query_Where_Delete)
-					return $this->compile_query_where_delete($fragment);
-				elseif ($fragment instanceof \Glue\DB\Fragment_Query_Where_Update)
-					return $this->compile_query_where_update($fragment);
-			}
+			if ($fragment instanceof \Glue\DB\Fragment_Query_Select)
+				return $this->compile_query_select($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Delete)
+				return $this->compile_query_delete($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Update)
+				return $this->compile_query_update($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Insert)
 				return $this->compile_query_insert($fragment);
 			else
@@ -597,6 +599,21 @@ abstract class Connection extends PDO {
 	}
 
 	/**
+	 * Compiles Fragment_Item_Set fragments into an SQL string.
+	 *
+	 * @param \Glue\DB\Fragment_Item_Set $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_item_set(\Glue\DB\Fragment_Item_Set $fragment) {
+		// Get data from fragment :
+		$setsql	= $this->compile($fragment->set());
+		$tosql	= $this->compile($fragment->to());
+
+		return $columnsql . ' = ' . $tosql;
+	}
+
+	/**
 	 * Compiles Fragment_Builder fragments into an SQL string.
 	 *
 	 * @param \Glue\DB\Fragment_Builder $fragment
@@ -675,13 +692,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Setlist fragments into an SQL string.
+	 * Compiles Fragment_Builder_Set fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Builder_Setlist $fragment
+	 * @param \Glue\DB\Fragment_Builder_Set $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_setlist(\Glue\DB\Fragment_Builder_Setlist $fragment) {
+	protected function compile_builder_set(\Glue\DB\Fragment_Builder_Set $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -723,7 +740,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return string
 	 */
-	protected function compile_query_where_select(\Glue\DB\Fragment_Query_Where_Select $fragment) {
+	protected function compile_query_select(\Glue\DB\Fragment_Query_Select $fragment) {
 		// Get data from fragment :
 		$selectsql	= $this->compile($fragment->columns());
 		$fromsql	= $this->compile($fragment->from());
@@ -757,8 +774,9 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_query_delete(\Glue\DB\Fragment_Query_Delete $fragment) {
 		// Get data from fragment :
-		$fromsql	= $fragment->from()->sql($this);
-		$wheresql	= $fragment->where()->sql($this);
+		$fromsql	= $this->compile($fragment->table());
+		$wheresql	= $this->compile($fragment->where());
+		$orderbysql	= $this->compile($fragment->orderby());
 		$limit		= $fragment->limit();
 		$offset		= $fragment->offset();
 
@@ -767,6 +785,7 @@ abstract class Connection extends PDO {
 
 		// Optional :
 		if ( ! empty($wheresql))	$sql .= ' WHERE '	. $wheresql;
+		if ( ! empty($orderbysql))	$sql .= ' ORDER BY '. $orderbysql;
 		if (   isset($limit))		$sql .= ' LIMIT '	. $limit;
 		if (   isset($offset))		$sql .= ' OFFSET '	. $offset;
 
@@ -820,21 +839,6 @@ abstract class Connection extends PDO {
 				' VALUES ' . $valuessql;
 
 		return $sql;
-	}
-
-	/**
-	 * Compiles Fragment_Assignment fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Assignment $fragment
-	 *
-	 * @return string
-	 */
-	protected function compile_assignment(\Glue\DB\Fragment_Assignment $fragment) {
-		// Get data from fragment :
-		$columnsql	= $fragment->column()->sql($this);
-		$tosql		= $fragment->to()->sql($this);
-
-		return $columnsql . ' = ' . $tosql;
 	}
 
 	/**

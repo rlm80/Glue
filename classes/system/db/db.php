@@ -114,15 +114,15 @@ class DB {
 	}
 
 	/**
-	 * Returns a new select query object and forwards parameters to Fragment_Query_Where_Select::from().
+	 * Returns a new select query object and forwards parameters to Fragment_Query_Select::from().
 	 *
 	 * @param mixed $table
 	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Where_Select
+	 * @return \Glue\DB\Fragment_Query_Select
 	 */
 	public static function select($table = null, &$operand = null) {
-		$f = new \Glue\DB\Fragment_Query_Where_Select();
+		$f = new \Glue\DB\Fragment_Query_Select();
 		if (func_num_args() > 0) {
 			$args = func_get_args();
 			return $f->from($table, $operand);
@@ -132,28 +132,28 @@ class DB {
 	}
 
 	/**
-	 * Returns a new update query object and forwards parameters to Fragment_Query_Where_Update::table().
+	 * Returns a new update query object and forwards parameters to Fragment_Query_Update::table().
 	 *
 	 * @param mixed $table
 	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Where_Table_Update
+	 * @return \Glue\DB\Fragment_Query_Update
 	 */
 	public static function update($table, &$operand = null) {
-		$query = new \Glue\DB\Fragment_Query_Where_Table_Update();
+		$query = new \Glue\DB\Fragment_Query_Update();
 		return $query->table($table, $operand);
 	}
 
 	/**
-	 * Returns a new update query object and forwards parameters to Fragment_Query_Where_Delete::table().
+	 * Returns a new update query object and forwards parameters to Fragment_Query_Delete::table().
 	 *
 	 * @param mixed $table
 	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Where_Table_Delete
+	 * @return \Glue\DB\Fragment_Query_Delete
 	 */
 	public static function delete($table, &$operand = null) {
-		$query = new \Glue\DB\Fragment_Query_Where_Table_Delete();
+		$query = new \Glue\DB\Fragment_Query_Delete();
 		return $query->table($table, $operand);
 	}
 
@@ -163,10 +163,10 @@ class DB {
 	 * @param mixed $table
 	 * @param mixed $operand
 	 *
-	 * @return \Glue\DB\Fragment_Query_Where_Table_Insert
+	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
 	public static function insert($table, &$operand = null) {
-		$query = new \Glue\DB\Fragment_Query_Where_Table_Insert();
+		$query = new \Glue\DB\Fragment_Query_Insert();
 		return $query->table($table, $operand);
 	}
 
@@ -177,7 +177,7 @@ class DB {
 	 *
 	 * @return \Glue\DB\Fragment_Value
 	 */
-	public static function value($value = null) {
+	public static function val($value = null) {
 		return new \Glue\DB\Fragment_Value($value);
 	}
 
@@ -266,7 +266,7 @@ class DB {
 	}
 
 	/**
-	 * Quotes a string literal for inclusion in a template.
+	 * Quotes a string literal for inclusion in a template. TODO rename this q() ?
 	 *
 	 * @param string $str
 	 *
@@ -288,7 +288,7 @@ class DB {
 	}
 
 	/**
-	 * Quotes an identifier for inclusion in a template.
+	 * Quotes an identifier for inclusion in a template. TODO rename this qi() ?
 	 *
 	 * @param mixed $str Array or string.
 	 *
