@@ -276,7 +276,7 @@ abstract class Connection extends PDO {
 	abstract public function get_formatter($dbtype);
 
 	/**
-	 * Compiles given fragment into an SQL string.
+	 * Compiles given fragment into an SQL string. TODO find a better way to do this than instanceof...
 	 *
 	 * @param \Glue\DB\Fragment $fragment
 	 * @param integer $style
@@ -291,8 +291,6 @@ abstract class Connection extends PDO {
 			return $this->compile_template($fragment);
 		elseif ($fragment instanceof \Glue\DB\Fragment_Table)
 			return $this->compile_table($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Column)
-			return $this->compile_column($fragment);
 		elseif ($fragment instanceof \Glue\DB\Fragment_Item) {
 			if ($fragment instanceof \Glue\DB\Fragment_Item_Bool)
 				return $this->compile_item_bool($fragment);
@@ -306,6 +304,10 @@ abstract class Connection extends PDO {
 				return $this->compile_item_select($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Set)
 				return $this->compile_item_set($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Values)
+				return $this->compile_item_values($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Columns)
+				return $this->compile_item_columns($fragment);
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
@@ -322,6 +324,10 @@ abstract class Connection extends PDO {
 				return $this->compile_builder_select($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Set)
 				return $this->compile_builder_set($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Values)
+				return $this->compile_builder_values($fragment);		
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Columns)
+				return $this->compile_builder_columns($fragment);	
 			else
 				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
@@ -612,6 +618,37 @@ abstract class Connection extends PDO {
 
 		return $setsql . ' = ' . $tosql;
 	}
+	
+	/**
+	 * Compiles Fragment_Item_Columns fragments into an SQL string.
+	 *
+	 * @param \Glue\DB\Fragment_Item_Columns $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_item_columns(\Glue\DB\Fragment_Item_Columns $fragment) {
+		return $this->quote_identifier($fragment->column());
+	}	
+	
+	/**
+	 * Compiles Fragment_Item_Values fragments into an SQL string.
+	 *
+	 * @param \Glue\DB\Fragment_Item_Values $fragment
+	 *
+	 * @return string
+	 */
+	protected function compile_item_values(\Glue\DB\Fragment_Item_Values $fragment) {
+		// Get data from fragment :
+		$values = $fragment->values();
+		
+		// Generate sql :
+		$sql = array();
+		foreach($values as $value)
+			$sql[] = $value instanceof \Glue\DB\Fragment ? $this->compile($value) : $this->quote_value($value);
+		$sql = '(' . implode(',', $sql) . ')';
+		
+		return $sql; 
+	}
 
 	/**
 	 * Compiles Fragment_Builder fragments into an SQL string.
@@ -703,13 +740,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Rowlist fragments into an SQL string.
+	 * Compiles Fragment_Builder_Values fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Builder_Rowlist $fragment
+	 * @param \Glue\DB\Fragment_Builder_Values $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_rowlist(\Glue\DB\Fragment_Builder_Rowlist $fragment) {
+	protected function compile_builder_values(\Glue\DB\Fragment_Builder_Values $fragment) {
 		return $this->compile_builder($fragment, ',');
 	}
 
@@ -721,16 +758,7 @@ abstract class Connection extends PDO {
 	 * @return string
 	 */
 	protected function compile_builder_columns(\Glue\DB\Fragment_Builder_Columns $fragment) {
-		// Get data from fragment :
-		$children = $fragment->children();
-
-		// Generate children fragment SQL strings :
-		$sqls = array();
-		foreach ($children as $child)
-			$sqls[] = $child->sql($this, \Glue\DB\Fragment_Column::STYLE_UNQUALIFIED);
-
-		// Return SQL :
-		return implode(', ', $sqls);
+		return $this->compile_builder($fragment, ', ');
 	}
 
 	/**
@@ -829,12 +857,12 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_query_insert(\Glue\DB\Fragment_Query_Insert $fragment) {
 		// Get data from fragment :
-		$intosql	= $fragment->into()->sql($this);
-		$valuessql	= $fragment->values()->sql($this);
-		$columnssql	= $fragment->columns()->sql($this);
+		$tablesql	= $this->compile($fragment->table());
+		$valuessql	= $this->compile($fragment->values());
+		$columnssql	= $this->compile($fragment->columns());
 
 		// Generate SQL :
-		$sql = 'INSERT INTO ' . $intosql .
+		$sql = 'INSERT INTO ' . $tablesql .
 				(empty($columnssql) ? '' : ' (' . $columnssql . ')') .
 				' VALUES ' . $valuessql;
 

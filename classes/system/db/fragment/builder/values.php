@@ -32,7 +32,7 @@ class Fragment_Builder_Values extends \Glue\DB\Fragment_Builder {
 			}
 			else {
 				// Array of arrays given, call this function recursively for each of them :
-				foreach($args as $arg)
+				foreach($args[0] as $arg)
 					$this->values($arg);
 			}
 		}

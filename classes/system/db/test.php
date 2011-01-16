@@ -390,13 +390,13 @@ EOD;
 			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);		
 
-/*
-		$insert1 = db::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2);
+
+		$insert1 = db::insert('users')->columns('login', 'password')->columns(array('id'))->values("test'1", "test'2", \Glue\DB\DB::tpl(':test'))->values(array("a", "b", "c"), array("d", "e", "f"))->values(array(array("a", "b", "c"), array("d", "e", "f")));
 		$tests['query insert'] = array(
 			$insert1,
-			"INSERT INTO `glusers` (`login`, `password`, `id`) VALUES ('test\'1','test\'2'),(1,2)"
+			"INSERT INTO `users` (`login`, `password`, `id`) VALUES ('test\'1','test\'2',:test),('a','b','c'),('d','e','f'),('a','b','c'),('d','e','f')"
 		);
-*/
+
 		// Checks :
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;
