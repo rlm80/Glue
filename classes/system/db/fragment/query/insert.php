@@ -5,19 +5,19 @@ namespace Glue\System\DB;
 /**
  * Fragment that represents an insert query.
  *
- * @package GlueDB
+ * @package Glue
  * @author Régis Lemaigre
  * @license MIT
  */
 
 class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var \Glue\DB\Fragment_Aliased_Table Table to insert rows into.
+	 * @var \Glue\DB\Fragment Table.
 	 */
-	protected $into;
+	protected $table;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Rowlist Row list.
+	 * @var \Glue\DB\Fragment_Builder_Values Values list.
 	 */
 	protected $values;
 
@@ -28,95 +28,58 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 
 	/**
 	 * Constructor.
-	 *
-	 * @param string $table_name Name of the table you're inserting rows into.
-	 * @param \Glue\DB\Fragment_Aliased_Table $alias Table alias object you may use to refer to the table columns.
 	 */
-	public function __construct($table_name = null, &$alias = null) { // TODO think...why is this constructor different into the one of select query ?
-		// Init children fragments :
-		$this->into		= new \Glue\DB\Fragment_Aliased_Table($table_name);
-		$this->values	= new \Glue\DB\Fragment_Builder_Rowlist();
+	public function __construct() {
+		$this->values	= new \Glue\DB\Fragment_Builder_Values();
 		$this->columns	= new \Glue\DB\Fragment_Builder_Columns();
-
-		// Set up dependecies :
-		$this->into->register_user($this);
-		$this->values->register_user($this);
-		$this->columns->register_user($this);
-
-		// Set up dependecies :
-		$this->into->context($this);
-		$this->values->context($this);
-		$this->columns->context($this);
-
-		// Initialize alias parameter :
-		$alias = $this->into;
 	}
 
 	/**
-	 * Into table getter/setter.
+	 * With parameters, initialize the table and returns $this.
+	 * Without parameters : returns table.
 	 *
-	 * @param mixed $table_name Table name.
-	 *
-	 * @return mixed
+	 * @param string $table
+	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
-	public function into($table_name = null) {
+	public function table($table = null, &$operand = null) {
 		if (func_num_args() > 0) {
-			$this->into->aliased(new \Glue\DB\Fragment_Table($table_name));
+			$operand = \Glue\DB\DB::table($table, null);
+			$this->table = $operand;
 			return $this;
 		}
 		else
-			return $this->into;
+			return $this->table;
 	}
 
 	/**
-	 * Returns the values fragment, initializing it with given parameters if any.
-	 * You may pass an array of values or an unlimited number of parameters.
+	 * With parameters, adds rows of values.
+	 * Without parameters, returns rows of values list.
 	 *
-	 * @return \Glue\DB\Fragment_Builder_Rowlist
+	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
 	public function values() {
 		if (func_num_args() > 0) {
 			$args = func_get_args();
-			$this->values->reset();
-			return call_user_func_array(array($this->values, 'and'), $args);
+			call_user_func_array(array($this->values, 'values'), $args);
+			return $this;
 		}
 		else
 			return $this->values;
 	}
 
 	/**
-	 * Returns the columns fragment, initializing it with given parameters if any.
-	 * You may pass an array of columns or an unlimited number of parameters.
+	 * With parameters, adds columns to the column list.
+	 * Without parameters, returns column list.
 	 *
-	 * @return \Glue\DB\Fragment_Builder_Columns
+	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
 	public function columns() {
 		if (func_num_args() > 0) {
-			// Get columns :
 			$args = func_get_args();
-			if (is_array($args[0]))
-				$columns = $args[0];
-			else
-				$columns = $args;
-
-			// Add columns :
-			$this->columns->reset();
-			foreach($columns as $column)
-				$this->columns->and($column);
+			call_user_func_array(array($this->columns, 'columns'), $args);
+			return $this;
 		}
-		return $this->columns;
-	}
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_query_insert($this, $style);
+		else
+			return $this->columns;
 	}
 }

@@ -12,7 +12,7 @@ namespace Glue\System\DB;
 
 class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	/**
-	 * Adds a list of columns to the order by list.
+	 * Adds a list of columns to the order by list. TODO make so that it is possible to pass an array
 	 * 
 	 * A parameter can be :
 	 * - a string (default order = asc),

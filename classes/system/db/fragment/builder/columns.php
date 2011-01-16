@@ -12,27 +12,24 @@ namespace Glue\System\DB;
 
 class Fragment_Builder_Columns extends \Glue\DB\Fragment_Builder {
 	/**
-	 * Adds an column at the end of the columns list.
-	 *
-	 * @param \Glue\DB\Fragment_Column $column
+	 * Adds columns at the end of the column list. Accepts :
+	 * - a list of columns,
+	 * - an array of columns.
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Columns
 	 */
-	public function _and(\Glue\DB\Fragment_Column $column) {
-		$this->push($column);
+	public function columns() {
+		// Get array of columns to add :
+		$args = func_get_args();
+		if (is_array($args[0]))
+			$columns = $args[0];
+		else 
+			$columns = $args; 
+			
+		// Add columns :
+		foreach($columns as $column)
+			$this->push(new \Glue\DB\Fragment_Item_Columns($column));
+			
 		return $this;
-	}
-
-	/**
-	 * Forwards call to given connection.
-	 *
-	 * @param \Glue\DB\Connection $cn
-	 * @param integer $style
-	 *
-	 * @return string
-	 */
-	protected function compile(\Glue\DB\Connection $cn, $style) {
-		// Forwards call to connection :
-		return $cn->compile_builder_columns($this, $style);
 	}
 }

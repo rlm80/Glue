@@ -373,11 +373,22 @@ EOD;
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
-		$update1 = db::update('users', $a)->set($a->login, 'test')->set($a->password, 'test')->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
+		$update1 = db::update('users', $a)->set('login', 'test')->set('password', \Glue\DB\DB::tpl(':pass'))->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `users` SET `login` = 'test', `password` = 'test' WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
+		
+		$update2 = db::update('users', $a)
+					->set(array(
+						'login' => 'test',
+						'password' => \Glue\DB\DB::tpl(':pass')
+					))
+					->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
+		$tests['query update array'] = array(
+			$update2,
+			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
+		);		
 
 /*
 		$insert1 = db::insert('glusers', $a)->columns($a->login, $a->password)->and($a->id)->values("test'1", "test'2")->and(1, 2);

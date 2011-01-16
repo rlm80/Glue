@@ -48,21 +48,13 @@ class Fragment_Query_Delete extends \Glue\DB\Fragment_Query {
 	 * With parameters, initialize the table and returns $this.
 	 * Without parameters : returns table.
 	 *
-	 * @return \Glue\DB\Fragment_Query_Delete
+	 * @param string $table
+	 * @return \Glue\DB\Fragment_Query_Update
 	 */
 	public function table($table = null, &$operand = null) {
 		if (func_num_args() > 0) {
-			// Build table fragment :
-			if (is_string($table))
-				$operand = \Glue\DB\DB::table($table, null);
-			elseif (is_array($table))
-				$operand = \Glue\DB\DB::table($table[0], $table[1]);
-			else
-				$operand = $table;
-
-			// Assign table fragment :
+			$operand = \Glue\DB\DB::table($table, null);
 			$this->table = $operand;
-
 			return $this;
 		}
 		else

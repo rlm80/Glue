@@ -607,15 +607,10 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_item_set(\Glue\DB\Fragment_Item_Set $fragment) {
 		// Get data from fragment :
-		$set	= $fragment->set();
+		$setsql	= $this->quote_identifier($fragment->set());
 		$tosql	= $this->compile($fragment->to());
-		
-		// Extract column from set string :
-		if ( ! preg_match("/`(?:``|[^`])*`$/", $set, $matches))
-			throw new Exception("Malformed column pseudo-SQL");
-		$column = \Glue\DB\DB::unquote_identifier($matches[0]);
 
-		return $this->quote_identifier($column) . ' = ' . $tosql;
+		return $setsql . ' = ' . $tosql;
 	}
 
 	/**

@@ -12,18 +12,25 @@ namespace Glue\System\DB;
 
 class Fragment_Builder_Set extends \Glue\DB\Fragment_Builder {
 	/**
-	 * Adds an element at the end of the set list.
+	 * Adds elements at the end of the set list.
 	 *
-	 * @param string $column Pseudo-sql describing the column, or a fragment.
-	 * @param mixed $to A value to be assigned to the column, or a fragment.
-	 *
+	 * @param mixed $arg1 A column name, or a names => values mapping array.
+	 * @param mixed $arg2 A value to be assigned to the column (can also be a fragment).
 	 * @return \Glue\DB\Fragment_Item_Set
 	 */
-	public function set($column, $to) {
-		$this->push(new \Glue\DB\Fragment_Item_Set(
-			$column,
-			$to instanceof \Glue\DB\Fragment ? $to : \Glue\DB\DB::val($to)
-		));
+	public function set($arg1, $arg2 = null) {
+		if (is_string($arg1)) {
+			// Name, value pair given :
+			$this->push(new \Glue\DB\Fragment_Item_Set(
+				$arg1,
+				$arg2 instanceof \Glue\DB\Fragment ? $arg2 : \Glue\DB\DB::val($arg2)
+			));
+		}
+		else {
+			// Names => values mapping given :			
+			foreach($arg1 as $col => $val)
+				$this->set($col, $val);
+		}
 		return $this;
 	}
 }

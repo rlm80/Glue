@@ -54,21 +54,13 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	 * With parameters, initialize the table and returns $this.
 	 * Without parameters : returns table.
 	 *
+	 * @param string $table
 	 * @return \Glue\DB\Fragment_Query_Update
 	 */
 	public function table($table = null, &$operand = null) {
 		if (func_num_args() > 0) {
-			// Build table fragment :
-			if (is_string($table))
-				$operand = \Glue\DB\DB::table($table, null);
-			elseif (is_array($table))
-				$operand = \Glue\DB\DB::table($table[0], $table[1]);
-			else
-				$operand = $table;
-
-			// Assign table fragment :
+			$operand = \Glue\DB\DB::table($table, null);
 			$this->table = $operand;
-
 			return $this;
 		}
 		else
@@ -79,8 +71,8 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	 * With parameters, adds an element to the set list and returns $this : @see \Glue\DB\Fragment_Builder_Set::set()
 	 * Without parameters : returns the set list.
 	 *
-	 * @param mixed $set
-	 * @param mixed $to
+	 * @param mixed $arg1 A column name, or a names => values mapping array.
+	 * @param mixed $arg2 A value to be assigned to the column (can also be a fragment).
 	 * @return \Glue\DB\Fragment_Query_Update
 	 */
 	public function set($set = null, $to = null) {
