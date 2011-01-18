@@ -161,13 +161,12 @@ class DB {
 	 * Returns a insert query object.
 	 *
 	 * @param mixed $table
-	 * @param mixed $operand
 	 *
 	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
-	public static function insert($table, &$operand = null) {
+	public static function insert($table) {
 		$query = new \Glue\DB\Fragment_Query_Insert();
-		return $query->table($table, $operand);
+		return $query->table($table);
 	}
 
 	/**

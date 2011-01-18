@@ -81,8 +81,8 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	protected function db_table_list() {
-		throw new \Glue\DB\Exception("The Connection::db_table_list function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	protected function table_list_from_db() {
+		throw new \Glue\DB\Exception("The Connection::table_list_from_db function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
 	}
 
 

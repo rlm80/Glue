@@ -41,10 +41,9 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	 * @param string $table
 	 * @return \Glue\DB\Fragment_Query_Insert
 	 */
-	public function table($table = null, &$operand = null) {
+	public function table($table = null) {
 		if (func_num_args() > 0) {
-			$operand = \Glue\DB\DB::table($table, null);
-			$this->table = $operand;
+			$this->table = \Glue\DB\DB::table($table, null);
 			return $this;
 		}
 		else

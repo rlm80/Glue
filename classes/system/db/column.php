@@ -14,17 +14,17 @@ namespace Glue\System\DB;
 
 class Column {
 	/**
-	 * @var \Glue\DB\Table Table object this column belongs to.
+	 * @var string Id of the connection that owns the table of this column.
+	 */
+	protected $cnid;
+
+	/**
+	 * @var string Name of the table this column belongs to.
 	 */
 	protected $table;
 
 	/**
-	 * @var string Name of this column, as it is known to the application.
-	 */
-	protected $alias;
-
-	/**
-	 * @var string Name of this column, as it is known to the database.
+	 * @var string Name of this column.
 	 */
 	protected $name;
 
@@ -32,6 +32,11 @@ class Column {
 	 * @var string Native database type.
 	 */
 	protected $type;
+
+	/**
+	 * @var string Most appropriate PHP type to represent the values of this column.
+	 */
+	protected $phptype;
 
 	/**
 	 * @var string Whether or not the column is nullable.
@@ -54,25 +59,20 @@ class Column {
 	protected $scale;
 
 	/**
-	 * @var string Default value of the column (stored as is from the database, not type casted).
+	 * @var string Default value of the column.
 	 */
 	protected $default;
 
 	/**
-	 * @var boolean Whether or not the column auto-incrementing.
+	 * @var boolean Whether or not the column is auto-incrementing.
 	 */
 	protected $auto;
 
 	/**
-	 * @var \Glue\DB\Formatter
-	 */
-	protected $formatter;
-
-	/**
 	 * Constructor.
 	 */
-	public function __construct(\Glue\DB\Table $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto) {
-		// Init basic properties :
+	public function __construct($cnid, $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto, $phptype) {
+		$this->cnid			= $cnid;
 		$this->table		= $table;
 		$this->name			= $name;
 		$this->type			= $type;
@@ -82,19 +82,7 @@ class Column {
 		$this->scale		= $scale;
 		$this->default		= $default;
 		$this->auto			= $auto;
-
-		// Get from table object :
-		$this->formatter	= $this->table->_get_column_formatter($this);
-		$this->alias		= $this->table->_get_column_alias($this);
-	}
-
-	/**
-	 * Returns column alias.
-	 *
-	 * @return string
-	 */
-	public function alias() {
-		return $this->alias;
+		$this->phptype		= $phptype;
 	}
 
 	/**
@@ -107,12 +95,21 @@ class Column {
 	}
 
 	/**
+	 * Returns the connection that owns the table of this column.
+	 *
+	 * @return \Glue\DB\Connection
+	 */
+	public function cn() {
+		return \Glue\DB\DB::cn($this->cnid);
+	}
+
+	/**
 	 * Returns the table of this column.
 	 *
 	 * @return \Glue\DB\Table
 	 */
 	public function table() {
-		return $this->table;
+		return $this->cn()->table($this->table);
 	}
 
 	/**
@@ -130,16 +127,7 @@ class Column {
 	 * @return string
 	 */
 	public function phptype() {
-		return $this->formatter->type();
-	}
-
-	/**
-	 * Returns the formatter.
-	 *
-	 * @return \Glue\DB\Formatter
-	 */
-	public function formatter() {
-		return $this->formatter;
+		return $this->phptype;
 	}
 
 	/**
@@ -179,17 +167,12 @@ class Column {
 	}
 
 	/**
-	 * Returns the default value of the column (type casted).
-	 *
-	 * @param $typecast Whether or not to return typecasted data.
+	 * Returns the default value of the column.
 	 *
 	 * @return string
 	 */
-	public function _default($typecast = true) {
-		if ($typecast)
-			return $this->formatter->format($this->default);
-		else
-			return $this->default;
+	public function _default() {
+		return $this->default;
 	}
 
 	/**

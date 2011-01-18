@@ -23,7 +23,7 @@ class Test {
 		echo ("<pre>");
 		self::create_test_tables();
 		try {
-			self::test_introspection();
+			//self::test_introspection();
 			self::test_fragments();
 			//self::test_queries();
 		}
@@ -378,7 +378,7 @@ EOD;
 			$update1,
 			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
-		
+
 		$update2 = db::update('users', $a)
 					->set(array(
 						'login' => 'test',
@@ -388,7 +388,7 @@ EOD;
 		$tests['query update array'] = array(
 			$update2,
 			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
-		);		
+		);
 
 
 		$insert1 = db::insert('users')->columns('login', 'password')->columns(array('id'))->values("test'1", "test'2", \Glue\DB\DB::tpl(':test'))->values(array("a", "b", "c"), array("d", "e", "f"))->values(array(array("a", "b", "c"), array("d", "e", "f")));

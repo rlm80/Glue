@@ -54,8 +54,8 @@ class Connection_SQLite extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	protected function db_table_list() {
-		throw new \Glue\DB\Exception("The Connection::db_table_list function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+	protected function table_list_from_db() {
+		throw new \Glue\DB\Exception("The Connection::table_list_from_db function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**

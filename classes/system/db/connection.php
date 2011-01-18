@@ -133,16 +133,12 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Returns all the tables defined on this connection as an array indexed by table alias.
+	 * Returns all tables defined on this connection as an array of table objects indexed by table name.
 	 *
 	 * @return array
 	 */
 	public function tables() {
-		$tables	= array();
-		$list	= $this->table_list();
-		foreach ($list as $name)
-			$tables[$name] = $this->table($name);
-		return $tables;
+		return array_map(array($this, 'table'), $this->table_list());
 	}
 
 	/**
@@ -177,32 +173,10 @@ abstract class Connection extends PDO {
 	protected function table_list_from_cache() {
 		$path = 'db/tables/list/' . $this->id . '.tmp';
 		if ( ! $list = \Glue\Core::get_cache_entry($path)) {
-			$list = $this->create_table_list();
+			$list = $this->table_list_from_db();
 			\Glue\Core::create_cache_entry($path, $list);
 		}
 		return $list;
-	}
-
-	/**
-	 * Creates table list from scratch and returns it.
-	 *
-	 * @return array
-	 */
-	protected function create_table_list() {
-		// Get table names :
-		$tables = $this->db_table_list();
-
-		// Get view names :
-		$views	= array();
-		$dir	= \Glue\CLASSPATH_USER . 'db/table';
-		foreach(\Glue\Core::globr($dir , '*.php') as $file) {
-			$parts = explode('/', substr($file, strlen($dir) + 1, -4));
-			array_shift($parts);
-			$name = implode('_', $parts);
-			$views[$name] = $name;
-		}
-
-		return array_merge($tables, $views);
 	}
 
 	/**
@@ -210,7 +184,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return array
 	 */
-	abstract protected function db_table_list();
+	abstract protected function table_list_from_db();
 
 	/**
 	 * Loads a table object, stores it in cache, and returns it.
@@ -236,50 +210,25 @@ abstract class Connection extends PDO {
 	protected function table_from_cache($name) {
 		$path = 'db/tables/'  . $this->id . '/' . $name . '.tmp';
 		if ( ! $table = \Glue\Core::get_cache_entry($path)) {
-			$table = $this->create_table($name);
+			$table = $this->table_from_db($name);
 			\Glue\Core::create_cache_entry($path, $table);
 		}
 		return $table;
 	}
 
 	/**
-	 * Loads a table by instanciating the appropriate class.
-	 *
-	 * @param string $name
-	 *
-	 * @return \Glue\DB\Table
-	 */
-	protected function create_table($name) {
-		$class = 'Glue\\DB\\Table_' . ucfirst($this->id) . '_' . ucfirst($name);
-		if (class_exists($class))
-			return new $class($this->id, $name);
-		else
-			return new \Glue\DB\Table($this->id, $name);
-	}
-
-	/**
-	 * Returns table information by database introspection.
+	 * Returns table object built by database introspection.
 	 *
 	 * @param $name
 	 *
 	 * @return array
 	 */
-	abstract public function _intro_table($name);
+	abstract protected function table_from_db($name); // TODO
 
 	/**
-	 * Returns the appropriate formatter for given db type.
-	 *
-	 * @param string $dbtype
-	 *
-	 * @return \Glue\DB\Formatter
-	 */
-	abstract public function get_formatter($dbtype);
-
-	/**
-	 * Compiles given fragment into an SQL string. TODO find a better way to do this than instanceof...
+	 * Compiles given fragment into an SQL string.
 	 *
 	 * @param \Glue\DB\Fragment $fragment
-	 * @param integer $style
 	 *
 	 * @return string
 	 */
@@ -308,8 +257,6 @@ abstract class Connection extends PDO {
 				return $this->compile_item_values($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Columns)
 				return $this->compile_item_columns($fragment);
-			else
-				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Builder) {
 			if ($fragment instanceof \Glue\DB\Fragment_Builder_Bool)
@@ -325,11 +272,9 @@ abstract class Connection extends PDO {
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Set)
 				return $this->compile_builder_set($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Values)
-				return $this->compile_builder_values($fragment);		
+				return $this->compile_builder_values($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Columns)
-				return $this->compile_builder_columns($fragment);	
-			else
-				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
+				return $this->compile_builder_columns($fragment);
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Query) {
 			if ($fragment instanceof \Glue\DB\Fragment_Query_Select)
@@ -340,11 +285,10 @@ abstract class Connection extends PDO {
 				return $this->compile_query_update($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Query_Insert)
 				return $this->compile_query_insert($fragment);
-			else
-				throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 		}
-		else
-			throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
+
+		// No suitable function to compile fragment : throw exception
+		throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 	}
 
 	/* ***************************************************************************************************** */
@@ -449,24 +393,6 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Column fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Column $fragment
-	 *
-	 * @return string
-	 */
-	protected function compile_column(\Glue\DB\Fragment_Column $fragment) {
-		// Get column real name in database :
-		$column = $this->table($fragment->table_alias()->table())->column($fragment->column())->name();
-
-		// Generate SQL :
-		$alias = $fragment->table_alias()->alias();
-		$sql = $this->quote_identifier($alias) . '.' . $this->quote_identifier($column);
-
-		return $sql;
-	}
-
-	/**
 	 * Compiles Fragment_Item_Bool fragments into an SQL string.
 	 *
 	 * @param \Glue\DB\Fragment_Item_Bool $fragment
@@ -546,9 +472,7 @@ abstract class Connection extends PDO {
 		$order		= $fragment->order();
 
 		// Generate fragment SQL :
-		$sql = $this->compile($ordered);
-		if ( ! $ordered instanceof \Glue\DB\Fragment_Column)
-			$sql = '(' . $sql . ')';
+		$sql = '(' . $this->compile($ordered) . ')';
 
 		// Add ordering :
 		if (isset($order)) {
@@ -618,7 +542,7 @@ abstract class Connection extends PDO {
 
 		return $setsql . ' = ' . $tosql;
 	}
-	
+
 	/**
 	 * Compiles Fragment_Item_Columns fragments into an SQL string.
 	 *
@@ -628,8 +552,8 @@ abstract class Connection extends PDO {
 	 */
 	protected function compile_item_columns(\Glue\DB\Fragment_Item_Columns $fragment) {
 		return $this->quote_identifier($fragment->column());
-	}	
-	
+	}
+
 	/**
 	 * Compiles Fragment_Item_Values fragments into an SQL string.
 	 *
@@ -640,14 +564,14 @@ abstract class Connection extends PDO {
 	protected function compile_item_values(\Glue\DB\Fragment_Item_Values $fragment) {
 		// Get data from fragment :
 		$values = $fragment->values();
-		
+
 		// Generate sql :
 		$sql = array();
 		foreach($values as $value)
 			$sql[] = $value instanceof \Glue\DB\Fragment ? $this->compile($value) : $this->quote_value($value);
 		$sql = '(' . implode(',', $sql) . ')';
-		
-		return $sql; 
+
+		return $sql;
 	}
 
 	/**
@@ -870,33 +794,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Row fragments into an SQL string.
-	 *
-	 * @param \Glue\DB\Fragment_Row $fragment
-	 *
-	 * @return string
-	 */
-	protected function compile_row(\Glue\DB\Fragment_Row $fragment) {
-		// Get data from fragment :
-		$values = $fragment->values();
-
-		// Generate value fragments SQL strings :
-		$sqls = array();
-		foreach ($values as $value)
-			$sqls[] = $value->sql($this);
-
-		// Return SQL :
-		return '(' . implode(',', $sqls) . ')';
-	}
-
-	/**
 	 * Quotes an identifier according to current connection conventions.
 	 *
 	 * @param string $identifier
 	 *
 	 * @return string
 	 */
-	protected function quote_identifier($identifier) {
+	public function quote_identifier($identifier) {
 		$identifier = strtr($identifier, array('"' => '""'));
 		return '"' . $identifier . '"';
 	}
@@ -922,7 +826,7 @@ abstract class Connection extends PDO {
 		elseif (is_null($value))
 			return $this->quote_null($value);
 		else
-			throw new \Glue\DB\Exception("Cannot quote objects.");
+			throw new \Glue\DB\Exception("Cannot quote given data type.");
 	}
 
 	/**

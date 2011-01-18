@@ -152,7 +152,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	 *
 	 * @return array
 	 */
-	protected function db_table_list() {
+	protected function table_list_from_db() {
 		$stmt = $this->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = :dbname");
 		$stmt->execute(array(':dbname' => $this->dbname));
 		$tables = array();

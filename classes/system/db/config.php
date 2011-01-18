@@ -3,7 +3,7 @@
 namespace Glue\System\DB;
 
 /**
- * Config class.
+ * Config class. TODO keep this ?
  *
  * Config options are stored as properties of a singleton instance of this class.
  *
