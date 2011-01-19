@@ -23,7 +23,7 @@ class Test {
 		echo ("<pre>");
 		self::create_test_tables();
 		try {
-			//self::test_introspection();
+			self::test_introspection();
 			self::test_fragments();
 			//self::test_queries();
 		}
@@ -42,31 +42,6 @@ class Test {
 		db::cn()->exec("create table glusers (id integer auto_increment, login varchar(31), password varchar(31), primary key(id))");
 		db::cn()->exec("create table glprofiles (id integer auto_increment, email varchar(255), primary key(id))");
 		db::cn()->exec("create table glposts (id integer auto_increment, content text, gluser_id integer, primary key(id))");
-
-		// View definitions :
-		$dir	= \Glue\CLASSPATH_USER . 'db/table/default/';
-		$path	= $dir . 'glpersons.php';
-		$code = <<<'EOD'
-<?php
-
-  namespace Glue\User\DB;
-
-  class Table_Default_Glpersons extends \Glue\DB\Table {
-
-    protected function init_name() {
-      return 'glusers';
-    }
-
-    public function _get_column_alias(\Glue\DB\Column $column) {
-      if ($column->name() === 'login')
-        return 'name';
-      return parent::_get_column_alias($column); // Any other column identifier is unchanged
-    }
-  }
-?>
-EOD;
-		@mkdir($dir, 777, true);
-		file_put_contents($path, $code);
 
 		// Connection definitions :
 		$dir	= \Glue\CLASSPATH_USER . 'db/connection/';
@@ -109,15 +84,15 @@ EOD;
 		// Table list :
 		$list = \Glue\DB\DB::cn()->table_list();
 		sort($list);
-		$tests['table list'] = array('glintro,glpersons,glposts,glprofiles,glusers', implode(',', $list));
+		$tests['table list'] = array('glintro,glposts,glprofiles,glusers', implode(',', $list));
 
 		// Table exists :
-		$tests['table exists true'] = array(true, \Glue\DB\DB::cn()->table_exists('glpersons'));
+		$tests['table exists true'] = array(true, \Glue\DB\DB::cn()->table_exists('glposts'));
 		$tests['table exists false'] = array(false, \Glue\DB\DB::cn()->table_exists('glpersonsqsdf'));
 
 		// Tables :
 		$tables = \Glue\DB\DB::cn()->tables();
-		$tests['tables'] = array(5, count($tables));
+		$tests['tables'] = array(4, count($tables));
 
 		// Table data :
 		$table = \Glue\DB\DB::cn()->table('glintro');
@@ -172,13 +147,6 @@ EOD;
 		$tests['d scale'] = array(2, $c->scale());
 		$tests['d default'] = array(45.0, $c->default());
 		$tests['d auto'] = array(false, $c->auto());
-
-		// Views :
-		$v = \Glue\DB\DB::cn()->table('glpersons');
-		$tests['view name'] = array('glusers', $v->name());
-		$tests['view alias'] = array('glpersons', $v->alias());
-		$tests['view column name'] = array('login', $v->column('name')->name());
-		$tests['view column alias'] = array('name', $v->column('name')->alias());
 
 		// Connection list :
 		$list = \Glue\DB\DB::connection_list();

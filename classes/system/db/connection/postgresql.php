@@ -68,12 +68,14 @@ class Connection_PostgreSQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Returns table information by database introspection.
+	 * Returns table object built by database introspection.
 	 *
-	 * @return array
+	 * @param $name
+	 *
+	 * @return \Glue\DB\Table
 	 */
-	public function _intro_table($name) {
-		throw new \Glue\DB\Exception("The Connection::intro_table function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
+	protected function table_from_db($name) {
+		throw new \Glue\DB\Exception("The Connection::table_from_db function isn't implemeted for postgre. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.postgresql.org/docs/8.1/interactive/information-schema.html");
 	}
 
 	/**

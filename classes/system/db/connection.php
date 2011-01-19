@@ -221,7 +221,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @param $name
 	 *
-	 * @return array
+	 * @return \Glue\DB\Table
 	 */
 	abstract protected function table_from_db($name); // TODO
 
@@ -806,7 +806,7 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Quotes a value for inclusion into an SQL query.
+	 * Quotes a PHP value for inclusion into an SQL query. You may override this.
 	 *
 	 * @param mixed $value
 	 *
@@ -897,4 +897,14 @@ abstract class Connection extends PDO {
 	protected function quote_null($value) {
 		return 'NULL';
 	}
+
+	/**
+	 * Returns an anonymous function that will be used to cast strings coming from the database to the appropriate
+	 * PHP type for given column.
+	 *
+	 * @param \Glue\DB\Column $column
+	 *
+	 * @return function
+	 */
+	abstract public function _get_formatter(\Glue\DB\Column $column);
 }

@@ -39,14 +39,14 @@ class Connection_SQLite extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Loads a table by database introspection.
+	 * Returns table object built by database introspection.
 	 *
-	 * @param string $name
+	 * @param $name
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	public function _intro_table($name) {
-		throw new \Glue\DB\Exception("The Connection::intro_table function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
+	protected function table_from_db($name) {
+		throw new \Glue\DB\Exception("The Connection::table_from_db function isn't implemeted for sqlite. If you want this feature, please fork the project on github and add it. The docs to do it are here : http://www.sqlite.org/pragma.html");
 	}
 
 	/**

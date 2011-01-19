@@ -68,13 +68,13 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Return information about given table name on current connection by database introspection.
+	 * Returns table object built by database introspection.
 	 *
-	 * @param string $name
+	 * @param $name
 	 *
-	 * @return array
+	 * @return \Glue\DB\Table
 	 */
-	public function _intro_table($name) {
+	protected function table_from_db($name) {
 		// Query information schema to get columns information :
 		$stmt = $this->prepare("
 			SELECT
@@ -85,32 +85,44 @@ class Connection_MySQL extends \Glue\DB\Connection {
 				character_maximum_length,
 				numeric_precision,
 				numeric_scale,
-				extra
+				extra,
+				ordinal_position
 			FROM
 				information_schema.columns
 			WHERE
 				table_schema = :dbname AND
 				table_name = :tablename
+			ORDER BY
+				ordinal_position
 		");
 		$stmt->execute(array(
 			':dbname'		=> $this->dbname,
 			':tablename'	=> $name
 		));
 
-		// Create columns data structure :
+		// Create columns :
 		$columns = array();
 		foreach($stmt as $row) {
-			// Build array :
-			$columns[] = array(
-				'column'	=> trim(strtolower($row[0])),					// Column name
-				'type'		=> trim(strtolower($row[1])),					// Native database type
-				'nullable'	=> ($row[2] === 'YES' ? true : false),			// Whether or not the column is nullable
-				'default'	=> $row[3],										// Maximum length of a text column
-				'maxlength'	=> isset($row[4]) ? (integer) $row[4] : null,	// Precision of the column
-				'precision' => isset($row[5]) ? (integer) $row[5] : null,	// Scale of the column
-				'scale' 	=> isset($row[6]) ? (integer) $row[6] : null,	// Default value of the column (stored as is from the database, not type casted)
-				'auto'		=> trim(strtolower($row[7])) === 'auto_increment' ? true : false,	// Whether or not the column auto-incrementing
+			// Column name and type :
+			$colname = trim(strtolower($row[0]));
+
+			// Build object :
+			$column = new \Glue\DB\Column(
+				$this->id,
+				$name,
+				$colname,
+				trim(strtolower($row[1])),
+				($row[2] === 'YES' ? true : false),
+				isset($row[4]) ? (integer) $row[4] : null,
+				isset($row[5]) ? (integer) $row[5] : null,
+				isset($row[6]) ? (integer) $row[6] : null,
+				$row[3],
+				trim(strtolower($row[7])) === 'auto_increment' ? true : false,
+				(integer) $row[8]
 			);
+
+			// Add column to array :
+			$columns[$colname] = $column;
 		}
 
 		// No columns ? Means table didn't exist :
@@ -135,16 +147,18 @@ class Connection_MySQL extends \Glue\DB\Connection {
 			':tablename'	=> $name
 		));
 
-		// Create columns data structure :
+		// Create pk :
 		$pk = array();
-		foreach($stmt as $row)
-			$pk[] = $row[0];
+		foreach($stmt as $row) {
+			// Column name :
+			$colname = $row[0];
+
+			// Add column to pk :
+			$pk[$colname] = $columns[$colname];
+		}
 
 		// Create and return info :
-		return array(
-				'columns'	=> $columns,
-				'pk'		=> $pk
-			);
+		return new \Glue\DB\Table($this->id, $name, $columns, $pk);
 	}
 
 	/**
@@ -164,13 +178,17 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Returns the appropriate formatter for given db type.
+	 * Returns an anonymous function that will be used to cast strings coming from the database to the appropriate
+	 * PHP type for given column.
 	 *
-	 * @param string $dbtype
+	 * @param \Glue\DB\Column $column
 	 *
-	 * @return \Glue\DB\Formatter
+	 * @return function
 	 */
-	public function get_formatter($dbtype) {
+	public function _get_formatter(\Glue\DB\Column $column) {
+		// Get type :
+		$dbtype = $column->type();
+
 		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
 		if (preg_match('/^\S+/', $dbtype, $matches))
 			$dbtype = $matches[0];
@@ -182,34 +200,34 @@ class Connection_MySQL extends \Glue\DB\Connection {
 		switch ($dbtype) {
 			// Integer types :
 			case 'TINYINT'; case 'SMALLINT'; case 'MEDIUMINT'; case 'INT'; case 'BIGINT';
-				$formatter = new \Glue\DB\Formatter_Integer;
+				$formatter = function ($value) {return (integer) $value;};
 				break;
 
 			// Real types :
 			case 'FLOAT'; case 'DOUBLE'; case 'DECIMAL';
-				$formatter = new \Glue\DB\Formatter_Float;
+				$formatter = function ($value) {return (float) $value;};
 				break;
 
 			// Boolean types :
 			case 'BIT';
-				$formatter = new \Glue\DB\Formatter_Boolean;
+				$formatter = function ($value) {return (boolean) $value;};
 				break;
 
 			// String types :
 			case 'CHAR'; case 'VARCHAR'; case 'TINYTEXT'; case 'TEXT';
 			case 'MEDIUMTEXT'; case 'LONGTEXT'; case 'ENUM'; case 'SET';
-				$formatter = new \Glue\DB\Formatter_String;
+				$formatter = function ($value) {return (string) $value;};
 				break;
 
 			// Binary types :
 			case 'BINARY'; case 'VARBINARY'; case 'TINYBLOB'; case 'BLOB';
 			case 'MEDIUMBLOB'; case 'LONGBLOB';
-				$formatter = new \Glue\DB\Formatter_String; // TODO Is this the right thing to do ?
+				$formatter = function ($value) {return (string) $value;}; // TODO Is this the right thing to do ?
 				break;
 
 			// Date and time types :
 			case 'DATE'; case 'DATETIME'; case 'TIME'; case 'TIMESTAMP'; case 'YEAR';
-				$formatter = new \Glue\DB\Formatter_String; // TODO Is this the right thing to do ?
+				$formatter = function ($value) {return (string) $value;}; // TODO Is this the right thing to do ?
 				break;
 
 			// Default :

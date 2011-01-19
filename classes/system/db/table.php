@@ -24,12 +24,12 @@ class Table {
 	protected $name;
 
 	/**
-	 * @var array Columns of this table.
+	 * @var array Columns of this table, indexed by name.
 	 */
 	protected $columns;
 
 	/**
-	 * @var array Primary key columns of this table.
+	 * @var array Primary key columns of this table, indexed by name.
 	 */
 	protected $pk;
 
@@ -46,39 +46,6 @@ class Table {
 		$this->name		= $name;
 		$this->columns	= $columns;
 		$this->pk		= $pk;
-
-		// Get table info by introspection :
-		$info = $this->cn()->_intro_table($this->name);
-
-		// Build columns :
-		$this->columns = array();
-		foreach ($info['columns'] as $ic) {
-			// Create column object :
-			$column = new \Glue\DB\Column(
-					$this,
-					$ic['column'],
-					$ic['type'],
-					$ic['nullable'],
-					$ic['maxlength'],
-					$ic['precision'],
-					$ic['scale'],
-					$ic['default'],
-					$ic['auto']
-				);
-
-			// Add columns :
-			$this->columns[$column->name()] = $column;
-		}
-
-		// Build pk :
-		$this->pk = array();
-		foreach($info['pk'] as $col) {
-			foreach($this->columns as $column) {
-				if ($column->name() === $col)
-					break;
-			}
-			$this->pk[$column->name()] = $column;
-		}
 	}
 
 	/**
