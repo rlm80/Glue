@@ -131,6 +131,24 @@ abstract class Connection extends PDO {
 	protected function set_charset() {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
+	
+	public function prepare() {
+		$args = func_get_args();
+		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
+		return call_user_func_array('parent::prepare', $args);
+	}
+	
+	public function query() {
+		$args = func_get_args();
+		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
+		return call_user_func_array('parent::query', $args);		
+	}	
+	
+	public function exec() {
+		$args = func_get_args();
+		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
+		return call_user_func_array('parent::exec', $args);		
+	}	
 
 	/**
 	 * Returns all tables defined on this connection as an array of table objects indexed by table name.
@@ -223,7 +241,7 @@ abstract class Connection extends PDO {
 	 *
 	 * @return \Glue\DB\Table
 	 */
-	abstract protected function table_from_db($name); // TODO
+	abstract protected function table_from_db($name);
 
 	/**
 	 * Compiles given fragment into an SQL string.
@@ -540,7 +558,7 @@ abstract class Connection extends PDO {
 		$setsql	= $this->quote_identifier($fragment->set());
 		$tosql	= $this->compile($fragment->to());
 
-		return $setsql . ' = ' . $tosql;
+		return $setsql . ' = (' . $tosql . ')';
 	}
 
 	/**
@@ -899,12 +917,11 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Returns an anonymous function that will be used to cast strings coming from the database to the appropriate
-	 * PHP type for given column.
+	 * Returns most appropriate PHP type to represent values from columns of given database type.
 	 *
-	 * @param \Glue\DB\Column $column
+	 * @param string $dbtype
 	 *
-	 * @return function
+	 * @return string
 	 */
-	abstract public function _get_formatter(\Glue\DB\Column $column);
+	abstract public function phptype($dbtype);
 }

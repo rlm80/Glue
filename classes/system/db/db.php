@@ -189,7 +189,11 @@ class DB {
 	 * @return \Glue\DB\Fragment_Table
 	 */
 	public static function table($table, $alias = null) {
-		return new \Glue\DB\Fragment_Table($table, $alias);
+		// Written like this on purpose. See Fragment_Table constructor to understand : number of arguments matters.
+		if (func_num_args() === 1)
+			return new \Glue\DB\Fragment_Table($table);
+		else
+			return new \Glue\DB\Fragment_Table($table, $alias);
 	}
 
 	/**

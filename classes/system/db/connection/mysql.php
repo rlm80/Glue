@@ -105,20 +105,22 @@ class Connection_MySQL extends \Glue\DB\Connection {
 		foreach($stmt as $row) {
 			// Column name and type :
 			$colname = trim(strtolower($row[0]));
+			$coltype = trim(strtolower($row[1]));
 
 			// Build object :
 			$column = new \Glue\DB\Column(
 				$this->id,
 				$name,
 				$colname,
-				trim(strtolower($row[1])),
+				$coltype,
 				($row[2] === 'YES' ? true : false),
 				isset($row[4]) ? (integer) $row[4] : null,
 				isset($row[5]) ? (integer) $row[5] : null,
 				isset($row[6]) ? (integer) $row[6] : null,
 				$row[3],
 				trim(strtolower($row[7])) === 'auto_increment' ? true : false,
-				(integer) $row[8]
+				(integer) $row[8],
+				$this->phptype($coltype)
 			);
 
 			// Add column to array :
@@ -178,17 +180,13 @@ class Connection_MySQL extends \Glue\DB\Connection {
 	}
 
 	/**
-	 * Returns an anonymous function that will be used to cast strings coming from the database to the appropriate
-	 * PHP type for given column.
+	 * Returns most appropriate PHP type to represent values from columns of given database type.
 	 *
-	 * @param \Glue\DB\Column $column
+	 * @param string $dbtype
 	 *
-	 * @return function
+	 * @return string
 	 */
-	public function _get_formatter(\Glue\DB\Column $column) {
-		// Get type :
-		$dbtype = $column->type();
-
+	public function phptype($dbtype) {
 		// Extract first word from type (MySQL may return things like "float unsigned" sometimes) :
 		if (preg_match('/^\S+/', $dbtype, $matches))
 			$dbtype = $matches[0];
@@ -196,38 +194,38 @@ class Connection_MySQL extends \Glue\DB\Connection {
 		// Convert type to upper case :
 		$dbtype = strtoupper($dbtype);
 
-		// Create appropriate formatter :
+		// Compute appropriate php type :
 		switch ($dbtype) {
 			// Integer types :
 			case 'TINYINT'; case 'SMALLINT'; case 'MEDIUMINT'; case 'INT'; case 'BIGINT';
-				$formatter = function ($value) {return (integer) $value;};
+				$phptype = 'integer';
 				break;
 
 			// Real types :
 			case 'FLOAT'; case 'DOUBLE'; case 'DECIMAL';
-				$formatter = function ($value) {return (float) $value;};
+				$phptype = 'float';
 				break;
 
 			// Boolean types :
 			case 'BIT';
-				$formatter = function ($value) {return (boolean) $value;};
+				$phptype = 'boolean';
 				break;
 
 			// String types :
 			case 'CHAR'; case 'VARCHAR'; case 'TINYTEXT'; case 'TEXT';
 			case 'MEDIUMTEXT'; case 'LONGTEXT'; case 'ENUM'; case 'SET';
-				$formatter = function ($value) {return (string) $value;};
+				$phptype = 'string';
 				break;
 
 			// Binary types :
 			case 'BINARY'; case 'VARBINARY'; case 'TINYBLOB'; case 'BLOB';
 			case 'MEDIUMBLOB'; case 'LONGBLOB';
-				$formatter = function ($value) {return (string) $value;}; // TODO Is this the right thing to do ?
+				$phptype = 'string'; // TODO Is this the right thing to do ?
 				break;
 
 			// Date and time types :
 			case 'DATE'; case 'DATETIME'; case 'TIME'; case 'TIMESTAMP'; case 'YEAR';
-				$formatter = function ($value) {return (string) $value;}; // TODO Is this the right thing to do ?
+				$phptype = 'string'; // TODO Is this the right thing to do ?
 				break;
 
 			// Default :
@@ -235,7 +233,7 @@ class Connection_MySQL extends \Glue\DB\Connection {
 				throw new \Glue\DB\Exception("Unknown MySQL data type : " . $dbtype);
 		}
 
-		return $formatter;
+		return $phptype;
 	}
 
 	/**

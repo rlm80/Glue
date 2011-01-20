@@ -25,13 +25,13 @@ class Test {
 		try {
 			self::test_introspection();
 			self::test_fragments();
-			//self::test_queries();
+			self::test_queries();
 		}
 		catch (\Exception $e) {
-			self::drop_test_tables();
+			//self::drop_test_tables();
 			throw $e;
 		}
-		self::drop_test_tables();
+		//self::drop_test_tables();
 	}
 
 	static private function create_test_tables() {
@@ -117,6 +117,7 @@ EOD;
 		$tests['a scale'] = array(0, $c->scale());
 		$tests['a default'] = array(null, $c->default());
 		$tests['a auto'] = array(true, $c->auto());
+		$tests['a phptype'] = array('integer', $c->phptype());
 
 		$c = $table->column('b');
 		$tests['b name'] = array('b', $c->name());
@@ -125,8 +126,9 @@ EOD;
 		$tests['b maxlength'] = array(null, $c->maxlength());
 		$tests['b precision'] = array(10, $c->precision());
 		$tests['b scale'] = array(0, $c->scale());
-		$tests['b default'] = array(0, $c->default());
+		$tests['b default'] = array('0', $c->default());
 		$tests['b auto'] = array(false, $c->auto());
+		$tests['b phptype'] = array('integer', $c->phptype());
 
 		$c = $table->column('c');
 		$tests['c name'] = array('c', $c->name());
@@ -137,6 +139,7 @@ EOD;
 		$tests['c scale'] = array(null, $c->scale());
 		$tests['c default'] = array('test', $c->default());
 		$tests['c auto'] = array(false, $c->auto());
+		$tests['c phptype'] = array('string', $c->phptype());
 
 		$c = $table->column('d');
 		$tests['d name'] = array('d', $c->name());
@@ -145,8 +148,9 @@ EOD;
 		$tests['d maxlength'] = array(null, $c->maxlength());
 		$tests['d precision'] = array(6, $c->precision());
 		$tests['d scale'] = array(2, $c->scale());
-		$tests['d default'] = array(45.0, $c->default());
+		$tests['d default'] = array('45.00', $c->default());
 		$tests['d auto'] = array(false, $c->auto());
+		$tests['d phptype'] = array('float', $c->phptype());
 
 		// Connection list :
 		$list = \Glue\DB\DB::connection_list();
@@ -168,7 +172,7 @@ EOD;
 			if ($expected === $real)
 				echo "ok \n";
 			else {
-				echo "error ! " . $real . " doesn't match target " . $expected . "\n";
+				echo '<b style="color:blue">error ! ' . $real . " doesn't match target " . $expected . "\n</b>";
 				return false;
 			}
 		}
@@ -344,7 +348,7 @@ EOD;
 		$update1 = db::update('users', $a)->set('login', 'test')->set('password', \Glue\DB\DB::tpl(':pass'))->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = ('test'), `password` = (:pass) WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
 		$update2 = db::update('users', $a)
@@ -355,7 +359,7 @@ EOD;
 					->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update array'] = array(
 			$update2,
-			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = ('test'), `password` = (:pass) WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
 
@@ -372,7 +376,7 @@ EOD;
 			if ($f->sql() === $target)
 				echo "ok \n";
 			else {
-				echo "error ! " . $f->sql() . " doesn't match target " . $target . "\n";
+				echo '<b style="color:blue">error ! ' . $f->sql() . " doesn't match target " . $target . "\n</b>";
 				return false;
 			}
 		}
@@ -381,28 +385,54 @@ EOD;
 	}
 
 	private function test_queries() {
-		$statement = db::insert('glusers', $u)
-						->columns($u->login, $u->password)
-						->values('test1', 'test1')
-							->and('test2', 'test2')
-							->and('test3', 'test3')
-						->prepare();
+		// Test insert :
+		$query = db::insert('glusers')->columns('login', 'password')
+					->values('test1', 'test1')
+					->values('test2', 'test2')
+					->values('test3', 'test3');
+		db::cn()->exec($query);
+		
+		// Test prepared insert :
+		$query = db::insert('glprofiles')->columns('id', 'email')
+					->values(null, 'test1')
+					->values(null, 'test2')
+					->values(null, 'test3');
+		$stmt = db::cn()->prepare($query);
+		$stmt->execute();
+
+		// Test update :
+		$query = db::update('glusers', $u)
+					->set('password', db::select('glprofiles')->columns("count(*)"))
+					->where("$u->login = ?", 'test2');	
+		db::cn()->exec($query);		
+		
+		// Test Delete :
+		$query = db::delete('glprofiles', $u)->where("$u->id = ?", 3);	
+		db::cn()->exec($query);		
+
+		// Test Select :
+		$query = db::select('glusers', $a)
+					->left('glusers', $b)->on("$a->id = $b->id")
+					->where("$a->login LIKE ?", 'test%')
+					->columns($a->id, $a->login, $b->id, $b->login)
+					->where("$a->id = ?", 3)
+					->groupby($a->id, $a->login, $b->id, $b->login)
+					->orderby($a->id, $a->login, $b->id, $b->login)
+					->limit(1)->offset(0);	
+		$stmt = db::cn()->query($query);	
+		foreach($stmt as $row) {
+			//var_dump($row);
+			var_dump($a->id($row));
+		}
+/*
+		$query = db::select('glusers', $u)->columns($u->id, $u->login, $u->password);
+		$statement = db::cn()->prepare($query);
 		$statement->execute();
-
-		//print_r($statement); die;
-
-		$statement = db::select('glusers', $u)
-						->columns($u->id)->and($u->login)->and($u->password)
-						->prepare();
-		$statement->execute();
-
-		$statement->bindColumn(1, $test);
-
 		while($res = $statement->fetch(PDO::FETCH_BOTH)) {
 			//var_dump($u['login']);
 			var_dump($res);
 			echo $test;
-		}
+		}*/
 
 		/*
 		$stmt = db::cn()->query("select login as login from glusers");

@@ -74,14 +74,9 @@ class Column {
 	protected $position;
 
 	/**
-	 * @var function Function used to cast values coming from the database to the appropriate PHP type.
-	 */
-	protected $formatter;
-
-	/**
 	 * Constructor.
 	 */
-	public function __construct($cnid, $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto, $position) {
+	public function __construct($cnid, $table, $name, $type, $nullable, $maxlength, $precision, $scale, $default, $auto, $position, $phptype) {
 		$this->cnid			= $cnid;
 		$this->table		= $table;
 		$this->name			= $name;
@@ -93,6 +88,7 @@ class Column {
 		$this->default		= $default;
 		$this->auto			= $auto;
 		$this->position		= $position;
+		$this->phptype		= $phptype;
 	}
 
 	/**
@@ -177,7 +173,7 @@ class Column {
 	}
 
 	/**
-	 * Returns the default value of the column.
+	 * Returns the default value of the column (as returned by the database).
 	 *
 	 * @return string
 	 */
@@ -192,29 +188,6 @@ class Column {
 	 */
 	public function auto() {
 		return $this->auto;
-	}
-
-	/**
-	 * Cast value coming from the database to the appropriate PHP type.
-	 *
-	 * @param string $value
-	 *
-	 * @return mixed
-	 */
-	public function format($value) {
-		$formatter = $this->formatter();
-		return $formatter($value);
-	}
-
-	/**
-	 * Returns formatter.
-	 *
-	 * @return function
-	 */
-	protected function formatter() {
-		if ( ! isset($this->formatter))
-			$this->formatter = $this->cn()->_get_formatter($this);
-		return $this->formatter;
 	}
 
 	public function __call($name, $args) {

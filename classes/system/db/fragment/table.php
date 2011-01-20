@@ -75,15 +75,15 @@ class Fragment_Table extends \Glue\DB\Fragment {
 			return $this;
 		}
 	}
-
+	
 	/**
 	 * Returns identifier of given column quoted for inclusion in a template.
 	 *
 	 * @param string $column
 	 *
 	 * @return string
-	 */
-	public function __get($column) {
+	 */	
+	public function column($column) {
 		return \Glue\DB\DB::quote_identifier(array(
 			empty($this->alias) ? $this->table : $this->alias,
 			$column
@@ -91,13 +91,39 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	}
 
 	/**
-	 * Returns quoted alias for inclusion in pseudo-SQL string.
-	 *
-	 * Useful for columns that aren't valid PHP identifiers and so cannot be included in pseudo-SQL
-	 * with $u->col .
+	 * Fowards to column().
 	 */
-	public function __toString() {
-		return \Glue\DB\DB::quote_identifier(empty($this->alias) ? $this->table : $this->alias);
+	public function __get($column) {
+		return $this->column($column);
+	}
+	
+	/**
+	 * Extract value of given column from PDOStatement row and type-casts it appropriately.
+	 * 
+	 * @param string $column
+	 * @param array $row
+	 * @param string $cnid
+	 * 
+	 * @return mixed
+	 */
+	public function value($column, array $row, $cnid = null) {
+		// Get appropriate php type :
+		$phptype = \Glue\DB\DB::cn($cnid)->table($this->table)->column($column)->phptype();
+		
+		// Extract value from row :
+		$value = $row[$this->column($column)];
+		
+		// Cast value :
+		settype($value, $phptype);
+		
+		return $value;
+	}
+	
+	public function __call($name, $args) {
+		if (count($args) === 2)
+			return $this->value($name, $args[0], $args[1]);
+		else
+			return $this->value($name, $args[0]);
 	}
 
 	/**
