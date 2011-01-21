@@ -5,11 +5,11 @@ title: Guide
 
 <h2>Quick start guide</h2>
 
-<p>This is a simple cookbook to get started quickly. For explanations and details, refer the the rest of the guide.</p>
+<p>This is a simple cookbook to get you started quickly. It assumes your using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For explanations and details, refer to the rest of the guide.</p>
 
 <h3>Database configuration</h3>
 
-<p>Assuming you're using MySQL, edit the following file and replace the connection parameters with your own :</p>
+<p>Edit the following file and replace the connection parameters with your own :</p>
 
 {% highlight php %}
 <?php
@@ -24,6 +24,8 @@ title: Guide
   }
 ?>
 {% endhighlight %}
+
+<p>For more information about defining database connections, refer to <a href="/Glue/guide/dbal/connections.html">Defining database connections</a>.</p>
 
 <h3>Using your database connection as a PDO instance</h3>
 
@@ -51,10 +53,50 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<p>For more information about using PDO, refer to <a href="/Glue/guide/dbal/pdo.html">PDO introduction</a>.</p>
+
 <h3>Using the query builder</h3>
 
+<p>Using the query builder to execute queries involves two steps :</p>
 
+<ul>
+  <li>building the query data structure,</li>
+  <li>passing the data structure for execution/preparation to PDO, just as you would pass it any normal query string.</li>
+</ul>
 
+<p>An example of each type of query that may be built (select, insert, update and delete) follows. To keep things simple, only a small range of the available methods are illustrated.</p>
+
+<p>Select query :</p>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+  
+  // Select :
+    // Build data stucture :
+    $query = db::select('users', $u)
+              ->left('profiles', $p)
+              ->on("$p->id = $u->id")
+              ->where("$u->login = ?", 'Mike')
+              ->columns($u->login, $p->email);
+      
+    // Execute it :
+    $statement = db::cn()->query($query); // Note that this is the standard PDO method for executing a query.
+    
+    // Fetch results :
+    foreach($stmt as $row) {
+      // Raw data (string) :
+      $login = $row[$u->login];
+      $email = $row[$p->email];
+      $count = $row['count'];
+      
+      // Type-casted data according to type of underlying db column :
+      $login = $u->login($row); 
+      $email = $p->email($row);
+    }
+?>
+{% endhighlight %}
 
 
 
