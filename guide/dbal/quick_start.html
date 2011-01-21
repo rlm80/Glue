@@ -5,7 +5,7 @@ title: Guide
 
 <h2>Quick start guide</h2>
 
-<p>This is a simple cookbook to get you started quickly. It assumes your using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For explanations and details, refer to the rest of the guide.</p>
+<p>This is a simple cookbook to get you started quickly. It assumes you're using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For more explanations and details, refer to the rest of the guide.</p>
 
 <h3>Database configuration</h3>
 
@@ -66,37 +66,94 @@ title: Guide
 
 <p>An example of each type of query that may be built (select, insert, update and delete) follows. To keep things simple, only a small range of the available methods are illustrated.</p>
 
-<p>Select query :</p>
+<h4>Select query</h4>
 
 {% highlight php %}
 <?php
 
   use Glue\DB\DB;
-  
-  // Select :
-    // Build data stucture :
-    $query = db::select('users', $u)
-              ->left('profiles', $p)
-              ->on("$p->id = $u->id")
-              ->where("$u->login = ?", 'Mike')
-              ->columns($u->login, $p->email);
-      
-    // Execute it :
-    $statement = db::cn()->query($query); // Note that this is the standard PDO method for executing a query.
+
+  // Build data stucture :
+  $query = db::select('users', $u)
+            ->left('profiles', $p)->on("$p->id = $u->id")
+            ->where("$u->login = ?", 'Mike')
+            ->columns($u->login, $p->email);
     
-    // Fetch results :
-    foreach($stmt as $row) {
-      // Raw data (string) :
-      $login = $row[$u->login];
-      $email = $row[$p->email];
-      $count = $row['count'];
-      
-      // Type-casted data according to type of underlying db column :
-      $login = $u->login($row); 
-      $email = $p->email($row);
-    }
+  // Pass query to PDO :
+  $statement = db::cn()->query($query);
+  
+  // Fetch results :
+  foreach($statement as $row) {
+    // Raw data (string) :
+    $login = $row[$u->login];
+    $email = $row[$p->email];
+    
+    // Type-casted data according to type of underlying db column :
+    $login = $u->login($row); 
+    $email = $p->email($row);
+  }
 ?>
 {% endhighlight %}
+
+<h4>Insert query</h4>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Build data stucture :
+  $query = db::insert('users')
+            ->columns('login', 'password')
+            ->values(array('Mike', 'qsdfazer'));
+    
+  // Pass query to PDO :
+  $count          = db::cn()->exec($query);
+  $last_insert_id = db::cn()->lastInsertId();
+?>
+{% endhighlight %}
+
+<h4>Delete query</h4>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Build data stucture :
+  $query = db::delete('users', $u)->where("$u->login = ?", 'mike');
+    
+  // Pass query to PDO :
+  $count = db::cn()->exec($query);
+?>
+{% endhighlight %}
+
+<h4>Update query</h4>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Build data stucture :
+  $query = db::update('users', $u)
+            ->set('password', '123456')
+            ->where("$u->login = ?", 'mike');
+    
+  // Pass query to PDO :
+  $count = db::cn()->exec($query);
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
 
 
 
