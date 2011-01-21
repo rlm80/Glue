@@ -3,24 +3,27 @@ layout: base
 title: Home
 ---
 
+<h2>Disclaimer</h2>
+
+<p>The code discussed here is experimental. For the most part it has been tested, but it has never been used on any real life website. Development may or may not continue and issues may or may not be fixed in the future. Take a look around, judge for yourself and use at your own risk.</p>
+
 <h2>What it is</h2>
 
 <p>Glue is a combination of two projects :</p>
 <ul>
 	<li>a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>,</li>
-	<li>an <a class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> (ORM) library based on the <a class="external" href="http://martinfowler.com/eaaCatalog/dataMapper.html">data mapper pattern</a>.
+	<li>an <a class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> (ORM) library based on the <a class="external" href="http://martinfowler.com/eaaCatalog/dataMapper.html">data mapper pattern</a> (<i>in the works, not available yet</i>).
 </ul>
 
 <h2>Database abstraction library</h2>
 
-<p>For the most part this is an expressive <b>SQL query builder</b> that makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
+<p>For the most part this is an <b>SQL query builder</b> that makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
 {% highlight php %}
 <?php
 	$stmt = db::select('users', $u)
-                ->columns($u->login, $u->password)
-                ->where("$u->login LIKE ?", 'abc%')
-                ->orderby($u->login)
-                ->execute();
+            ->columns($u->login, $u->password)
+            ->where("$u->login = ?", 'Mike')
+            ->orderby($u->login);
 ?>
 {% endhighlight %}
 <p>There are two benefits in writing SQL queries this way :</p>
@@ -29,6 +32,6 @@ title: Home
   <li>queries can be composed bits by bits, in no particular order, making it easy for more than one object to contribute something to them.</li>
 </ul>
 
-<h2>Object relational mapping library</h2>
+<h2>Object relational mapping library (not available yet)</h2>
 
 <p>The <b>ORM</b> is built on top of the DBAL. It makes it possible to deal with model objects only, never having to worry about the way they are stored into, and retrieved from, the database.</p>
