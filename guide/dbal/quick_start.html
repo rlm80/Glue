@@ -156,6 +156,10 @@ title: Guide
   
   use Glue\DB\DB;
 
+  // Get the most appropriate PHP type to represent values
+  // of column email of table 'profiles' on default connection :
+  $phptype = db::cn()->table('profiles')->column('email')->phptype();  
+  
   // List tables of default connection :
   $tables = DB::cn()->tables();
   foreach($tables as $table)
@@ -165,7 +169,6 @@ title: Guide
   $columns = DB::cn()->table('users')->columns();
   foreach($columns as $column)
     echo $column->name() . '<br>';
-
 ?>
 {% endhighlight %}
 
