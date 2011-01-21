@@ -7,8 +7,8 @@ title: Guide
 
 <ol>
 	<li>Download the latest version from <a class="external" href="https://github.com/rlm80/Glue">Github</a>.</li>
-	<li>Unpack on your web server, preferably outside the document root.</li>
+	<li>Unpack on your web server.</li>
 	<li>Include the file <span class="inline_code">bootstrap.php</span> located at the root of the glue directory.</li>
 	<li>At the beginning of <b>every file</b> (PHP import rules work per file) where you want to use the database library, add the <a class="external" href="http://www.php.net/manual/en/language.namespaces.importing.php">import rule</a> <span class="inline_code">use Glue\DB\DB;</span> . If you wish to use the ORM, add <span class="inline_code">use Glue\ORM\ORM;</span> .</li>
-	<li>Call the static methods <span class="inline_code">DB::...()</span> and <span class="inline_code">ORM::...()</span> to use the library.</li>
+	<li>Call the static methods <span class="inline_code">db::...()</span> and <span class="inline_code">orm::...()</span> to use the library.</li>
 </ol>

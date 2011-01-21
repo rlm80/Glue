@@ -1,0 +1,66 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Quick start guide</h2>
+
+<p>This is a simple cookbook to get started quickly. For explanations and details, refer the the rest of the guide.</p>
+
+<h3>Database configuration</h3>
+
+<p>Assuming you're using MySQL, edit the following file and replace the connection parameters with your own :</p>
+
+{% highlight php %}
+<?php
+  // File classes/user/db/connection/default.php
+  
+  namespace Glue\User\DB;
+
+  class Connection_Default extends \Glue\DB\Connection_MySQL {
+    protected $dbname   = 'test'; // Change this
+    protected $username = 'root'; // Change this
+    protected $password = '';     // Change this
+  }
+?>
+{% endhighlight %}
+
+<h3>Using your database connection as a PDO instance</h3>
+
+<p>The entry point into everything DBAL-related is the static methods of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class. Calling <span class="inline_code">DB::cn()</span> will return a singleton instance of the Connection class that you defined above. You may use that object like you would use any other PDO instance, since that's what it actually is.</p>
+
+<p>For example :</p>
+
+{% highlight php %}
+<?php
+  // Import the \Glue\DB\DB class into the current file, so that you can refer to it as simply "DB" :
+  use Glue\DB\DB;
+    
+  try {
+    // Issue query :
+    $statement = DB::cn()->query("SELECT name FROM fruits");
+    
+    // Display results :
+    foreach($statement as $row)
+      echo $row[0] . "\n";
+  }
+  catch (PDOException $e) {
+    // Deal with errors :
+    echo $e->getMessage();
+  }
+?>
+{% endhighlight %}
+
+<h3>Using the query builder</h3>
+
+
+
+
+
+
+
+
+
+
+
+
