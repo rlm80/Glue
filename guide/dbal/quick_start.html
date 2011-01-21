@@ -64,7 +64,9 @@ title: Guide
   <li>passing the data structure for execution/preparation to PDO, just as you would pass it any normal query string.</li>
 </ul>
 
-<p>An example of each type of query that may be built (select, insert, update and delete) follows. To keep things simple, only a small range of the available methods are illustrated.</p>
+<p>An example of each type of query that may be built (select, insert, update and delete) follows. To keep things simple, only a small range of the available methods is illustrated. For more information about using the query builder, refer to <a href="/Glue/guide/dbal/query_builder/">Query builder</a> and subsequent chapters.</p>
+
+<p>Please note that, except for the query building parts, everything else in the following snippets is standard PDO. Where you would usually pass an SQL string, you simply pass the query data structure instead.</p>
 
 <h4>Select query</h4>
 
@@ -145,7 +147,27 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<h3>Using the introspection API</h3>
 
+<p>Only a small range of the available methods is illustrated. For more information about using the introspection API, refer to <a href="/Glue/guide/dbal/introspection.html">Database introspection</a>.</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+
+  // List tables of default connection :
+  $tables = DB::cn()->tables();
+  foreach($tables as $table)
+    echo $table->name() . '<br>';
+    
+  // List columns of table users :
+  $columns = DB::cn()->table('users')->columns();
+  foreach($columns as $column)
+    echo $column->name() . '<br>';
+
+?>
+{% endhighlight %}
 
 
 
