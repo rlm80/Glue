@@ -5,11 +5,11 @@ title: Guide
 
 <h2>Quick start guide</h2>
 
-<p>This is a cookbook to get you started quickly. It assumes you're using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For more explanations and details, refer to the rest of the guide.</p>
+<p>This is a cookbook to get started quickly. Knowledge of the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter is required.</p>
 
 <h3>Entry point</h3>
 
-<p>The entry point into everything DBAL-related is the static methods of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class. To conveniently use that class, import it into the current file :</p>
+<p>The entry point into everything DBAL-related is the static methods of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class. It can be imported it into the current file like this :</p>
 
 {% highlight php %}
 <?php
@@ -39,7 +39,7 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Calling <span class="inline_code">DB::cn()</span> will return a singleton instance of the default Connection class that you defined above :</p>
+<p>Calling <span class="inline_code">DB::cn()</span> will return a singleton instance of the default Connection class that was defined above :</p>
 
 {% highlight php %}
 <?php
@@ -81,7 +81,7 @@ title: Guide
   <li>passing the data structure for execution/preparation to PDO, just as you would pass it any normal query string.</li>
 </ul>
 
-<p>An example of each type of query that may be built (select, insert, update and delete) follows. To keep things simple, only a small range of the available methods is illustrated. For more information about using the query builder, refer to <a href="/Glue/guide/dbal/query_builder/">Query builder</a> and subsequent chapters.</p>
+<p>An example of each type of query that may be built (select, insert, update and delete) follows. For more information about using the query builder, refer to <a href="/Glue/guide/dbal/query_builder/">Query builder</a> and subsequent chapters.</p>
 
 <p>Please note that, except for the query building parts, everything else in the following snippets is standard PDO. Where you would usually pass an SQL string, you simply pass the query data structure instead.</p>
 
@@ -159,9 +159,9 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h3>Using the introspection API</h3>
+<h3>Using the database introspection API</h3>
 
-<p>Only a small range of the available methods is illustrated. For more information about using the introspection API, refer to <a href="/Glue/guide/dbal/introspection.html">Database introspection</a>.</p>
+<p>Example :</p>
 
 {% highlight php %}
 <?php
@@ -183,6 +183,8 @@ title: Guide
     echo $column->name() . '<br>';
 ?>
 {% endhighlight %}
+
+<p>For more information about using the introspection API, refer to <a href="/Glue/guide/dbal/introspection.html">Database introspection</a>.</p>
 
 
 

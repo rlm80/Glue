@@ -11,7 +11,7 @@ title: Guide
 
 <h3>Connection classes</h3>
 
-<p>The library comes with three connection classes that extend PDO : <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> and <span class="inline_code">\Glue\DB\Connection_SQLite</span>. Each of them has specific properties that define the required parameters to connect to the database it is designed to work with :</p>
+<p>The library comes with three connection classes that extend PDO : <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/mysql.php"><span class="inline_code">\Glue\DB\Connection_MySQL</span></a>, <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/postgresql.php"><span class="inline_code"><span class="inline_code">\Glue\DB\Connection_PostgreSQL</span></a> and <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/sqlite.php"><span class="inline_code"><span class="inline_code">\Glue\DB\Connection_SQLite</span></a>. Each of them has specific properties that define the required parameters to connect to the database it is designed to work with :</p>
 
 <p>Common to all connection classes.</p>
 <ul>
@@ -35,11 +35,11 @@ title: Guide
 
 <h3>Defining database connections</h3>
 
-<p>A database connection is defined by creating a new user class that extends either <span class="inline_code">\Glue\DB\Connection_MySQL</span>, <span class="inline_code">\Glue\DB\Connection_PostgreSQL</span> or <span class="inline_code">\Glue\DB\Connection_SQLite</span>. You must create one connection class by database connection. The name of the connection class must be of the form <span class="inline_code">Connection_&lt;id&gt;</span>, where &lt;id&gt; is a <b>connection identifier</b> of your own choosing.</p>
+<p>A database connection is defined by creating a new user class that extends either <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/mysql.php"><span class="inline_code">\Glue\DB\Connection_MySQL</span></a>, <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/postgresql.php"><span class="inline_code"><span class="inline_code">\Glue\DB\Connection_PostgreSQL</span></a> or <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/connection/sqlite.php"><span class="inline_code"><span class="inline_code">\Glue\DB\Connection_SQLite</span></a>. You must create one connection class by database connection. The name of the connection class must be of the form <span class="inline_code">Connection_&lt;id&gt;</span>, where &lt;id&gt; is a <b>connection identifier</b> of your own choosing.</p>
 
 <p>Connection identifiers cannot contain underscores and at least one connection must have an identifier called <span class="inline_code">default</span>. That is, a <span class="inline_code">Connection_Default</span> class must exist.</p>
 
-<p>Suppose you want to work with two database connections : your main database powered by SQLite and a MySQL database with a forum. You would create two classes :</p>
+<p>Suppose you want to work with two database connections : your main database (SQLite) and a database with a forum (MySQL). You would create two classes :</p>
 
 {% highlight php %}
 <?php  

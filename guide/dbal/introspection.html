@@ -8,7 +8,7 @@ title: Guide
 
 <h3>Table data</h3>
 
-<p>Table data is represented as instances of the <span class="inline_code">\Glue\DB\Table</span> class. These objects can be retrieved and used like this :</p>
+<p>Table data is represented as instances of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/table.php"><span class="inline_code">\Glue\DB\Table</span></a> class. These objects can be retrieved and used like this :</p>
 
 {% highlight php %}
 <?php
@@ -16,11 +16,10 @@ title: Guide
   use Glue\DB\DB;
   
   // Returns data about table 'mytable' of connection 'myconnection'
-  $table = DB::cn('myconnection')->table('mytable');
+  $table = db::cn('myconnection')->table('mytable');
   
   // Available data about that table :
-  $alias    = $table->alias();    // Name of the table, as it is known in PHP-land (see Views)
-  $name     = $table->name();     // Name of the table, as it is known to the database (see Views)
+  $name     = $table->name();     // Name of the table
   $cn       = $table->cn();       // Connection
   $columns  = $table->columns();  // Columns array
   $pk       = $table->pk();       // Primary key columns array
@@ -30,7 +29,7 @@ title: Guide
 
 <h3>Column data</h3>
 
-<p>Column data is stored in instances of the <span class="inline_code">\Glue\DB\Column</span> class. These objects can be retrieved and used like this :</p>
+<p>Column data is stored in instances of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/column.php"><span class="inline_code">\Glue\DB\Column</span></a> class. These objects can be retrieved and used like this :</p>
 
 {% highlight php %}
 <?php
@@ -38,19 +37,18 @@ title: Guide
   use Glue\DB\DB;
   
   // Returns data about column 'mycolumn' of table 'mytable' of connection 'myconnection'
-  $column = DB::cn('myconnection')->table('mytable')->column('mycolumn');
+  $column = db::cn('myconnection')->table('mytable')->column('mycolumn');
   
   // Available data about that column :
-  $alias      = $column->alias();       // Name of the table, as it is known in PHP-land (see Views)
-  $name       = $column->name();        // Name of the table, as it is known to the database (see Views)
-  $type       = $column->type()));      // Database type (as returned by RDBMS)
-  $phptype    = $column->phptype());    // Most appropriate PHP type to store column data    
-  $nullable   = $column->nullable());   // Whether or not column is nullable
-  $maxlength  = $column->maxlength());  // Max length for character columns
-  $precision  = $column->precision());  // Decimal(6,2) ? => precision = 6
-  $scale      = $column->scale());      // Decimal(6,2) ? => scale = 2
-  $default    = $column->default());    // Default column value (type casted according to php type)
-  $auto       = $column->auto());       // Whether or not column is auto-incrementing
+  $name       = $column->name();       // Name of the column
+  $type       = $column->type();       // Database type (as returned by RDBMS)
+  $phptype    = $column->phptype();    // Most appropriate PHP type to represent column data    
+  $nullable   = $column->nullable();   // Whether or not column is nullable
+  $maxlength  = $column->maxlength();  // Max length for character columns
+  $precision  = $column->precision();  // Decimal(6,2) ? => precision = 6
+  $scale      = $column->scale();      // Decimal(6,2) ? => scale = 2
+  $default    = $column->default();    // Default column value (string as returned by RDBMS)
+  $auto       = $column->auto();       // Whether or not column is auto-incrementing
 ?>
 {% endhighlight %}
 
@@ -62,11 +60,11 @@ title: Guide
   use Glue\DB\DB;
 
   // List connections :
-  $list         = DB::connection_list(); // Returns array of connection ids indexed by ids
-  $connections  = DB::connections();     // Returns array of connection objects indexed by ids
+  $list         = db::connection_list(); // Returns array of connection ids indexed by ids
+  $connections  = db::connections();     // Returns array of connection objects indexed by ids
   
   // Checking existence of a connection :
-  $exists = DB::connection_exists('myconnection');
+  $exists = db::connection_exists('myconnection');
 
 ?>
 {% endhighlight %}
@@ -79,11 +77,11 @@ title: Guide
   use Glue\DB\DB;
 
   // List tables of default connection :
-  $list   = DB::cn()->table_list(); // Returns array of table names indexed by names
-  $tables = DB::cn()->tables();     // Returns array of table objects indexed by names
+  $list   = db::cn()->table_list(); // Returns array of table names indexed by names
+  $tables = db::cn()->tables();     // Returns array of table objects indexed by names
   
   // Checking existence of a table :
-  $exists = DB::cn()->table_exists('mytable');
+  $exists = db::cn()->table_exists('mytable');
 
 ?>
 {% endhighlight %}
@@ -96,7 +94,7 @@ title: Guide
   use Glue\DB\DB;
   
   // Get table :
-  $table = DB::cn()->table('mytable'); 
+  $table = db::cn()->table('mytable'); 
 
   // List columns :
   $list     = $table->column_list(); // Returns array of column names indexed by names
@@ -117,8 +115,8 @@ title: Guide
   
   use Glue\DB\DB;
   
-  $t1 = DB::cn()->table('mytable');
-  $t2 = DB::cn()->table('mytable');
+  $t1 = db::cn()->table('mytable');
+  $t2 = db::cn()->table('mytable');
   
   var_dump($t1 === $t2); // TRUE
   
@@ -129,4 +127,4 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<p>Between each page load, all introspected data is cached on disk as serialized <span class="inline_code">\Glue\DB\Table</span> objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely (see options).</p>
+<p>Between each page load, all introspected data is cached on disk as serialized objects. If you change the database schema, you must clear the cache by deleting the cache directory. If not in production, you may also disable the introspection cache entirely.</p>
