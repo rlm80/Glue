@@ -5,40 +5,30 @@ title: Guide
 
 <h2>Query builder</h2>
 
-<p>A query builder is a system that makes it possible to build SQL queries bits by bits, in no particular order.</p>
-
-<p>It works by representing the query internally as a data structure rather than a string, so that it can be easily modified. A convenient interface is provided to create and modify the data structure. Once the data structure is ready, it can be compiled into an SQL string according to the SQL dialect of the underlying RDBMS.</p>
-
-<h3>Query builder : the point</h3>
-
-<p>Such a system comes in handy if you need dynamic queries - queries that are assembled at runtime according to some logic. To some extent, it also provides database independence by automatically quoting values and identifiers, and generating the right SQL constructs for LIMIT and OFFSET for instance.</p>
-
-<h3>Query builder : not the point</h3>
-
-<p>The point of a query builder is not to make writing queries easier or faster. Nothing will ever beat writing straight SQL for that. It is not the ultimate weapon to ensure database independence either. You're on your own when it comes to handling SQL function names and operators differences between various database vendors.</p>
-
-<h3>Example</h3>
+<p>A query builder is a system that makes it possible to build SQL queries bits by bits, in no particular order :</p>
 
 {% highlight php %}
 <?php
-  // Creates query :
-	$query = db::select('users', $u)
-                ->columns($u->login, $u->password)
-                ->where("$u->login LIKE ?", 'abc%')
-                ->orderby($u->login)
-                ->root();
-                
-  // Generates SQL according to default connection dialect :
-  echo $query->sql();
+
+  use Glue\DB\DB;
+
+  // Base query :
+  $query = db::select('users', $u)->where("$u->login = ?", 'Mike')->columns($u->login);
   
-  // prints "SELECT `users`.`login`, `users`.`password` FROM `users` WHERE `users`.`login` LIKE 'abc%' ORDER BY `users`.`login`"
+  // Adds a join :
+  $query->left('profiles', $p)->on("$p->id = $u->id")->columns($p->email);
+  
+  // Compile against default connection to view generated SQL :
+  $sql = db::cn()->compile($query);
 ?>
 {% endhighlight %}
 
+<p>It works by representing the query as a data structure rather than a string, so that it can be easily modified. Once the data structure is ready, it can be compiled into an SQL string according to the SQL dialect of the underlying RDBMS.</p>
 
+<h3>Query builder : the point</h3>
 
+<p>Such a system comes in handy if you need dynamic queries - queries that are assembled at runtime according to some logic.</p>
 
+<p>To some extent, it also provides database independence by automatically quoting values and identifiers, generating the right SQL constructs for LIMIT and OFFSET, or dealing with SQL function and operator naming discrepancies between various database vendors.</p>
 
-
-
-
+<p>If neither of those are a requirement for what you're doing, you'll be better off using straight SQL.</p>
