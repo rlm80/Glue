@@ -5,7 +5,21 @@ title: Guide
 
 <h2>Quick start guide</h2>
 
-<p>This is a simple cookbook to get you started quickly. It assumes you're using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For more explanations and details, refer to the rest of the guide.</p>
+<p>This is a cookbook to get you started quickly. It assumes you're using a MySQL database and that you've read the <a href="/Glue/guide/installation.html">Installation and usage</a> chapter. For more explanations and details, refer to the rest of the guide.</p>
+
+<h3>Entry point</h3>
+
+<p>The entry point into everything DBAL-related is the static methods of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class. To conveniently use that class, import it into the current file :</p>
+
+{% highlight php %}
+<?php
+  // Import the \Glue\DB\DB class, so that you can refer to it as simply "DB" (or "db") :
+  use Glue\DB\DB;
+    
+  // Use static methods to do stuff :
+  db::some_static_method();
+?>
+{% endhighlight %}
 
 <h3>Database configuration</h3>
 
@@ -25,35 +39,38 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<p>Calling <span class="inline_code">DB::cn()</span> will return a singleton instance of the default Connection class that you defined above :</p>
+
+{% highlight php %}
+<?php
+  
+  use Glue\DB\DB;
+    
+  $connection = db::cn();
+?>
+{% endhighlight %}
+
 <p>For more information about defining database connections, refer to <a href="/Glue/guide/dbal/connections.html">Defining database connections</a>.</p>
 
-<h3>Using your database connection as a PDO instance</h3>
+<h3>Using a database connection</h3>
 
-<p>The entry point into everything DBAL-related is the static methods of the <a class="external" href="https://github.com/rlm80/Glue/blob/master/classes/system/db/db.php"><span class="inline_code">\Glue\DB\DB</span></a> class. Calling <span class="inline_code">DB::cn()</span> will return a singleton instance of the Connection class that you defined above. You may use that object like you would use any other PDO instance, since that's what it actually is.</p>
+<p>Database connections are PDO instances connected to a database and must be used as such. Everything documented in the <a class="external" href="http://www.php.net/manual/en/book.pdo.php">PDO docs</a> applies here. If you have no idea what PDO is and how to use it, head over to <a href="/Glue/guide/dbal/pdo.html">PDO introduction</a>.</p>
 
-<p>For example :</p>
+<p>Example of how you may issue a simple query and display the results :</p>
 
 {% highlight php %}
 <?php
   // Import the \Glue\DB\DB class into the current file, so that you can refer to it as simply "DB" :
   use Glue\DB\DB;
-    
-  try {
-    // Issue query :
-    $statement = DB::cn()->query("SELECT name FROM fruits");
-    
-    // Display results :
-    foreach($statement as $row)
-      echo $row[0] . "\n";
-  }
-  catch (PDOException $e) {
-    // Deal with errors :
-    echo $e->getMessage();
-  }
+  
+  // Issue query :
+  $results = DB::cn()->query("SELECT name FROM fruits");
+  
+  // Display results :
+  foreach($results as $row)
+    echo $row[0] . "<br>";
 ?>
 {% endhighlight %}
-
-<p>For more information about using PDO, refer to <a href="/Glue/guide/dbal/pdo.html">PDO introduction</a>.</p>
 
 <h3>Using the query builder</h3>
 
@@ -86,13 +103,8 @@ title: Guide
   
   // Fetch results :
   foreach($statement as $row) {
-    // Raw data (string) :
     $login = $row[$u->login];
     $email = $row[$p->email];
-    
-    // Type-casted data according to type of underlying db column :
-    $login = $u->login($row); 
-    $email = $p->email($row);
   }
 ?>
 {% endhighlight %}

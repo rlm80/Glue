@@ -19,9 +19,9 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
      +--bootstrap.php
 </pre>
 
-<p><span class="inline_code">bootstrap.php</span> is the file is that must be included in order to use the library. The classes are located in the <span class="inline_code">classes</span> directory, one class per file.</p>
-
 <h2>Namespaces and class naming conventions</h2>
+
+<p>Classes are located in the <span class="inline_code">classes</span> directory, one class per file.</p>
 
 <p><b>System classes</b> live in the <span class="inline_code">\Glue\System</span> namespace. For those classes, the auto-loader will expect a class called <span class="inline_code">\Glue\System\DB\Some_Class</span> to be located in the file <span class="inline_code">system/db/some/class.php</span>.</p>
 
@@ -58,7 +58,7 @@ Prerequisites : <a class="external" href="http://php.net/manual/en/language.oop5
 
 <p>Please note that through this process, you can customize the library <b>without ever touching anyting in the system directory</b>. You only define classes in the user directory. This way you can upgrade to the next version of the library with no fear of losing your changes, if you made some.</p>
 
-<p>To provide the ability to customize the library without actually touching its code is the whole point of the aliasing system.</p>
+<p>Providing the ability to customize the library without actually touching its code is the whole point of the aliasing system.</p>
 
 <h2>Creating user classes</h2>
 
