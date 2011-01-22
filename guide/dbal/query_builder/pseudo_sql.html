@@ -1,0 +1,27 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Template fragments</h2>
+
+<p>Items like boolean operands can be a complex mix of arithmetic expressions, string concatenations, operators, functions and whatnot.</p>
+
+<p>Obviously the strategy of representing everything as a data structure rather than straight SQL cannot apply here : there is little point in keeping track of the internal structure of something like that, and the data structure would be very tedious to build.</p>
+
+<p>Still, we want to keep the benefit of database independence. So we cannot simply represent such expressions as straight SQL. To name only two things, depending on the underlying database, values and identifiers need to be quoted differently.</p>
+
+<p>Template fragments solve that dilemma. They are used internally to provide the user with the convenience of writing SQL code directly, while still retaining database independence.</p>
+
+<h3>Pseudo-SQL</h3>
+
+<p>The core of a template fragment is a string of "pseudo-SQL". In pseudo-SQL code, string literals and identifiers must be quoted according to the following conventions :</p>
+
+<ul>
+  <li>String literals : surrounded by simple quotes ('), escape character = simple quote (so my'test becomes 'my''test').</li>
+  <li>Identifiers : surrounded by backticks (`), escape character = backtick (so my`test becomes `my``test`).</li>
+</ul>
+
+<p>Utility functions are provided to quote values and identifiers this way : <span class="inline_code">DB::quote()</span> and <span class="inline_code">DB::quote_identifier()</span>.</p>
+
+<p>When the template is compiled, a regex is used to detect string literals and identifiers. They are then re-quoted according to the conventions of the connection that was used to compile them. Additionally, a hook is provided so that you can implement your own replacements in the template compiling process, should you for example replace the standard '||' operator by the '+' required by MSSQL.</p>

@@ -5,7 +5,7 @@ title: Guide
 
 <h2>Fragments</h2>
 
-<p>Queries are represented internally as <b>trees</b> of <b>fragments</b>.</p>
+<p>Queries are represented as <b>trees</b> of <b>fragments</b>.</p>
 
 <p>Fragments are objects that hold data about specific pieces of SQL. Boolean expressions, boolean operands, order by clauses, join expressions and even queries, all of these are represented as fragments. Fragment classes may be found in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment"><span class="inline_code">classes/system/db/fragment/</span></a> folder.</p>
 
@@ -37,7 +37,7 @@ title: Guide
   <li>a builder class : represents the list and provides a fluent interface to build it.</li>
 </ul>
 
-<p>Builder classes are located in <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a>. They all extend the class <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> and thus share some common methods :</p>
+<p>Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. They all extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
 
 <ul>
   <li><span class="inline_code">->pop()</span> : removes last item,</li>
@@ -47,6 +47,11 @@ title: Guide
   <li><span class="inline_code">->last()</span> : returns last item,</li>
   <li><span class="inline_code">->children()</span> : returns the items array by reference.</li>
 </ul>
+
+
+
+
+
 
 
 
