@@ -1,0 +1,26 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Items and builders</h2>
+
+<p>A recurring pattern throughout the library is the use of items and builders.</p>
+
+<p>Most parts of an SQL query are lists of elements. A boolean expression is a list of boolean operands, a join expression is a list of join operands, and so on. Each of these lists is represented as a pair of classes :</p>
+
+<ul>
+  <li>an item class : represents the elements that make up the list and provides getter/setters to access their data,</li>
+  <li>a builder class : represents the list and provides a fluent interface to build it.</li>
+</ul>
+
+<p>Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. They all extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
+
+<ul>
+  <li><span class="inline_code">->pop()</span> : removes last item,</li>
+  <li><span class="inline_code">->reset()</span> : removes all items,</li>
+  <li><span class="inline_code">->is_empty()</span> : whether the list is empty,</li>
+  <li><span class="inline_code">->first()</span> : returns first item,</li>
+  <li><span class="inline_code">->last()</span> : returns last item,</li>
+  <li><span class="inline_code">->children()</span> : returns the items array by reference.</li>
+</ul>

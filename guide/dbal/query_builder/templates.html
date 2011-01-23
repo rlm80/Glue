@@ -1,0 +1,45 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Template fragments</h2>
+
+<p>Down to a certain level of detail, it isn't convenient to represent queries as data structures anymore.</p>
+
+<p>For example, operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators and functions. There is little point in keeping track of their internal structure. It is best to consider such elements as atomic, and describe them in SQL.</p>
+
+<p>Still, we cannot use straight SQL, since database independence would be lost. To name only two things, depending on the underlying database, values and identifiers need to be quoted differently. That is why "pseudo-SQL" is introduced.</p>
+
+<h3>Pseudo SQL</h3>
+
+<p>Pseudo SQL is an SQL dialect standardized in such a way that it can easily be converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
+
+<p>In pseudo SQL code, string literals and identifiers must be quoted according to the following conventions :</p> 
+
+<ul>
+  <li>String literals : surrounded by simple quotes ('), escape character = simple quote (so my'test becomes 'my''test').</li>
+  <li>Identifiers : surrounded by backticks (`), escape character = backtick (so my`test becomes `my``test`).</li>
+</ul>
+
+<p>When pseudo-SQL is compiled, a regexp is used to detect string literals and identifiers. They are then re-quoted according to the conventions of the underlying RDBMS.</p>
+
+<p>For SQL functions and operators, at the moment the library doesn't impose a standard. It is probably best to follow ANSI recommendations. A hook is provided so that you can implement your own replacements in pseudo SQL at compile time for a specific connection, should you want to replace for example the standard '||' operator by the '+' required by MSSQL. The hook only operate between string literals and identifiers, so there is no risk of unfortunate matches inside of those.</p>
+
+<h3>Template fragments</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
