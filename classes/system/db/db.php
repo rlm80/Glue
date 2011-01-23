@@ -7,7 +7,7 @@ namespace Glue\System\DB;
  *
  * Contains only static methods. Entry point for about everything you may want to do with this library.
  *
- * @package GlueDB
+ * @package Glue
  * @author Régis Lemaigre
  * @license MIT
  */

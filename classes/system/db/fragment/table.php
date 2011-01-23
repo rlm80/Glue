@@ -96,35 +96,6 @@ class Fragment_Table extends \Glue\DB\Fragment {
 	public function __get($column) {
 		return $this->column($column);
 	}
-	
-	/**
-	 * Extract value of given column from PDOStatement row and type-casts it appropriately.
-	 * 
-	 * @param string $column
-	 * @param array $row
-	 * @param string $cnid
-	 * 
-	 * @return mixed
-	 */
-	public function value($column, array $row, $cnid = null) {
-		// Get appropriate php type :
-		$phptype = \Glue\DB\DB::cn($cnid)->table($this->table)->column($column)->phptype();
-		
-		// Extract value from row :
-		$value = $row[$this->column($column)];
-		
-		// Cast value :
-		settype($value, $phptype);
-		
-		return $value;
-	}
-	
-	public function __call($name, $args) {
-		if (count($args) === 2)
-			return $this->value($name, $args[0], $args[1]);
-		else
-			return $this->value($name, $args[0]);
-	}
 
 	/**
 	 * Generate unique alias for table $table.

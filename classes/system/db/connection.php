@@ -306,7 +306,7 @@ abstract class Connection extends PDO {
 		}
 
 		// No suitable function to compile fragment : throw exception
-		throw new \Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
+		throw new \Glue\DB\Exception("Cannot compile fragment of class '" . get_class($fragment) . "' : unknown fragment type.");
 	}
 
 	/* ***************************************************************************************************** */
@@ -356,22 +356,27 @@ abstract class Connection extends PDO {
 				$sql .= preg_replace_callback(
 					'/[?!]/',
 					function ($matches) use ($cn, &$replacements) {
+						// Get next replacement :
 						$replacement = array_shift($replacements);
-						if ($matches[0] === '?') {
-							// Value :
-							if ($replacement instanceof \Glue\DB\Fragment)
-								return $cn->compile($replacement);
-							else
-								return $cn->quote_value($replacement);
-						}
+						
+						// Replacement is a fragment ?
+						if ($replacement instanceof \Glue\DB\Fragment)
+							return $cn->compile($replacement);
 						else {
-							// Identifier :
-							if (is_array($replacement)) {
-								$replacement = array_map(array($cn, 'quote_identifier'), $replacement);
-								return implode('.', $replacement);
+							// Tell appart value from identifier replacements :
+							if ($matches[0] === '?') {
+								// Value :
+								return $cn->quote_value($replacement);
 							}
-							else
-								return $cn->quote_identifier($replacement);
+							else {
+								// Identifier :
+								if (is_array($replacement)) {
+									$replacement = array_map(array($cn, 'quote_identifier'), $replacement);
+									return implode('.', $replacement);
+								}
+								else
+									return $cn->quote_identifier($replacement);
+							}
 						}
 					},
 					$part
@@ -497,7 +502,7 @@ abstract class Connection extends PDO {
 			switch ($order) {
 				case \Glue\DB\DB::ASC :		$sql .= ' ASC';		break;
 				case \Glue\DB\DB::DESC :	$sql .= ' DESC';	break;
-				default : throw new \Exception("Unknown order constant : " . $order);
+				default : throw new \Glue\DB\Exception("Unknown order constant : " . $order);
 			}
 		}
 

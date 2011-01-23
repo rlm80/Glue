@@ -420,10 +420,21 @@ EOD;
 					->orderby($a->id, $a->login, $b->id, $b->login)
 					->limit(1)->offset(0);	
 		$stmt = db::cn()->query($query);	
-		foreach($stmt as $row) {
-			//var_dump($row);
+
+		  // Base query :
+  $query = db::select('users', $u)->where("$u->login = ?", 'Mike')->columns($u->login);
+  
+  // Add a join :
+  $query->left('profiles', $p)->on("$p->id = $u->id")->columns($p->email);
+  
+  // Compile against default connection :
+  echo db::cn()->compile($query);
+  
+		/*foreach($stmt as $row) {
+			var_dump($row);
 			var_dump($a->id($row));
-		}
+		}*/
+		
 /*
 		$query = db::select('glusers', $u)->columns($u->id, $u->login, $u->password);
 		$statement = db::cn()->prepare($query);
