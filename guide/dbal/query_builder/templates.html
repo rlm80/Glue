@@ -11,17 +11,35 @@ title: Guide
 
 <h3>Pseudo SQL</h3>
 
-<p>Pseudo SQL is SQL code standardized in such a way that it can easily be converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
+<p>Pseudo SQL is SQL code standardized in such a way that it can be easily converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
 
 <h4>String literals and identifiers</h4>
 
-<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). The escape mechanism is described <a class="external" href="http://en.wikipedia.org/wiki/Delimiter#Padding_quoting_delimiters">here</a> (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, thanks to replacements and table fragments (see below), you won't need to explicitely quote anything most of the time.</p>
+<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). The escape mechanism is described <a class="external" href="http://en.wikipedia.org/wiki/Delimiter#Padding_quoting_delimiters">here</a> (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, thanks to replacements and table fragments (see below), you won't need to explicitely quote anything most of the time. But should you need to, the functions <span class="inline_code">DB::quote()</span> and <span class="inline_code">DB::quote_identifier()</span> are available.</p>
 
 <h4>Operators, functions and pre-defined constants</h4>
 
-<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the whole application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that you can implement your own name conversions from pseudo SQL to proprietary SQL for a specific connection (the hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those).</p>
+<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the whole application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that you can implement your own name conversions from pseudo SQL to proprietary SQL for a specific connection (the hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those). If you target only one database and don't care about portability, use its naming conventions and don't worry about any of this.</p>
 
 <h3>Template fragments</h3>
+
+<p>A template fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Fragment replacements are compiled and included as-is.</p>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::tpl("1 = ? AND 'test' = ? AND `mytest` = ! AND 'a' IN ?", 2, "my'test", "my`test", array('a', 'b'));
+  
+  // Output SQL :
+  echo db::cn()->compile($f);
+  
+  // Assuming a MySQL default connection, it prints :
+  // 1 = 2 AND 'test' = 'my\'test' AND `mytest` = `my``test` AND 'a' IN ('a','b')
+?>
+{% endhighlight %}
 
 <h2>Table fragments</h2>
 
