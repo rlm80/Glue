@@ -5,13 +5,11 @@ title: Home
 
 <h2>Disclaimer</h2>
 
-<p>The code discussed here is experimental. It has never been put to any real use. Development may or may not continue in the future. Take a look around, judge for yourself and use at your own risk.</p>
-
-<p>Only MySQL is fully supported. Some support for PostgreSQL and SQLite is also provided, but it has never been tested and the introspection API isn't implemented for these databases. Feel free to contribute on Github.</p>
+<p>The code discussed here is experimental. Development may or may not continue in the future. Take a look around, judge for yourself and use at your own risk.</p>
 
 <h2>What it is</h2>
 
-<p>Glue is a combination of two projects :</p>
+<p>This is a combination of two projects :</p>
 
 <ul>
 	<li>a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>,</li>
@@ -25,9 +23,8 @@ title: Home
 {% highlight php %}
 <?php
 	$stmt = db::select('users', $u)
-            ->columns($u->login, $u->password)
-            ->where("$u->login = ?", 'Mike')
-            ->orderby($u->login);
+            ->columns($u->password, $u->email)
+            ->where("$u->login = ?", 'Mike');
 ?>
 {% endhighlight %}
 
