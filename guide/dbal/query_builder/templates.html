@@ -5,26 +5,52 @@ title: Guide
 
 <h2>Template fragments</h2>
 
-<p>Things like operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators and functions. There is little point in keeping track of their internal structure, and it would be tedious to describe them as a tree of objects.</p>
+<p>Low-level elements like operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators and functions. There is little point in keeping track of their internal structure, and it would be tedious to describe them as a tree of objects.</p>
 
-<p>Down to a certain level of detail, it isn't convenient nor useful to represent queries as data structures anymore. It is best to consider low-level elements as atomic, and describe them in SQL. Still, straight SQL cannot be used, since database independence would be lost. That is why <b>"pseudo SQL"</b> is introduced.</p>
+<p>It is best to consider low-level elements as atomic, and describe them in SQL. Still, straight SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
 
 <h3>Pseudo SQL</h3>
 
-<p>Pseudo SQL is an SQL dialect standardized in such a way that it can easily be converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
+<p>Pseudo SQL is SQL code standardized in such a way that it can easily be converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
 
-<p>In pseudo SQL code, string literals and identifiers must be quoted according to the following conventions :</p> 
+<h4>String literals and identifiers</h4>
+
+<p>String literals and identifiers must be quoted according to the following conventions :</p>
 
 <ul>
   <li><b>String literals</b> : surrounded by simple quotes ('), escape character = simple quote (so my'test becomes 'my''test').</li>
   <li><b>Identifiers</b> : surrounded by backticks (`), escape character = backtick (so my`test becomes `my``test`).</li>
 </ul>
 
-<p>When pseudo-SQL is compiled, a regexp is used to detect string literals and identifiers quoted as described above. They are then un-quoted and re-quoted according to the conventions of the underlying RDBMS.</p>
+<p>When the query is compiled, a regexp is used to detect strings quoted as described above. They are then re-quoted according to the conventions of the underlying RDBMS.</p>
 
-<p>For SQL functions and operators, at the moment the library doesn't impose any naming conventions. It is probably best to follow ANSI recommendations. A hook (<span class="inline_code">Connection::hook_replace()</span>) is provided so that you can implement your own replacements in pseudo SQL at compile time for a specific connection. The hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those.</p>
+<p>Fortunately, thanks to replacements and table fragments (see below), you won't need to explicitely quote anything most of the time.</p>
+
+<h4>Operators, functions and pre-defined constants</h4>
+
+<p>At the moment the library doesn't impose any naming conventions. What's important is to be consistent accross the whole application.</p>
+
+<p>A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that you can implement your own name conversions from pseudo SQL to proprietary SQL for a specific connection. The hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those.</p>
 
 <h3>Template fragments</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
