@@ -31,19 +31,21 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::tpl("1 = ? AND 'test' = ? AND `mytest` = ! AND 'a' IN ?", 2, "my'test", "my`test", array('a', 'b'));
+  $f = db::tpl("1=? AND 'test'=? AND `mytest`=! AND 'a' IN ?",2,"my'test","my`test",array('a','b'));
   
   // Output SQL :
   echo db::cn()->compile($f);
   
   // Assuming a MySQL default connection, it prints :
-  // 1 = 2 AND 'test' = 'my\'test' AND `mytest` = `my``test` AND 'a' IN ('a','b')
+  // 1=2 AND 'test'='my\'test' AND `mytest`=`my``test` AND 'a' IN ('a','b')
 ?>
 {% endhighlight %}
 
+<p>By themselves template fragments are not very useful, but most functions of the query builder create a template fragment behind the scene and accept a parameter list that match the one of <span class="inline_code">db::tpl()</span>.</p>
+
 <h2>Table fragments</h2>
 
-
+<p></p>
 
 
 
