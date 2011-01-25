@@ -5,7 +5,7 @@ title: Guide
 
 <h2>Templates</h2>
 
-<p>Low-level elements like operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators, functions, identifiers and constants. It would be useless and tedious to describe them as a tree of objects. It is best to consider such elements as atomic, and describe them in SQL. Still, straight SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
+<p>Low-level elements like operands in boolean expressions are a mix of arithmetic expressions, string concatenations, operators, functions, identifiers, string literals and pre-defined constants. It would be pointless and tedious to describe them as a tree of objects. Such elements are considered atomic, and must be described in SQL. Still, proprietary SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
 
 <h3>Pseudo SQL</h3>
 
@@ -13,17 +13,17 @@ title: Guide
 
 <h4>String literals and identifiers</h4>
 
-<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). Inner occurrences of quoting characters must be doubled (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, most of the time it isn't necessary to explicitely quote anything, as explained below. Should the need arise, the functions <span class="inline_code">DB::quote()</span> and <span class="inline_code">DB::quote_identifier()</span> are available.</p>
+<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). Inner occurrences of quoting characters must be doubled (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, most of the time it isn't necessary to explicitely quote anything, thanks to template fragments and table fragments, as explained below.</p>
 
 <h4>Operators, functions and pre-defined constants</h4>
 
-<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that name conversions from pseudo SQL to proprietary SQL can be implemented for a specific connection. The hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those. By default the hook does nothing, so all names are passed from pseudo SQL to proprietary SQL as-is.</p>
+<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that name conversions from pseudo SQL to proprietary SQL can be implemented for a specific connection. By default the hook does nothing, so all names are passed from pseudo SQL to proprietary SQL as-is.</p>
 
 <h3>Template fragments</h3>
 
-<p>A template fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments.</p>
+<p>A template fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
 
-<p>When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
+<p>Thanks to replacements, explicitely quoting a value is almost never needed.</p>
 
 {% highlight php %}
 <?php
@@ -31,21 +31,21 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::tpl("1=? AND 'test'=? AND `mytest`=! AND 'a' IN ?",2,"my'test","my`test",array('a','b'));
+  $f = db::tpl("1=? AND 'test'=? AND `myid`=! AND 'a' IN ?", 2, "my'test", "my`id", array('a','b'));
   
   // Output SQL :
   echo db::cn()->compile($f);
   
   // Assuming a MySQL default connection, it prints :
-  // 1=2 AND 'test'='my\'test' AND `mytest`=`my``test` AND 'a' IN ('a','b')
+  // 1=2 AND 'test'='my\'test' AND `myid`=`my``id` AND 'a' IN ('a','b')
 ?>
 {% endhighlight %}
 
-<p>By themselves template fragments are not very useful. But many functions of the query builder create a template fragment behind the scene and accept a parameter list that match the one of <span class="inline_code">db::tpl()</span>.</p>
-
 <h2>Table fragments</h2>
 
-<p>Table fragments represent table-alias pairs. If the alias is omitted, a unique one is generated.</p>
+<p>Table fragments represent table-alias pairs. If the alias is omitted, a unique one is generated. Table fragments can be used to generate pseudo SQL expressions for fully qualified columns identifiers. This makes them especially useful into template fragments.</p>
+
+<p>Thanks to table fragments and their use in templates, explicitely quoting an identifier is almost never needed.</p>
 
 {% highlight php %}
 <?php
@@ -53,29 +53,14 @@ title: Guide
   use Glue\DB\DB;
 
   // Explicit alias :
-  $f = db::table('mytable', 'myalias');
-  echo db::cn()->compile($f); // For PostgreSQL, prints : "mytable"."myalias"
+  echo db::cn()->compile( db::table('mytable', 'myalias') ); // For PostgreSQL, prints : "mytable" AS "myalias"
   
   // Automatic alias :
-  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable"."mytable__0"
-  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable"."mytable__1"
-  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable"."mytable__2"
-  // ...
-  
-?>
-{% endhighlight %}
+  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable" AS "mytable__0"
+  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable" AS "mytable__1"
+  echo db::cn()->compile( db::table('mytable') ); // For PostgreSQL, prints : "mytable" AS "mytable__2"
 
-<p>The good thing about table fragments is that they can be used to generate pseudo SQL expressions for fully qualified columns identifiers. This makes them especially useful into template fragments :</p>
-
-{% highlight php %}
-<?php
-
-  use Glue\DB\DB;
-
-  // Create fragment :
-  $f = db::table('mytable', 'myalias');
-
-  // Generate column pseudo SQL :
+  // Column pseudo SQL generation :
   echo $f->column('mycolumn');  // Prints `myalias`.`mycolumn`
   echo $f->mycolumn;            // Prints `myalias`.`mycolumn` (shortcut)
   
@@ -84,8 +69,6 @@ title: Guide
   echo db::cn()->compile($tpl); // For PostgreSQL, prints "myalias"."mycolumn" = 'my\'test'
 ?>
 {% endhighlight %}
-
-<p>Like template fragments, table fragments are not very useful by themselves. But many functions of the query builder (those that add a table to a query) create a table fragment behind the scene and return it to you, so that you can use it in pseudo SQL later on.</p>
 
 
 
