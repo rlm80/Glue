@@ -5,9 +5,7 @@ title: Guide
 
 <h2>Templates</h2>
 
-<p>Low-level elements like operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators and functions. There is little point in keeping track of their internal structure, and it would be tedious to describe them as a tree of objects.</p>
-
-<p>It is best to consider low-level elements as atomic, and describe them in SQL. Still, straight SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
+<p>Low-level elements like operands in boolean expressions can be a complex mix of arithmetic expressions, string concatenations, operators, functions, identifiers and constants. It would be useless and tedious to describe them as a tree of objects. It is best to consider such elements as atomic, and describe them in SQL. Still, straight SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
 
 <h3>Pseudo SQL</h3>
 
@@ -15,11 +13,11 @@ title: Guide
 
 <h4>String literals and identifiers</h4>
 
-<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). The escape mechanism is described <a class="external" href="http://en.wikipedia.org/wiki/Delimiter#Padding_quoting_delimiters">here</a> (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, thanks to replacements and table fragments (see below), you won't need to explicitely quote anything most of the time. But should you need to, the functions <span class="inline_code">DB::quote()</span> and <span class="inline_code">DB::quote_identifier()</span> are available.</p>
+<p>String literals must be surrounded by simple quotes (') and identifiers by backticks (`). Inner occurrences of quoting characters must be doubled (e.g. string literal <i>my'test</i> becomes <i>'my''test'</i>, identifier <i>my`test</i> becomes <i>`my``test`</i>). Fortunately, most of the time it isn't necessary to explicitely quote anything, as explained below. Should the need arise, the functions <span class="inline_code">DB::quote()</span> and <span class="inline_code">DB::quote_identifier()</span> are available.</p>
 
 <h4>Operators, functions and pre-defined constants</h4>
 
-<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the whole application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that you can implement your own name conversions from pseudo SQL to proprietary SQL for a specific connection (the hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those). If you target only one database and don't care about portability, use its naming conventions and don't worry about any of this.</p>
+<p>The library doesn't impose any naming conventions. What's important is to be consistent accross the application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that name conversions from pseudo SQL to proprietary SQL can be implemented for a specific connection. The hook only operates between string literals and identifiers, so there is no risk of unfortunate matches occurring inside of those. By default the hook does nothing, so all names are passed from pseudo SQL to proprietary SQL as-is.</p>
 
 <h3>Template fragments</h3>
 
@@ -83,7 +81,6 @@ title: Guide
   
   // Usage in template fragments :
   $tpl = db::tpl("$f->mycolumn = ?", "my'test");
-  
   echo db::cn()->compile($tpl); // For PostgreSQL, prints "myalias"."mycolumn" = 'my\'test'
 ?>
 {% endhighlight %}
