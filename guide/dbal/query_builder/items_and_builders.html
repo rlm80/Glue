@@ -7,7 +7,7 @@ title: Guide
 
 <p>An SQL query is made up of lists of elements, of which there are 8 types :</p>
 
-<ol>
+<ul>
   <li>boolean operands lists,</li>
   <li>join operands lists,</li>
   <li>order by lists,</li>
@@ -16,13 +16,13 @@ title: Guide
   <li>columns lists in an insert query,</li>
   <li>values lists in an insert query,</li>
   <li>assignements lists in an update query.</li>
-</ol>
+</ul>
 
-<p>Each of these lists is represented as a pair of classes :</p>
+<p>Each of these lists is represented as a pair of fragments :</p>
 
 <ul>
-  <li>an item class : represents the elements that make up the list and provides getter/setters to access their data,</li>
-  <li>a builder class : represents the list and provides a fluent interface to build it.</li>
+  <li>an item fragment : represents the elements that make up the list and provides getter/setters to access their data,</li>
+  <li>a builder fragment : represents the list and provides a fluent interface to build it.</li>
 </ul>
 
 <p>Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. They all extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>

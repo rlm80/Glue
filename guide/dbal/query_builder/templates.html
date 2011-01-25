@@ -21,6 +21,8 @@ title: Guide
 
 <h3>Template fragments</h3>
 
+<p>Factory method : <span class="inline_code">db::tpl()</span></p>
+
 <p>A template fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
 
 <p>Thanks to replacements, explicitely quoting a value is almost never needed.</p>
@@ -42,6 +44,8 @@ title: Guide
 {% endhighlight %}
 
 <h2>Table fragments</h2>
+
+<p>Factory method : <span class="inline_code">db::table()</span></p>
 
 <p>Table fragments represent table-alias pairs. If the alias is omitted, a unique one is generated. Table fragments can be used to generate pseudo SQL expressions for fully qualified columns identifiers. This makes them especially useful in template fragments.</p>
 
