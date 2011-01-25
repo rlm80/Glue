@@ -66,8 +66,10 @@ title: Guide
   
   // Use in template fragments :
   $f = db::table('mytable', 'myalias');                 // Table fragment definition
+  
   $tpl1 = db::tpl("`myalias`.`mycolumn` = 'my''test'"); // Manual quoting
   $tpl2 = db::tpl("$f->mycolumn = ?", "my'test");       // With table fragment and replacement
+  
   echo db::cn()->compile( $tpl1 ); // For PostgreSQL, prints "myalias"."mycolumn" = 'my\'test'
   echo db::cn()->compile( $tpl2 ); // Same as above
 ?>

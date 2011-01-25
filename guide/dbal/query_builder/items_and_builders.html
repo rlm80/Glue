@@ -5,9 +5,20 @@ title: Guide
 
 <h2>Items and builders</h2>
 
-<p>A recurring pattern throughout the library is the use of items and builders.</p>
+<p>An SQL query is made up of lists of elements, of which there are 8 types :</p>
 
-<p>Most parts of an SQL query are lists of elements. A boolean expression is a list of boolean operands, a join expression is a list of join operands, and so on. Each of these lists is represented as a pair of classes :</p>
+<ol>
+  <li>boolean operands lists,</li>
+  <li>join operands lists,</li>
+  <li>order by lists,</li>
+  <li>group by lists,</li>
+  <li>select list,</li>
+  <li>columns lists in an insert query,</li>
+  <li>values lists in an insert query,</li>
+  <li>assignements lists in an update query.</li>
+</ol>
+
+<p>Each of these lists is represented as a pair of classes :</p>
 
 <ul>
   <li>an item class : represents the elements that make up the list and provides getter/setters to access their data,</li>
@@ -24,3 +35,6 @@ title: Guide
   <li><span class="inline_code">->last()</span> : returns last item,</li>
   <li><span class="inline_code">->children()</span> : returns the items array by reference.</li>
 </ul>
+
+<p>The following sections look into each type of list one by one, and describe the interface of their builders.</p>
+
