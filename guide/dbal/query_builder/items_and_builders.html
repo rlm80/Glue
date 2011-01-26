@@ -3,6 +3,8 @@ layout: base
 title: Guide
 ---
 
+<p>The following explanation may seem lenghty. That is because it is thorough. Fortunately, in practice it is much easier to use than it is to explain. It may be preferable to first take a look at the code examples to get a first feel of how things work, and than read the text for details.</p>
+
 <h2>Items and builders</h2>
 
 <p>An SQL query is made up of lists of elements, of which there are 8 types :</p>
@@ -125,8 +127,8 @@ title: Guide
 <p>Calling the factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>. The methods <span class="inline_code">init()</span>, <span class="inline_code">right()</span>, <span class="inline_code">left()</span>, <span class="inline_code">inner()</span> and <span class="inline_code">comma()</span> all take two parameters : </p>
 
 <ol>
-  <li>A table name, or a (table name, table alias) array. A table fragment will be built using this data to serve as the operand of the join.</li>
-  <li>(optional) A variable passed by reference, to be filled with the table fragment created with the first parameter.</li>
+  <li>A table name, a (table name, table alias) array or any fragment.</li>
+  <li>(optional) A variable passed by reference, to be filled with the operand of the join item. If a table name or a table-alias array was passed as first parameter, the operand is a table fragment.</li>
 </ol>
 
 {% highlight php %}
@@ -135,21 +137,20 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::bool("`column` = ?", "test")->and("1=?", 1)->or("2=2");
+  $f = db::join('users', $u)->left(array('profiles', 'myalias'), $p)->on("$p->id = $u->id");
   
-  // Output SQL :
-  echo db::cn()->compile( $f ); // ("column" = 'test') AND (1=1) OR (2=2)
+  // Output SQL (assuming PostgreSQL default connection) :
+  echo db::cn()->compile( $f );
+  // "users" AS "users_0" LEFT OUTER JOIN "profiles" AS "myalias" ON ("myalias"."id" = "users_0"."id")
   
-  // Nested boolean expressions and negation :
-  $f = db::bool("1=1")->and($nested = db::bool());
-  $nested->init("2=2")->and("3=3")->not();
+  // Nested joins expressions and negation :
+  $f = db::join('t1', $t1)->left(
+         db::join('t2', $t2)->inner('t3', $t3)->on("$t2->col = $t3->col")
+       )->on("$t2->id = $t1->id")->or("$t3->id = $t1->id");
   
-  // Output SQL :
-  echo db::cn()->compile( $f ); // (1=1) AND NOT ((2=2) OR (3=3))
-  
-  // Other ways of writing the same boolean expression :
-  $f = db::bool("1=1")->and( db::bool("2=2")->and("3=3")->not() );
-  $f = db::bool("1=1 AND NOT ?", db::bool("2=2")->and("3=3") );
+  // Output SQL (assuming MySQL default connection) :
+  echo db::cn()->compile( $f );
+  // `t1` AS `t1_0` LEFT OUTER JOIN (`t2` AS `t2_0` INNER JOIN `t3` AS `t3_0` ON (`t2_0`.`col` = `t3_0`.`col`)) ON (`t2_0`.`id` = `t1_0`.`id`) OR (`t3_0`.`id` = `t1_0`.`id`)
 ?>
 {% endhighlight %}
 
