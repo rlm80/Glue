@@ -4,13 +4,6 @@ namespace Glue\System\DB;
 
 /**
  * Fragment that represents a boolean expression.
- * 
- * A boolean expression is a list of boolean operands. A boolean operand is a fragment paired with a boolean
- * operator (OR, AND). The whole expression can be negated.
- * 
- * The SQL output of a boolean expression is the SQL output of each of its operands put one after the other,
- * preceded with NOT and surrounded with parentheses if the expression is negated. The SQL output of a boolean
- * operand is its boolean operator followed by the SQL output of its fragment surrounded with parentheses.
  *
  * @package    Glue
  * @author     Régis Lemaigre
@@ -22,7 +15,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	 * @var boolean Whether or not this boolean expression should be negated.
 	 */
 	protected $negated = false;
-	
+
 	/**
 	 * Resets the expression and initializes it with a first operand.
 	 *
@@ -44,7 +37,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		$args = func_get_args();
 		return $this->add(
 			$args,
-			$this->is_empty() ? null : \Glue\DB\Fragment_Item_Bool::_OR
+			$this->is_empty() ? null : \Glue\DB\DB::_OR
 		);
 	}
 
@@ -58,7 +51,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		$args = func_get_args();
 		return $this->add(
 			$args,
-			$this->is_empty() ? null : \Glue\DB\Fragment_Item_Bool::_AND
+			$this->is_empty() ? null : \Glue\DB\DB::_AND
 		);
 	}
 
@@ -80,10 +73,10 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 				$operator
 			)
 		);
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Negate expression.
 	 *
@@ -93,7 +86,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		$this->negated = ! $this->negated;
 		return $this;
 	}
-	
+
 	/**
 	 * Returns whether or not expression is negated.
 	 *
@@ -102,7 +95,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 	public function negated() {
 		return $this->negated;
 	}
-	
+
 	/*
 	 * Sets up aliases for _or(), _and(). Required because
 	 * keywords aren't valid function names in PHP.
@@ -112,5 +105,5 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 			return call_user_func_array(array($this, '_or'), $args);
 		elseif ($name === 'and')
 			return call_user_func_array(array($this, '_and'), $args);
-	}	
+	}
 }

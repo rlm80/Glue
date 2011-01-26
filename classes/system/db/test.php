@@ -391,7 +391,7 @@ EOD;
 					->values('test2', 'test2')
 					->values('test3', 'test3');
 		db::cn()->exec($query);
-		
+
 		// Test prepared insert :
 		$query = db::insert('glprofiles')->columns('id', 'email')
 					->values(null, 'test1')
@@ -403,12 +403,12 @@ EOD;
 		// Test update :
 		$query = db::update('glusers', $u)
 					->set('password', db::select('glprofiles')->columns("count(*)"))
-					->where("$u->login = ?", 'test2');	
-		db::cn()->exec($query);		
-		
+					->where("$u->login = ?", 'test2');
+		db::cn()->exec($query);
+
 		// Test Delete :
-		$query = db::delete('glprofiles', $u)->where("$u->id = ?", 3);	
-		db::cn()->exec($query);		
+		$query = db::delete('glprofiles', $u)->where("$u->id = ?", 3);
+		db::cn()->exec($query);
 
 		// Test Select :
 		$query = db::select('glusers', $a)
@@ -418,23 +418,21 @@ EOD;
 					->where("$a->id = ?", 3)
 					->groupby($a->id, $a->login, $b->id, $b->login)
 					->orderby($a->id, $a->login, $b->id, $b->login)
-					->limit(1)->offset(0);	
-		$stmt = db::cn()->query($query);	
+					->limit(1)->offset(0);
+		$stmt = db::cn()->query($query);
 
-		  // Base query :
-  $query = db::select('users', $u)->where("$u->login = ?", 'Mike')->columns($u->login);
-  
-  // Add a join :
-  $query->left('profiles', $p)->on("$p->id = $u->id")->columns($p->email);
-  
-  // Compile against default connection :
-  echo db::cn()->compile($query);
-  
+  $f = db::join('t1', $t1)->left( $nested = db::join() );
+  $nested->init('t2', $t2)->inner('t3', $t3)->on("$t2->col = $t3->col + ?", 5);
+  $f->on("$t2->id = $t1->id")->or("$t3->id = $t1->id");
+
+  // Output SQL :
+  echo db::cn()->compile( $f ); // (1=1) AND NOT ((2=2) OR (3=3))
+
 		/*foreach($stmt as $row) {
 			var_dump($row);
 			var_dump($a->id($row));
 		}*/
-		
+
 /*
 		$query = db::select('glusers', $u)->columns($u->id, $u->login, $u->password);
 		$statement = db::cn()->prepare($query);

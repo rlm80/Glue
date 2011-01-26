@@ -11,10 +11,6 @@ namespace Glue\System\DB;
  */
 
 class Fragment_Item_Bool extends \Glue\DB\Fragment_Item {
-	// Boolean operators :
-	const _AND		= 0;
-	const _OR		= 1;
-	
 	/**
 	 * @var integer Operator.
 	 */
@@ -27,7 +23,7 @@ class Fragment_Item_Bool extends \Glue\DB\Fragment_Item {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param \Glue\DB\Fragment $operand
 	 * @param integer $operator Null means first operand.
 	 */

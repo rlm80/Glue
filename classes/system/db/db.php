@@ -23,6 +23,10 @@ class DB {
 	const INNER	= 2;
 	const COMMA	= 3;
 
+	// Boolean operators :
+	const _AND		= 0;
+	const _OR		= 1;
+
 	/**
 	 * @var array Connection instances cache.
 	 */
@@ -230,10 +234,10 @@ class DB {
 	 *
 	 * @return \Glue\DB\Fragment_Item_Join
 	 */
-	public static function join($table = 0, &$obj = null) {
+	public static function join($table = 0, &$operand = null) {
 		$f = new \Glue\DB\Fragment_Builder_Join();
 		if (func_num_args() > 0)
-			return $f->init($table, $alias);
+			return $f->init($table, $operand);
 		else
 			return $f;
 	}

@@ -131,24 +131,24 @@ abstract class Connection extends PDO {
 	protected function set_charset() {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
-	
+
 	public function prepare() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
 		return call_user_func_array('parent::prepare', $args);
 	}
-	
+
 	public function query() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
-		return call_user_func_array('parent::query', $args);		
-	}	
-	
+		return call_user_func_array('parent::query', $args);
+	}
+
 	public function exec() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
-		return call_user_func_array('parent::exec', $args);		
-	}	
+		return call_user_func_array('parent::exec', $args);
+	}
 
 	/**
 	 * Returns all tables defined on this connection as an array of table objects indexed by table name.
@@ -358,7 +358,7 @@ abstract class Connection extends PDO {
 					function ($matches) use ($cn, &$replacements) {
 						// Get next replacement :
 						$replacement = array_shift($replacements);
-						
+
 						// Replacement is a fragment ?
 						if ($replacement instanceof \Glue\DB\Fragment)
 							return $cn->compile($replacement);
@@ -431,8 +431,8 @@ abstract class Connection extends PDO {
 		$sql = '';
 		if (isset($operator)) {
 			switch ($operator) {
-				case \Glue\DB\Fragment_Item_Bool::_AND :	$sql = 'AND ';	break;
-				case \Glue\DB\Fragment_Item_Bool::_OR :		$sql = 'OR ';	break;
+				case \Glue\DB\DB::_AND :	$sql = 'AND ';	break;
+				case \Glue\DB\DB::_OR :		$sql = 'OR ';	break;
 			}
 		}
 
