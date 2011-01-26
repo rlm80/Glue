@@ -22,7 +22,7 @@ title: Guide
 
 <ul>
   <li>an item fragment : represents the elements that make up the list and provides getter/setters to access their data,</li>
-  <li>a builder fragment : represents the list and provides a fluent interface to build it.</li>
+  <li>a builder fragment : represents the list and provides a <a class="external" href="http://en.wikipedia.org/wiki/Method_chaining">fluent interface</a> to build it.</li>
 </ul>
 
 <p>Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. They all extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
@@ -36,5 +36,77 @@ title: Guide
   <li><span class="inline_code">->children()</span> : returns the items array by reference.</li>
 </ul>
 
-<p>The following sections look into each type of list one by one, and describe the interface of their builders.</p>
+<p>The following sections look into each type of lists one by one, giving an example of how to use their builders.</p>
+
+<h2>Boolean operands lists</h2>
+
+<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/bool.php"><span class="inline_code">Fragment_Builder_Bool</span></a></p>
+
+<p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/bool.php"><span class="inline_code">Fragment_Item_Bool</span></a></p>
+
+<p>Factory method : <span class="inline_code">DB::bool()</span></p>
+
+<p>The builder has 4 methods :</p>
+
+<ul>
+  <li><span class="inline_code">->init()</span> : removes all items and initialize the expression with a first operand,</li>
+  <li><span class="inline_code">->and()</span> : adds an operand, connecting it with AND,</li>
+  <li><span class="inline_code">->or()</span> : adds an operand, connecting it with OR,</li>
+  <li><span class="inline_code">->not()</span> : toggles negation of the expression.</li>
+</ul>
+
+<p>The methods <span class="inline_code">init()</span>, <span class="inline_code">and()</span> and <span class="inline_code">or()</span> take the same parameters as <span class="inline_code">DB::tpl()</span>, that is, a string of pseudo SQL, followed by a list of replacements. Alternatively, they also accept a single fragment parameter. The factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>.</p>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::bool("`column` = ?", "test")->and("1=?", 1)->or("2=2");
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // ("column" = 'test') AND (1=1) OR (2=2)
+  
+  // Nested boolean expressions and negation :
+  $f = db::bool("1=1")->and($nested = db::bool());
+  $nested->init("2=2")->and("3=3")->not();
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // (1=1) AND NOT ((2=2) OR (3=3))
+  
+  // Other ways of writing the same boolean expression :
+  $f = db::bool("1=1")->and( db::bool("2=2")->and("3=3")->not() );
+  $f = db::bool("1=1 AND NOT ?", db::bool("2=2")->and("3=3") );
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
