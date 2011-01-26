@@ -8,8 +8,8 @@ title: Guide
 <p>An SQL query is made up of lists of elements, of which there are 8 types :</p>
 
 <ul>
-  <li>boolean operands lists,</li>
-  <li>join operands lists,</li>
+  <li>boolean expressions,</li>
+  <li>join expressions,</li>
   <li>order by lists,</li>
   <li>group by lists,</li>
   <li>select list,</li>
@@ -18,11 +18,11 @@ title: Guide
   <li>assignements lists in an update query.</li>
 </ul>
 
-<p>Each of these lists is represented as a pair of fragments :</p>
+<p>Each of these lists is represented as a pair of fragment classes :</p>
 
 <ul>
-  <li>an item fragment : represents the elements that make up the list and provides getter/setters to access their data,</li>
-  <li>a builder fragment : represents the list and provides a <a class="external" href="http://en.wikipedia.org/wiki/Method_chaining">fluent interface</a> to build it.</li>
+  <li>item fragment : represents the elements that make up the list and provides getter/setters to access their data,</li>
+  <li>builder fragment : represents the list and provides a <a class="external" href="http://en.wikipedia.org/wiki/Method_chaining">fluent interface</a> to build it.</li>
 </ul>
 
 <p>Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. They all extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
@@ -38,7 +38,7 @@ title: Guide
 
 <p>The following sections look into each type of lists one by one, giving an example of how to use their builders.</p>
 
-<h2>Boolean operands lists</h2>
+<h2>Boolean expressions</h2>
 
 <p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/bool.php"><span class="inline_code">Fragment_Builder_Bool</span></a></p>
 
@@ -46,16 +46,23 @@ title: Guide
 
 <p>Factory method : <span class="inline_code">DB::bool()</span></p>
 
-<p>The builder has 4 methods :</p>
+<p>The item is an operator-operand pair. The operator can be either <span class="inline_code">DB::_OR</span> or <span class="inline_code">DB::_AND</span>, and the operand can be any fragment. It has 2 methods :</p>
 
 <ul>
-  <li><span class="inline_code">->init()</span> : removes all items and initialize the expression with a first operand,</li>
-  <li><span class="inline_code">->and()</span> : adds an operand, connecting it with AND,</li>
-  <li><span class="inline_code">->or()</span> : adds an operand, connecting it with OR,</li>
+  <li><span class="inline_code">->operator()</span> : operator getter/setter,</li>
+  <li><span class="inline_code">->operand()</span> : operand getter/setter.</li>
+</ul>
+
+<p>The builder has 4 methods, they all return <span class="inline_code">$this</span> :</p>
+
+<ul>
+  <li><span class="inline_code">->init()</span> : removes all items and initialize the expression with a first item (no operator),</li>
+  <li><span class="inline_code">->and()</span> : adds a new item with AND operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->or()</span> : adds a new item with OR operator (no operator if list is still empty),</li>
   <li><span class="inline_code">->not()</span> : toggles negation of the expression.</li>
 </ul>
 
-<p>The methods <span class="inline_code">init()</span>, <span class="inline_code">and()</span> and <span class="inline_code">or()</span> take the same parameters as <span class="inline_code">DB::tpl()</span>, that is, a string of pseudo SQL, followed by a list of replacements. Alternatively, they also accept a single fragment parameter. The factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>.</p>
+<p>The methods <span class="inline_code">init()</span>, <span class="inline_code">and()</span> and <span class="inline_code">or()</span> take the same parameters as <span class="inline_code">DB::tpl()</span>, that is, a string of pseudo SQL, followed by a list of replacements. Alternatively, they also accept a single fragment parameter. Calling the factory method is the same as creating a new object and calling <span class="inline_code">init()</span>.</p>
 
 {% highlight php %}
 <?php
@@ -81,7 +88,69 @@ title: Guide
 ?>
 {% endhighlight %}
 
+<h2>Join expressions</h2>
 
+<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/join.php"><span class="inline_code">Fragment_Builder_Join</span></a></p>
+
+<p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/bool.php"><span class="inline_code">Fragment_Item_Join</span></a></p>
+
+<p>Factory method : <span class="inline_code">DB::join()</span></p>
+
+<p>The item is an operator-operand pair and a boolean expression (ON clause). The operator can be either <span class="inline_code">DB::INNER</span>, <span class="inline_code">DB::LEFT</span>, <span class="inline_code">DB::RIGHT</span> or <span class="inline_code">DB::COMMA</span>. The operand can be any fragment. It has 3 methods :</p>
+
+<ul>
+  <li><span class="inline_code">->operator()</span> : operator getter/setter,</li>
+  <li><span class="inline_code">->operand()</span> : operand getter/setter,</li>
+  <li><span class="inline_code">->on()</span> : returns the on clause.</li>
+</ul>
+
+<p>The builder has 8 methods, all of them return <span class="inline_code">$this</span> :</p>
+
+<ul>
+  <li><span class="inline_code">->init()</span> : removes all items and initialize the expression with a first item (no operator),</li>
+  <li><span class="inline_code">->right()</span> : adds a new item with RIGHT OUTER JOIN operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->left()</span> : adds a new item with LEFT OUTER JOIN operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->inner()</span> : adds a new item with INNER JOIN operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->comma()</span> : adds a new item with ',' join operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->on()</span> :
+    <ul>
+      <li>without parameters, returns the ON clause of the last item,</li>
+      <li>with parameters, forwards call to <span class="inline_code">->and()</span> method of the ON clause of the last item.</li>
+  </li>
+  <li><span class="inline_code">->and()</span> : forwards call to <span class="inline_code">->and()</span> method of the ON clause of the last item,</li>
+  <li><span class="inline_code">->or()</span> : forwards call to <span class="inline_code">->or()</span> method of the ON clause of the last item.</li>
+</ul>
+
+<p>Calling the factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>. The methods <span class="inline_code">init()</span>, <span class="inline_code">right()</span>, <span class="inline_code">left()</span>, <span class="inline_code">inner()</span> and <span class="inline_code">comma()</span> all take two parameters : </p>
+
+<ol>
+  <li>A table name, or a (table name, table alias) array. A table fragment will be built using this data to serve as the operand of the join.</li>
+  <li>(optional) A variable passed by reference, to be filled with the table fragment created with the first parameter.</li>
+</ol>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::bool("`column` = ?", "test")->and("1=?", 1)->or("2=2");
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // ("column" = 'test') AND (1=1) OR (2=2)
+  
+  // Nested boolean expressions and negation :
+  $f = db::bool("1=1")->and($nested = db::bool());
+  $nested->init("2=2")->and("3=3")->not();
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // (1=1) AND NOT ((2=2) OR (3=3))
+  
+  // Other ways of writing the same boolean expression :
+  $f = db::bool("1=1")->and( db::bool("2=2")->and("3=3")->not() );
+  $f = db::bool("1=1 AND NOT ?", db::bool("2=2")->and("3=3") );
+?>
+{% endhighlight %}
 
 
 
