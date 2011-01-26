@@ -3,8 +3,6 @@ layout: base
 title: Guide
 ---
 
-<p>The following explanation may seem lenghty. That is because it is thorough. Fortunately, in practice it is much easier to use than it is to explain. It may be preferable to first take a look at the code examples to get a first feel of how things work, and than read the text for details.</p>
-
 <h2>Items and builders</h2>
 
 <p>An SQL query is made up of lists of elements, of which there are 8 types :</p>
@@ -145,12 +143,12 @@ title: Guide
   
   // Nested joins expressions and negation :
   $f = db::join('t1', $t1)->left(
-         db::join('t2', $t2)->inner('t3', $t3)->on("$t2->col = $t3->col")
+         db::join('t2', $t2)->inner('t3', $t3)->on("$t2->col = $t3->col + ?", 5)
        )->on("$t2->id = $t1->id")->or("$t3->id = $t1->id");
   
   // Output SQL (assuming MySQL default connection) :
   echo db::cn()->compile( $f );
-  // `t1` AS `t1_0` LEFT OUTER JOIN (`t2` AS `t2_0` INNER JOIN `t3` AS `t3_0` ON (`t2_0`.`col` = `t3_0`.`col`)) ON (`t2_0`.`id` = `t1_0`.`id`) OR (`t3_0`.`id` = `t1_0`.`id`)
+  // `t1` AS `t1_0` LEFT OUTER JOIN (`t2` AS `t2_0` INNER JOIN `t3` AS `t3_0` ON (`t2_0`.`col` = `t3_0`.`col` + 5)) ON (`t2_0`.`id` = `t1_0`.`id`) OR (`t3_0`.`id` = `t1_0`.`id`)
 ?>
 {% endhighlight %}
 
