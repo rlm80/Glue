@@ -5,13 +5,13 @@ title: Guide
 
 <h2>Join expressions</h2>
 
-<p>Factory method : <span class="inline_code">DB::join()</span></p>
+<p>Factory : <span class="inline_code">DB::join()</span></p>
 
-<p>Represents a list of parentheses enclosed (TODO) join operands, connected by join operators : <span class="inline_code">TODO</span></p>
+<p>Represents a list of join operands, connected by join operators : <span class="inline_code">"table1" AS "alias1" LEFT OUTER JOIN "table2" AS "alias2" ON ...</span></p>
 
 <h3>Items</h3>
 
-<p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/bool.php"><span class="inline_code">Fragment_Item_Join</span></a></p>
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/join.php"><span class="inline_code">Fragment_Item_Join</span></a></p>
 
 <p>The item is an operator-operand pair and a boolean expression (ON clause). The operator can be either <span class="inline_code">DB::INNER</span>, <span class="inline_code">DB::LEFT</span>, <span class="inline_code">DB::RIGHT</span> or <span class="inline_code">DB::COMMA</span>. The operand can be any fragment. It has 3 methods :</p>
 
@@ -23,34 +23,36 @@ title: Guide
 
 <h3>Builders</h3>
 
-<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/join.php"><span class="inline_code">Fragment_Builder_Join</span></a></p>
+<p>Class : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/join.php"><span class="inline_code">Fragment_Builder_Join</span></a></p>
 
-<p>The builder has 8 methods, all of them return <span class="inline_code">$this</span> :</p>
+<p>There are 5 methods to add items to the list (all of them return <span class="inline_code">$this</span>) :</p>
 
 <ul>
   <li><span class="inline_code">->init()</span> : removes all items and initialize the expression with a first item (no operator),</li>
-  <li><span class="inline_code">->right()</span> : adds a new item with RIGHT OUTER JOIN operator (no operator if list is still empty),</li>
-  <li><span class="inline_code">->left()</span> : adds a new item with LEFT OUTER JOIN operator (no operator if list is still empty),</li>
-  <li><span class="inline_code">->inner()</span> : adds a new item with INNER JOIN operator (no operator if list is still empty),</li>
-  <li><span class="inline_code">->comma()</span> : adds a new item with ',' join operator (no operator if list is still empty),</li>
-  <li><span class="inline_code">->on()</span> :
-    <ul>
-      <li>without parameters, returns the ON clause of the last item,</li>
-      <li>with parameters, forwards call to <span class="inline_code">->and()</span> method of the ON clause of the last item.</li>
-    </ul>
-  </li>
-  <li><span class="inline_code">->and()</span> : forwards call to <span class="inline_code">->and()</span> method of the ON clause of the last item,</li>
-  <li><span class="inline_code">->or()</span> : forwards call to <span class="inline_code">->or()</span> method of the ON clause of the last item.</li>
+  <li><span class="inline_code">->right()</span> : adds a new item with <span class="inline_code">DB::RIGHT</span> operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->left()</span> : adds a new item with <span class="inline_code">DB::LEFT</span> operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->inner()</span> : adds a new item with <span class="inline_code">DB::INNER</span> operator (no operator if list is still empty),</li>
+  <li><span class="inline_code">->comma()</span> : adds a new item with <span class="inline_code">DB::COMMA</span> operator (no operator if list is still empty).</li>
 </ul>
 
-<p>Calling the factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>. The methods <span class="inline_code">init()</span>, <span class="inline_code">right()</span>, <span class="inline_code">left()</span>, <span class="inline_code">inner()</span> and <span class="inline_code">comma()</span> all take two parameters : </p>
+<p>These methods all take two parameters : </p>
 
 <ol>
-  <li>A table name, a (table name, table alias) array or any fragment.</li>
-  <li>(optional) A variable passed by reference, to be filled with the operand of the join item. If a table name or a table-alias array was passed as first parameter, the operand is a table fragment.</li>
+  <li>A table name, a table-alias array or any fragment.</li>
+  <li>(optional) A variable passed by reference, to be filled with the table fragment defined by the first parameter.</li>
 </ol>
 
-<h3>Code samples</h3>
+<p>The 3 remaining methods operate on the ON clause of the last item (all of them return <span class="inline_code">$this</span>) :</p>
+
+<ul>
+  <li><span class="inline_code">->on()</span> : without parameters, returns the ON clause of the last item; otherwise forwards call to <span class="inline_code">->and()</span> method of the last ON clause.</li>
+  <li><span class="inline_code">->and()</span> : forwards call to <span class="inline_code">->and()</span> method of the last ON clause,</li>
+  <li><span class="inline_code">->or()</span> : forwards call to <span class="inline_code">->or()</span> method of the last ON clause.</li>
+</ul>
+
+<p>Calling the factory method is the same as creating a new builder and calling <span class="inline_code">init()</span>.</p>
+
+<h3>Exemples</h3>
 
 {% highlight php %}
 <?php
