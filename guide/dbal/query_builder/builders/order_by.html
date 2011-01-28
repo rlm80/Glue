@@ -7,7 +7,7 @@ title: Guide
 
 <p>Factory : <span class="inline_code">DB::orderby()</span></p>
 
-<p>Represents a list of parentheses enclosed SQL expressions, followed by an ordering specification : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) ASC, ("mytable"."mycolumn3") DESC, ...</span></p>
+<p>Represents a comma separated list of parentheses enclosed SQL expressions, followed by an ordering specification : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) ASC, ("mytable"."mycolumn3") DESC, ...</span></p>
 
 <h3>Item class</h3>
 
@@ -26,7 +26,7 @@ title: Guide
 
 <p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/orderby.php"><span class="inline_code">Fragment_Builder_Orderby</span></a></p>
 
-<p>The builder has only 1 method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;>orderby()</span>. It adds a list of SQL expressions to the order by. It can take any number of parameters, each of them can be either :</p>
+<p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;orderby()</span>. It adds a list of SQL expressions to the order by. It can take any number of parameters, each of them can be either :</p>
 
 <ul>
   <li>a string of pseudo SQL (DB::ASC is assumed),</li>
@@ -55,7 +55,6 @@ title: Guide
   // Output SQL : 
   echo db::cn()->compile( $f );  
   
-  // ("myalias"."column1" + "myalias"."column2" * 5) ASC,  ("myalias"."column2") ASC, ("myalias"."column3") DESC
-  
+  // ("myalias"."column1" + "myalias"."column2" * 5) ASC, ("myalias"."column2") ASC, ("myalias"."column3") DESC
 ?>
 {% endhighlight %}
