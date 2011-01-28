@@ -1,0 +1,60 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Select lists</h2>
+
+<p>Factory : <span class="inline_code">DB::selectlist()</span></p>
+
+<p>Represents a comma separated list of parentheses enclosed SQL expressions, followed by an alias : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) AS "alias1", ("mytable"."mycolumn3") AS "alias2", ...</span></p>
+
+<h3>Item class</h3>
+
+<p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/select.php"><span class="inline_code">Fragment_Item_Select</span></a></p>
+
+<p>The item is a fragment-alias pair. It has 2 methods :</p>
+
+<ul>
+  <li><span class="inline_code">-&gt;selected()</span> : fragment getter/setter,</li>
+  <li><span class="inline_code">-&gt;alias()</span> : alias getter/setter.</li>
+</ul>
+
+<h3>Builder class</h3>
+
+<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/select.php"><span class="inline_code">Fragment_Builder_Select</span></a></p>
+
+<p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;columns()</span>. It adds a list of SQL expressions to the select list. It can take any number of parameters, each of them can be either :</p>
+
+<ul>
+  <li>a string of pseudo SQL (default alias = pseudo SQL quoted as an identifier),</li>
+  <li>a fragment (default alias = none),</li>
+  <li>an array (string of pseudo SQL, alias),</li>
+  <li>an array (fragment, alias).</li>
+</ul>
+
+<p>The function checks aliases uniqueness. An item with an already taken alias is ignored.</p>
+
+<h3>Examples</h3>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::selectlist(array("`column1` + `column2` * 5", "alias1"))->columns("`column2`", "column3");
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) AS "alias1",  ("column2") AS "`column2`", (column3) AS "column3"
+  
+  // Usage with table fragment :
+  $t = db::table('mytable', 'myalias');
+  $f = db::selectlist(array"$t->column1 + $t->column2 * 5", "alias1"))->columns($t->column2, $t->column3);
+  
+  // Output SQL : 
+  echo db::cn()->compile( $f );  
+  
+  // ("myalias"."column1" + "myalias"."column2" * 5)  AS "alias1", ("myalias"."column2")  AS "`myalias`.`column2`", ("myalias"."column3") "`myalias`.`column3`"
+?>
+{% endhighlight %}

@@ -13,22 +13,13 @@ title: Guide
 
 <p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/groupby.php"><span class="inline_code">Fragment_Item_Groupby</span></a></p>
 
-<p>The item has one property (a fragment) and one method :</p>
-
-<ul>
-  <li><span class="inline_code">-&gt;grouped()</span> : fragment getter/setter.</li>
-</ul>
+<p>The item has one property (a fragment) and one method : <span class="inline_code">-&gt;grouped()</span>, the fragment getter/setter.</p>
 
 <h3>Builder class</h3>
 
 <p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/groupby.php"><span class="inline_code">Fragment_Builder_Groupby</span></a></p>
 
-<p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;groupby()</span>. It adds a list of SQL expressions to the group by. It can take any number of parameters, each of them can be either :</p>
-
-<ul>
-  <li>a string of pseudo SQL (DB::ASC is assumed),</li>
-  <li>a fragment (DB::ASC is assumed).
-</ul>
+<p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;groupby()</span>. It adds a list of SQL expressions to the group by. It can take any number of parameters, each of them can be either a string of pseudo SQL or a fragment.</p>
 
 <h3>Examples</h3>
 
