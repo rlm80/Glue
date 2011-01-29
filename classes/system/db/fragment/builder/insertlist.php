@@ -10,13 +10,13 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Builder_Columns extends \Glue\DB\Fragment_Builder {
+class Fragment_Builder_InsertList extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds columns at the end of the column list. Accepts :
 	 * - a list of columns,
 	 * - an array of columns.
 	 *
-	 * @return \Glue\DB\Fragment_Builder_Columns
+	 * @return \Glue\DB\Fragment_Builder_InsertList
 	 */
 	public function columns() {
 		// Get array of columns to add :
@@ -28,7 +28,7 @@ class Fragment_Builder_Columns extends \Glue\DB\Fragment_Builder {
 			
 		// Add columns :
 		foreach($columns as $column)
-			$this->push(new \Glue\DB\Fragment_Item_Columns($column));
+			$this->push(new \Glue\DB\Fragment_Item_InsertList($column));
 			
 		return $this;
 	}

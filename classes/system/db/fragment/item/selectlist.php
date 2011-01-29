@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Item_Select extends \Glue\DB\Fragment_Item {
+class Fragment_Item_SelectList extends \Glue\DB\Fragment_Item {
 	/**
 	 * @var \Glue\DB\Fragment Fragment to be selected.
 	 */

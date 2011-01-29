@@ -22,7 +22,7 @@ class Fragment_Builder_Orderby extends \Glue\DB\Fragment_Builder {
 	 *
 	 * @return \Glue\DB\Fragment_Builder_Orderby
 	 */
-	public function orderby() {
+	public function orderby() { // TODO think...isn't it better to call this "add" or "and" ?
 		// Get array of columns :
 		$columns = func_get_args();
 		

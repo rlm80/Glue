@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Builder_Select extends \Glue\DB\Fragment_Builder {
+class Fragment_Builder_SelectList extends \Glue\DB\Fragment_Builder {
 	/**
 	 * Adds a list of columns to the select list, making sure the same alias isn't used twice.
 	 * 
@@ -20,7 +20,7 @@ class Fragment_Builder_Select extends \Glue\DB\Fragment_Builder {
 	 * - an array(string, alias),
 	 * - an array(fragment, alias).
 	 *
-	 * @return \Glue\DB\Fragment_Builder_Select
+	 * @return \Glue\DB\Fragment_Builder_SelectList
 	 */
 	public function columns() {
 		// Get array of columns :
@@ -49,7 +49,7 @@ class Fragment_Builder_Select extends \Glue\DB\Fragment_Builder {
 			if ($found) continue;
 						
 			// Add column :
-			$this->push(new \Glue\DB\Fragment_Item_Select($col, $alias));
+			$this->push(new \Glue\DB\Fragment_Item_SelectList($col, $alias));
 		}
 		
 		return $this;

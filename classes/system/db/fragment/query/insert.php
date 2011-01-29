@@ -22,7 +22,7 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	protected $values;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Columns Columns list.
+	 * @var \Glue\DB\Fragment_Builder_InsertList Columns list.
 	 */
 	protected $columns;
 
@@ -31,7 +31,7 @@ class Fragment_Query_Insert extends \Glue\DB\Fragment_Query {
 	 */
 	public function __construct() {
 		$this->values	= new \Glue\DB\Fragment_Builder_Values();
-		$this->columns	= new \Glue\DB\Fragment_Builder_Columns();
+		$this->columns	= new \Glue\DB\Fragment_Builder_InsertList();
 	}
 
 	/**

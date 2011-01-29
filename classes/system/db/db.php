@@ -256,6 +256,51 @@ class DB {
 		else
 			return $f;
 	}
+	
+	/**
+	 * Returns a new select list fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_SelectList
+	 */
+	public static function selectlist() {
+		$f = new \Glue\DB\Fragment_Builder_SelectList();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'columns'), $args);
+		}
+		else
+			return $f;
+	}	
+	
+	/**
+	 * Returns a new update list fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_UpdateList
+	 */
+	public static function updatelist() {
+		$f = new \Glue\DB\Fragment_Builder_UpdateList();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'set'), $args);
+		}
+		else
+			return $f;
+	}
+
+	/**
+	 * Returns a new insert list fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_InsertList
+	 */
+	public static function insertlist() {
+		$f = new \Glue\DB\Fragment_Builder_InsertList();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'columns'), $args);
+		}
+		else
+			return $f;
+	}	
 
 	/**
 	 * Returns a new group by fragment.

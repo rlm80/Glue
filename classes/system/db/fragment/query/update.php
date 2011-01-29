@@ -17,7 +17,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	protected $table;
 
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Set Set list.
+	 * @var \Glue\DB\Fragment_Builder_UpdateList Set list.
 	 */
 	protected $set;
 
@@ -45,7 +45,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->set		= new \Glue\DB\Fragment_Builder_Set();
+		$this->set		= new \Glue\DB\Fragment_Builder_UpdateList();
 		$this->where	= new \Glue\DB\Fragment_Builder_Bool();
 		$this->orderby	= new \Glue\DB\Fragment_Builder_Orderby();
 	}
@@ -68,7 +68,7 @@ class Fragment_Query_Update extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * With parameters, adds an element to the set list and returns $this : @see \Glue\DB\Fragment_Builder_Set::set()
+	 * With parameters, adds an element to the set list and returns $this : @see \Glue\DB\Fragment_Builder_UpdateList::set()
 	 * Without parameters : returns the set list.
 	 *
 	 * @param mixed $arg1 A column name, or a names => values mapping array.

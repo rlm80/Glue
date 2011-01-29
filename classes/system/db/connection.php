@@ -132,18 +132,33 @@ abstract class Connection extends PDO {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
 
+	/** 
+	 * Overridden to accept fragments as well as SQL strings.
+	 * 
+	 * @see PDO::prepare()
+	 */
 	public function prepare() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
 		return call_user_func_array('parent::prepare', $args);
 	}
 
+	/** 
+	 * Overridden to accept fragments as well as SQL strings.
+	 * 
+	 * @see PDO::query()
+	 */	
 	public function query() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
 		return call_user_func_array('parent::query', $args);
 	}
 
+	/** 
+	 * Overridden to accept fragments as well as SQL strings.
+	 * 
+	 * @see PDO::exec()
+	 */	
 	public function exec() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
@@ -267,14 +282,14 @@ abstract class Connection extends PDO {
 				return $this->compile_item_orderby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Groupby)
 				return $this->compile_item_groupby($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Select)
-				return $this->compile_item_select($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Set)
-				return $this->compile_item_set($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_SelectList)
+				return $this->compile_item_selectlist($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_UpdateList)
+				return $this->compile_item_updatelist($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Values)
 				return $this->compile_item_values($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Item_Columns)
-				return $this->compile_item_columns($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Item_InsertList)
+				return $this->compile_item_insertlist($fragment);
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Builder) {
 			if ($fragment instanceof \Glue\DB\Fragment_Builder_Bool)
@@ -285,14 +300,14 @@ abstract class Connection extends PDO {
 				return $this->compile_builder_orderby($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Groupby)
 				return $this->compile_builder_groupby($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Select)
-				return $this->compile_builder_select($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Set)
-				return $this->compile_builder_set($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_SelectList)
+				return $this->compile_builder_selectlist($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_UpdateList)
+				return $this->compile_builder_updatelist($fragment);
 			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Values)
 				return $this->compile_builder_values($fragment);
-			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_Columns)
-				return $this->compile_builder_columns($fragment);
+			elseif ($fragment instanceof \Glue\DB\Fragment_Builder_InsertList)
+				return $this->compile_builder_insertlist($fragment);
 		}
 		elseif ($fragment instanceof \Glue\DB\Fragment_Query) {
 			if ($fragment instanceof \Glue\DB\Fragment_Query_Select)
@@ -529,13 +544,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Item_Select fragments into an SQL string.
+	 * Compiles Fragment_Item_SelectList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Item_Select $fragment
+	 * @param \Glue\DB\Fragment_Item_SelectList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_item_select(\Glue\DB\Fragment_Item_Select $fragment) {
+	protected function compile_item_selectlist(\Glue\DB\Fragment_Item_SelectList $fragment) {
 		// Get data from fragment :
 		$selected	= $fragment->selected();
 		$alias		= $fragment->alias();
@@ -552,13 +567,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Item_Set fragments into an SQL string.
+	 * Compiles Fragment_Item_UpdateList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Item_Set $fragment
+	 * @param \Glue\DB\Fragment_Item_UpdateList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_item_set(\Glue\DB\Fragment_Item_Set $fragment) {
+	protected function compile_item_updatelist(\Glue\DB\Fragment_Item_UpdateList $fragment) {
 		// Get data from fragment :
 		$setsql	= $this->quote_identifier($fragment->set());
 		$tosql	= $this->compile($fragment->to());
@@ -567,13 +582,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Item_Columns fragments into an SQL string.
+	 * Compiles Fragment_Item_InsertList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Item_Columns $fragment
+	 * @param \Glue\DB\Fragment_Item_InsertList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_item_columns(\Glue\DB\Fragment_Item_Columns $fragment) {
+	protected function compile_item_insertlist(\Glue\DB\Fragment_Item_InsertList $fragment) {
 		return $this->quote_identifier($fragment->column());
 	}
 
@@ -643,13 +658,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Select fragments into an SQL string.
+	 * Compiles Fragment_Builder_SelectList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Builder_Select $fragment
+	 * @param \Glue\DB\Fragment_Builder_SelectList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_select(\Glue\DB\Fragment_Builder_Select $fragment) {
+	protected function compile_builder_selectlist(\Glue\DB\Fragment_Builder_SelectList $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -676,13 +691,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Set fragments into an SQL string.
+	 * Compiles Fragment_Builder_UpdateList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Builder_Set $fragment
+	 * @param \Glue\DB\Fragment_Builder_UpdateList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_set(\Glue\DB\Fragment_Builder_Set $fragment) {
+	protected function compile_builder_updatelist(\Glue\DB\Fragment_Builder_UpdateList $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -698,13 +713,13 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Builder_Columns fragments into an SQL string.
+	 * Compiles Fragment_Builder_InsertList fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Builder_Columns $fragment
+	 * @param \Glue\DB\Fragment_Builder_InsertList $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_builder_columns(\Glue\DB\Fragment_Builder_Columns $fragment) {
+	protected function compile_builder_insertlist(\Glue\DB\Fragment_Builder_InsertList $fragment) {
 		return $this->compile_builder($fragment, ', ');
 	}
 
@@ -723,11 +738,12 @@ abstract class Connection extends PDO {
 		$groupbysql	= $this->compile($fragment->groupby());
 		$havingsql	= $this->compile($fragment->having());
 		$orderbysql	= $this->compile($fragment->orderby());
+		$unique		= $fragment->unique();
 		$limit		= $fragment->limit();
 		$offset		= $fragment->offset();
 
 		// Mandatory :
-		$sql = 'SELECT ' . (empty($selectsql) ? '*' : $selectsql) . ' FROM ' . $fromsql;
+		$sql = 'SELECT ' . ($unique ? 'DISTINCT ' : '') . (empty($selectsql) ? '*' : $selectsql) . ' FROM ' . $fromsql;
 
 		// Optional :
 		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;

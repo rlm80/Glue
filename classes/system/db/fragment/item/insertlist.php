@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Item_Columns extends \Glue\DB\Fragment_Item {
+class Fragment_Item_InsertList extends \Glue\DB\Fragment_Item {
 	/**
 	 * @var string Column.
 	 */

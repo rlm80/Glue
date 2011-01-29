@@ -287,7 +287,7 @@ EOD;
 			"(`myalias`.`login`), (`myalias`.`password` || 'qsdf'), (`myalias`.`email`)"
 		);
 
-		$select = new \Glue\DB\Fragment_Builder_Select();
+		$select = new \Glue\DB\Fragment_Builder_SelectList();
 		$select->columns($t->login, DB::tpl($t->password))->columns(array($t->email, 'myemail'))->columns($t->login);
 		$tests['select'] = array(
 			$select,
@@ -295,10 +295,10 @@ EOD;
 		);
 
 
-		$select1 = db::select(array('users','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3");
+		$select1 = db::select(array('users','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3")->distinct();
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT * FROM `users` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
+			"SELECT DISTINCT * FROM `users` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
 		);
 
 		$select2 = db::select(array('users','myusers'), $u)->where("$u->login = 'mylogin'");
@@ -421,12 +421,12 @@ EOD;
 					->limit(1)->offset(0);
 		$stmt = db::cn()->query($query);
 
-  $f = db::join('t1', $t1)->left( $nested = db::join() );
-  $nested->init('t2', $t2)->inner('t3', $t3)->on("$t2->col = $t3->col + ?", 5);
-  $f->on("$t2->id = $t1->id")->or("$t3->id = $t1->id");
-
+ 
+  // Create fragment :
+  $f = db::insertlist(array('column1', 'column1'))->columns('column3', 'column4');
+  
   // Output SQL :
-  echo db::cn()->compile( $f ); // (1=1) AND NOT ((2=2) OR (3=3))
+  echo db::cn()->compile( $f ); // Prints "column1", "column2", "column3", "column4"
 
 		/*foreach($stmt as $row) {
 			var_dump($row);

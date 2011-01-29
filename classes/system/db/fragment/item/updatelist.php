@@ -10,7 +10,7 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
+class Fragment_Item_UpdateList extends \Glue\DB\Fragment_Item {
 	/**
 	 * @var string Column name.
 	 */
@@ -37,7 +37,7 @@ class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	 *
 	 * @param string $set
 	 *
-	 * @return \Glue\DB\Fragment_Item_Set
+	 * @return \Glue\DB\Fragment_Item_UpdateList
 	 */
 	public function set($set = null) {
 		if (func_num_args() === 0)
@@ -53,7 +53,7 @@ class Fragment_Item_Set extends \Glue\DB\Fragment_Item {
 	 *
 	 * @param \Glue\DB\Fragment $to
 	 *
-	 * @return \Glue\DB\Fragment_Item_Set
+	 * @return \Glue\DB\Fragment_Item_UpdateList
 	 */
 	public function to(\Glue\DB\Fragment $to = null) {
 		if (func_num_args() === 0)

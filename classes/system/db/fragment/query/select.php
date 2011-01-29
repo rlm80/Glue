@@ -12,7 +12,7 @@ namespace Glue\System\DB;
 
 class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	/**
-	 * @var \Glue\DB\Fragment_Builder_Select Select list.
+	 * @var \Glue\DB\Fragment_Builder_SelectList Select list.
 	 */
 	protected $select;
 
@@ -50,12 +50,17 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	 * @var Integer Offset.
 	 */
 	protected $offset;
+	
+	/**
+	 * @var Boolean Whether the query results must be distinct.
+	 */
+	protected $unique = false;	
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->select	= new \Glue\DB\Fragment_Builder_Select();
+		$this->select	= new \Glue\DB\Fragment_Builder_SelectList();
 		$this->from		= new \Glue\DB\Fragment_Builder_Join();
 		$this->where	= new \Glue\DB\Fragment_Builder_Bool();
 		$this->orderby	= new \Glue\DB\Fragment_Builder_Orderby();
@@ -64,7 +69,7 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 	}
 
 	/**
-	 * With parameters, returns $this and add columns to the select list : @see \Glue\DB\Fragment_Builder_Select::columns()
+	 * With parameters, returns $this and add columns to the select list : @see \Glue\DB\Fragment_Builder_SelectList::columns()
 	 * Without parameters : returns select list builder.
 	 *
 	 * @return \Glue\DB\Fragment_Query_Select
@@ -312,4 +317,29 @@ class Fragment_Query_Select extends \Glue\DB\Fragment_Query {
 			return $this;
 		}
 	}
+	
+	/**
+	 * Unique getter / setter (+ return $this).
+	 *
+	 * @param boolean $unique
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function unique($unique = null) {
+		if (func_num_args() === 0)
+			return $this->unique;
+		else {
+			$this->unique = $unique;
+			return $this;
+		}
+	}	
+	
+	/**
+	 * Sets $this->unique to true and return $this.
+	 *
+	 * @return \Glue\DB\Fragment_Query_Select
+	 */
+	public function distinct() {
+		return $this->unique(true);
+	}		
 }
