@@ -50,7 +50,7 @@ title: Guide
   
   // Usage with table fragment :
   $t = db::table('mytable', 'myalias');
-  $f = db::selectlist(array"$t->column1 + $t->column2 * 5", "alias1"))->columns($t->column2, $t->column3);
+  $f = db::selectlist(array("$t->column1 + $t->column2 * 5", "alias1"))->columns($t->column2, $t->column3);
   
   // Output SQL : 
   echo db::cn()->compile( $f );  
