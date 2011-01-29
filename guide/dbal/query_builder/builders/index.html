@@ -8,24 +8,25 @@ title: Guide
 <p>An SQL query is made up of lists of elements :</p>
 
 <ul>
-  <li>boolean expressions,</li>
-  <li>join expressions,</li>
-  <li>order by lists,</li>
-  <li>group by lists,</li>
-  <li>select list,</li>
-  <li>columns lists in an insert query,</li>
-  <li>values lists in an insert query,</li>
-  <li>assignements lists in an update query.</li>
-</ul>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/boolean_expressions.html">Boolean expressions</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/join_expressions.html">Join expressions</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/order_by.html">Order by</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/group_by.html">Group by</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/select_lists.html">Select lists</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/insert_lists.html">Insert lists</a>,</li>
+  <li><a href="/Glue/guide/dbal/query_builder/builders/update_lists.html">Update lists</a>,</li>             
+  <li><a href="/Glue/guide/dbal/query_builder/builders/values.html">Values</a>,</li>
+</ul> 
 
-<p>Each of these lists is represented as a pair of fragment classes :</p>
+<p>Each of these lists is represented as a pair of fragment classes : an item class and a builder class. Even though items and builders are not very useful by themselves, their interfaces show up through the queries API, so it is necessary to understand them.</p>
 
-<ul>
-  <li>item fragment : represents the elements that make up the list and provides getter/setters to access their data,</li>
-  <li>builder fragment : represents the list and provides a <a class="external" href="http://en.wikipedia.org/wiki/Method_chaining">fluent interface</a> to build it.</li>
-</ul>
+<h3>Item classes</h3>
 
-<p>Item classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item"><span class="inline_code">classes/system/db/fragment/item/</span></a> folder. Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. All builders extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
+<p>Item fragments represent the elements that make up the lists and provide getter/setters to access their data. Item classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item"><span class="inline_code">classes/system/db/fragment/item/</span></a> folder.</p>
+
+<h3>Builder classes</h3>
+
+<p>Builder classes represent the lists and provide a <a class="external" href="http://en.wikipedia.org/wiki/Method_chaining">chainable methods</a> to build them. Builder classes are located in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder"><span class="inline_code">classes/system/db/fragment/builder/</span></a> folder. All builders extend the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder.php"><span class="inline_code">\Glue\DB\Fragment_Builder</span></a> class and thus share some common methods :</p>
 
 <ul>
   <li><span class="inline_code">->pop()</span> : removes last item,</li>
