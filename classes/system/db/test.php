@@ -28,10 +28,10 @@ class Test {
 			self::test_queries();
 		}
 		catch (\Exception $e) {
-			//self::drop_test_tables();
+			self::drop_test_tables();
 			throw $e;
 		}
-		//self::drop_test_tables();
+		self::drop_test_tables();
 	}
 
 	static private function create_test_tables() {
@@ -205,19 +205,19 @@ EOD;
 					"NULL"
 				),
 			'template - simple' => array(
-					db::tpl("test template"),
+					db::sql("test template"),
 					"test template"
 				),
 			'template - complex' => array(
-					db::tpl("test `q'sdf``a'zer``` testtest 'q`sdf''a`zer'''"),
+					db::sql("test `q'sdf``a'zer``` testtest 'q`sdf''a`zer'''"),
 					"test `q'sdf``a'zer``` testtest 'q`sdf\\'a`zer\\''"
 				),
 			'template - complex with replacements' => array(
-					db::tpl("? test ? `q'?sd!f``a'zer``` test ! test ? 'q`sdf''a`zer''' !", 'a', 'b', 'c', 'd', array('e','f')),
+					db::sql("? test ? `q'?sd!f``a'zer``` test ! test ? 'q`sdf''a`zer''' !", 'a', 'b', 'c', 'd', array('e','f')),
 					"'a' test 'b' `q'?sd!f``a'zer``` test `c` test 'd' 'q`sdf\\'a`zer\\'' `e`.`f`"
 				),
 			'template - nested' => array(
-					db::tpl("? test ? ?", db::tpl('toast'), db::tpl('toast'), 10),
+					db::sql("? test ? ?", db::sql('toast'), db::sql('toast'), 10),
 					"toast test toast 10"
 				),
 			'boolean - simple' => array(
@@ -241,7 +241,7 @@ EOD;
 					"`glusers` AS `myalias`"
 				),
 			'template - columns' => array(
-					db::tpl("$t->id < $t->password qsdf"),
+					db::sql("$t->id < $t->password qsdf"),
 					"`myalias`.`id` < `myalias`.`password` qsdf"
 				),
 		);
@@ -280,7 +280,7 @@ EOD;
 
 		$groupby = new \Glue\DB\Fragment_Builder_Groupby();
 		$groupby
-			->groupby($t->login, DB::tpl("$t->password || 'qsdf'"))
+			->groupby($t->login, DB::sql("$t->password || 'qsdf'"))
 			->groupby($t->email);
 		$tests['groupby'] = array(
 			$groupby,
@@ -288,7 +288,7 @@ EOD;
 		);
 
 		$select = new \Glue\DB\Fragment_Builder_SelectList();
-		$select->columns($t->login, DB::tpl($t->password))->columns(array($t->email, 'myemail'))->columns($t->login);
+		$select->columns($t->login, DB::sql($t->password))->columns(array($t->email, 'myemail'))->columns($t->login);
 		$tests['select'] = array(
 			$select,
 			"(`myalias`.`login`) AS ```myalias``.``login```, (`myalias`.`password`), (`myalias`.`email`) AS `myemail`"
@@ -345,7 +345,7 @@ EOD;
 			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
-		$update1 = db::update('users', $a)->set('login', 'test')->set('password', \Glue\DB\DB::tpl(':pass'))->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
+		$update1 = db::update('users', $a)->set('login', 'test')->set('password', \Glue\DB\DB::sql(':pass'))->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
 			"UPDATE `users` SET `login` = ('test'), `password` = (:pass) WHERE (`users`.`login` = 'test') ORDER BY (`users`.`login`) ASC LIMIT 30 OFFSET 20"
@@ -354,7 +354,7 @@ EOD;
 		$update2 = db::update('users', $a)
 					->set(array(
 						'login' => 'test',
-						'password' => \Glue\DB\DB::tpl(':pass')
+						'password' => \Glue\DB\DB::sql(':pass')
 					))
 					->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update array'] = array(
@@ -363,7 +363,7 @@ EOD;
 		);
 
 
-		$insert1 = db::insert('users')->columns('login', 'password')->columns(array('id'))->values("test'1", "test'2", \Glue\DB\DB::tpl(':test'))->values(array("a", "b", "c"), array("d", "e", "f"))->values(array(array("a", "b", "c"), array("d", "e", "f")));
+		$insert1 = db::insert('users')->columns('login', 'password')->columns(array('id'))->values("test'1", "test'2", \Glue\DB\DB::sql(':test'))->values(array("a", "b", "c"), array("d", "e", "f"))->values(array(array("a", "b", "c"), array("d", "e", "f")));
 		$tests['query insert'] = array(
 			$insert1,
 			"INSERT INTO `users` (`login`, `password`, `id`) VALUES ('test\'1','test\'2',:test),('a','b','c'),('d','e','f'),('a','b','c'),('d','e','f')"
@@ -373,7 +373,7 @@ EOD;
 		foreach($tests as $type => $data) {
 			list($f, $target) = $data;
 			echo ("Testing fragments : " . $type . " ...");
-			if ($f->sql() === $target)
+			if (db::cn()->compile($f) === $target)
 				echo "ok \n";
 			else {
 				echo '<b style="color:blue">error ! ' . $f->sql() . " doesn't match target " . $target . "\n</b>";
@@ -423,10 +423,17 @@ EOD;
 
  
   // Create fragment :
-  $f = db::insertlist(array('column1', 'column1'))->columns('column3', 'column4');
+  $f = db::values(1, 'test1')
+         ->values(array(2, 'test2'))
+         ->values(
+           array(
+             array(3, 'test3'),
+             array(4, 'test4'),
+           )
+         );
   
   // Output SQL :
-  echo db::cn()->compile( $f ); // Prints "column1", "column2", "column3", "column4"
+  echo db::cn()->compile( $f ); // (1,'test1'),(2,'test2'),(3,'test3'),(4,'test4')
 
 		/*foreach($stmt as $row) {
 			var_dump($row);

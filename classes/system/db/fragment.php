@@ -13,16 +13,6 @@ namespace Glue\System\DB;
  */
 
 abstract class Fragment {
-	/**
-	 * Compiles fragment according to given connection SQL dialect and return SQL.
-	 * 
-	 * @param string $cnid Connection id.
-	 * 
-	 * @return string
-	 */
-	public function sql($cnid = null) {
-		return \Glue\DB\DB::cn($cnid)->compile($this);		
-	}
 }
 
 

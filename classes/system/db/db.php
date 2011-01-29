@@ -201,14 +201,14 @@ class DB {
 	}
 
 	/**
-	 * Returns a new template fragment.
+	 * Returns a new SQL fragment.
 	 *
-	 * @return \Glue\DB\Fragment_Template
+	 * @return \Glue\DB\Fragment_SQL
 	 */
-	public static function tpl() {
+	public static function sql() {
 		$values		= func_get_args();
 		$template	= array_shift($values);
-		return new \Glue\DB\Fragment_Template($template, $values);
+		return new \Glue\DB\Fragment_SQL($template, $values);
 	}
 
 	/**
@@ -301,6 +301,21 @@ class DB {
 		else
 			return $f;
 	}	
+	
+	/**
+	 * Returns a new values fragment.
+	 *
+	 * @return \Glue\DB\Fragment_Builder_Values
+	 */
+	public static function values() {
+		$f = new \Glue\DB\Fragment_Builder_Values();
+		if (func_num_args() > 0) {
+			$args = func_get_args();
+			return call_user_func_array(array($f, 'values'), $args);
+		}
+		else
+			return $f;
+	}		
 
 	/**
 	 * Returns a new group by fragment.

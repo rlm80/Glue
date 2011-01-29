@@ -27,7 +27,7 @@ class Fragment_Builder_Groupby extends \Glue\DB\Fragment_Builder {
 		// Add columns one by one :
 		foreach($columns as $column) {
 			$this->push(new \Glue\DB\Fragment_Item_Groupby(
-				is_string($column) ? new \Glue\DB\Fragment_Template($column) : $column
+				is_string($column) ? new \Glue\DB\Fragment_SQL($column) : $column
 			));
 		}
 		

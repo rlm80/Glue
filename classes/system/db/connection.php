@@ -269,8 +269,8 @@ abstract class Connection extends PDO {
 		// Branch to the right function depending on fragment type :
 		if ($fragment instanceof \Glue\DB\Fragment_Value)
 			return $this->compile_value($fragment);
-		elseif ($fragment instanceof \Glue\DB\Fragment_Template)
-			return $this->compile_template($fragment);
+		elseif ($fragment instanceof \Glue\DB\Fragment_SQL)
+			return $this->compile_sql($fragment);
 		elseif ($fragment instanceof \Glue\DB\Fragment_Table)
 			return $this->compile_table($fragment);
 		elseif ($fragment instanceof \Glue\DB\Fragment_Item) {
@@ -344,15 +344,15 @@ abstract class Connection extends PDO {
 	}
 
 	/**
-	 * Compiles Fragment_Template fragments into an SQL string.
+	 * Compiles Fragment_SQL fragments into an SQL string.
 	 *
-	 * @param \Glue\DB\Fragment_Template $fragment
+	 * @param \Glue\DB\Fragment_SQL $fragment
 	 *
 	 * @return string
 	 */
-	protected function compile_template(\Glue\DB\Fragment_Template $fragment) {
+	protected function compile_sql(\Glue\DB\Fragment_SQL $fragment) {
 		// Get data from fragment :
-		$template		= $fragment->template();
+		$template		= $fragment->sql();
 		$replacements	= $fragment->replacements();
 
 		// Split template according to inline string litterals and identifiers :

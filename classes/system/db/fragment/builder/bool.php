@@ -69,7 +69,7 @@ class Fragment_Builder_Bool extends \Glue\DB\Fragment_Builder {
 		// Add new operand :
 		$this->push(
 			new \Glue\DB\Fragment_Item_Bool(
-				is_string($first) ? new \Glue\DB\Fragment_Template($first, $values) : $first,
+				is_string($first) ? new \Glue\DB\Fragment_SQL($first, $values) : $first,
 				$operator
 			)
 		);

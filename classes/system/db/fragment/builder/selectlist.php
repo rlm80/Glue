@@ -30,11 +30,11 @@ class Fragment_Builder_SelectList extends \Glue\DB\Fragment_Builder {
 		foreach($columns as $column) {
 			// Split :
 			if (is_array($column)) {
-				$col	= is_string($column[0]) ? new \Glue\DB\Fragment_Template($column[0]) : $column[0];
+				$col	= is_string($column[0]) ? new \Glue\DB\Fragment_SQL($column[0]) : $column[0];
 				$alias	= $column[1];
 			}
 			else {
-				$col	= is_string($column) ? new \Glue\DB\Fragment_Template($column) : $column;
+				$col	= is_string($column) ? new \Glue\DB\Fragment_SQL($column) : $column;
 				$alias	= is_string($column) ? $column : null; 
 			}
 			

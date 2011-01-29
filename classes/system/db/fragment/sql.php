@@ -10,11 +10,11 @@ namespace Glue\System\DB;
  * @license    MIT
  */
 
-class Fragment_Template extends \Glue\DB\Fragment {
+class Fragment_SQL extends \Glue\DB\Fragment {
 	/**
 	 * @var string Pseudo-SQL template.
 	 */
-	protected $template;
+	protected $sql;
 
 	/**
 	 * @var array Replacements to be made in pseudo-SQL template.
@@ -24,26 +24,26 @@ class Fragment_Template extends \Glue\DB\Fragment {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $template
+	 * @param string $sql
 	 * @param array $replacements
 	 */
-	public function __construct($template = '', array $replacements = array()) {
-		$this->template($template);
+	public function __construct($sql = '', array $replacements = array()) {
+		$this->sql($sql);
 		$this->replacements($replacements);
 	}
 
 	/**
 	 * Template setter/getter.
 	 *
-	 * @param string $template
+	 * @param string $sql
 	 *
 	 * @return mixed
 	 */
-	public function template($template = null) {
+	public function sql($sql = null) {
 		if (func_num_args() === 0)
-			return $this->template;
+			return $this->sql;
 		else {
-			$this->template = $template;
+			$this->sql = $sql;
 			return $this;
 		}
 	}

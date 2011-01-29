@@ -32,7 +32,7 @@ class Fragment_Item_Values extends \Glue\DB\Fragment_Item {
 	 *
 	 * @return mixed
 	 */
-	public function values($values = null) {
+	public function values(array $values = null) {
 		if (func_num_args() === 0)
 			return $this->values;
 		else {
