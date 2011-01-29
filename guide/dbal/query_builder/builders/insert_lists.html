@@ -11,6 +11,8 @@ title: Guide
 
 <h3>Item class</h3>
 
+<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/insertlist.php"><span class="inline_code">Fragment_Item_InsertList</span></a></p>
+
 <p>Item has a single property (the column name) and a single method to set/get it : <span class="inline_code">-&gt;column()</span></p>
 
 <h3>Builder class</h3>
@@ -27,7 +29,7 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::insertlist(array('column1', 'column1'))->columns('column3', 'column4');
+  $f = db::insertlist(array('column1', 'column2'))->columns('column3', 'column4');
   
   // Output SQL :
   echo db::cn()->compile( $f ); // Prints "column1", "column2", "column3", "column4"

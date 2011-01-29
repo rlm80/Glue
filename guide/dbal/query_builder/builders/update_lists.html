@@ -1,0 +1,47 @@
+---
+layout: base
+title: Guide
+---
+
+<h2>Update lists</h2>
+
+<p>Factory method : <span class="inline_code">DB::updatelist()</span></p>
+
+<p>Represents a comma separated list of assignements to be used in update queries : <span class="inline_code">"column1" = 5, "column2" = 'test', "column3" = (SELECT ...), </span></p>
+
+<h3>Item class</h3>
+
+<p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/updatelist.php"><span class="inline_code">Fragment_Item_UpdateList</span></a></p>
+
+<p>The item is an column-fragment pair. It has 2 methods :</p>
+
+<ul>
+  <li><span class="inline_code">-&gt;set()</span> : column getter/setter,</li>
+  <li><span class="inline_code">-&gt;to()</span> : fragment getter/setter.</li>
+</ul>
+
+<h3>Builder class</h3>
+
+<p>Builder : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/builder/updatelist.php"><span class="inline_code">Fragment_Builder_UpdateList</span></a></p>
+
+<p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">->set()</span>. It can take as parameters either :</p>
+
+<ul>
+  <li>a column name and a value (or a fragment) to be assigned to it,</li>
+  <li>an array of values (or fragments) indexed by column names.</li>
+</ul>
+
+<h3>Code samples</h3>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::updatelist('column1', 1)->set(array('column2' => 2, 'column3' => 'test'));
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // "column1" = (1), "column2" = (2), "column3" = ('test')
+?>
+{% endhighlight %}
