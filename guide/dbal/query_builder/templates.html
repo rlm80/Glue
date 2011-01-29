@@ -3,11 +3,9 @@ layout: base
 title: Guide
 ---
 
-<h2>Templates</h2>
+<h2>Pseudo SQL</h2>
 
 <p>Low-level elements like operands in boolean expressions are a mix of arithmetic expressions, string concatenations, operators, functions, identifiers, string literals and pre-defined constants. It would be pointless and tedious to describe them as a tree of objects. Such elements are considered atomic, and must be described in SQL. Still, proprietary SQL cannot be used, since database independence would be lost. That is why "<b>pseudo SQL</b>" is introduced.</p>
-
-<h3>Pseudo SQL</h3>
 
 <p>Pseudo SQL is SQL code standardized in such a way that it can be easily converted into proprietary SQL, and its special characters don't need to be escaped in double-quoted PHP strings.</p>
 
@@ -19,11 +17,11 @@ title: Guide
 
 <p>The library doesn't impose any naming conventions. What's important is to be consistent accross the application. A hook ( <span class="inline_code">Connection::hook_sql_replace()</span> ) is provided so that name conversions from pseudo SQL to proprietary SQL can be implemented for a specific connection. By default the hook does nothing, so all names are passed from pseudo SQL to proprietary SQL as-is.</p>
 
-<h3>Template fragments</h3>
+<h3>SQL fragments</h3>
 
-<p>Factory method : <span class="inline_code">db::tpl()</span></p>
+<p>Factory method : <span class="inline_code">db::sql()</span></p>
 
-<p>A template fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
+<p>An SQL fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
 
 <p>Thanks to replacements, explicitely quoting a value is almost never needed.</p>
 
@@ -33,7 +31,7 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::tpl("1=? AND 'test'=? AND `myid`=! AND 'a' IN ?", 2, "my'test", "my`id", array('a','b'));
+  $f = db::sql("1=? AND 'test'=? AND `myid`=! AND 'a' IN ?", 2, "my'test", "my`id", array('a','b'));
   
   // Output SQL :
   echo db::cn()->compile($f);
@@ -43,13 +41,13 @@ title: Guide
 ?>
 {% endhighlight %}
 
-<h2>Table fragments</h2>
+<h3>Table fragments</h3>
 
 <p>Factory method : <span class="inline_code">db::table()</span></p>
 
-<p>Table fragments represent table-alias pairs. If the alias is omitted, a unique one is generated. Table fragments can be used to generate pseudo SQL expressions for fully qualified columns identifiers. This makes them especially useful in template fragments.</p>
+<p>Table fragments represent table-alias pairs. If the alias is omitted, a unique one is generated. Table fragments can be used to generate pseudo SQL expressions for fully qualified columns identifiers. This makes them especially useful in SQL fragments.</p>
 
-<p>Thanks to table fragments and their use in templates, explicitely quoting an identifier is almost never needed.</p>
+<p>Thanks to table fragments, explicitely quoting an identifier in pseudo SQL is almost never needed.</p>
 
 {% highlight php %}
 <?php
@@ -68,11 +66,11 @@ title: Guide
   echo $f->column('mycolumn');  // Prints `myalias`.`mycolumn`
   echo $f->mycolumn;            // Prints `myalias`.`mycolumn` (shortcut)
   
-  // Use in template fragments :
+  // Use in SQL fragments :
   $f = db::table('mytable', 'myalias');                 // Table fragment definition
   
-  $tpl1 = db::tpl("`myalias`.`mycolumn` = 'my''test'"); // Manual quoting
-  $tpl2 = db::tpl("$f->mycolumn = ?", "my'test");       // With table fragment and replacement
+  $tpl1 = db::sql("`myalias`.`mycolumn` = 'my''test'"); // Manual quoting
+  $tpl2 = db::sql("$f->mycolumn = ?", "my'test");       // With table fragment and replacement
   
   echo db::cn()->compile( $tpl1 ); // For PostgreSQL, prints "myalias"."mycolumn" = 'my\'test'
   echo db::cn()->compile( $tpl2 ); // Same as above
