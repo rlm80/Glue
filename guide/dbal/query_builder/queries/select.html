@@ -7,14 +7,79 @@ title: Guide
 
 <p>Aggregates the following builders : <a href="/Glue/guide/dbal/query_builder/builders/boolean_expressions.html">boolean expressions</a> (where, having), <a href="/Glue/guide/dbal/query_builder/builders/join_expressions.html">join expression</a> (from), <a href="/Glue/guide/dbal/query_builder/builders/order_by.html">order by</a>, <a href="/Glue/guide/dbal/query_builder/builders/group_by.html">group by</a>, <a href="/Glue/guide/dbal/query_builder/builders/select_lists.html">select list</a>.
 
+<h3>Methods</h3>
+
 <p>All methods return <span class="inline_code">$this</span> unless specified otherwise.</p>
 
-<p>Methods that target the from clause :</p>
+<h4>Methods that target the from clause :</h4>
 
 <ul>
   <li><span class="inline_code">-&gt;from()</span> : without parameters, returns the from clause; otherwise forwards call to <span class="inline_code">-&gt;init()</span> function of the from clause.</li>
   <li><span class="inline_code">-&gt;inner()</span>, <span class="inline_code">-&gt;right()</span>, <span class="inline_code">-&gt;left()</span>, <span class="inline_code">-&gt;comma()</span> : forwards call to from clause.</li>
-  <li><span class="inline_code">-&gt;on()</span> : without parameters, returns the last ON clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the last ON clause.</li>
-  <li><span class="inline_code">-&gt;andon()</span> : forwards call to <span class="inline_code">-&gt;and()</span> function of the last ON clause.</li>
-  <li><span class="inline_code">-&gt;oron()</span> : forwards call to <span class="inline_code">-&gt;or()</span> function of the last ON clause.</li>
 </ul>
+
+<ul>  
+  <li><span class="inline_code">-&gt;on()</span> : without parameters, returns the last ON clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the from clause.</li>
+  <li><span class="inline_code">-&gt;andon()</span>, <span class="inline_code">-&gt;oron()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the from clause.</li>
+</ul>
+
+<h4>Methods that target the where clause :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;where()</span> : without parameters, returns the where clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the where clause.</li>
+  <li><span class="inline_code">-&gt;andwhere()</span>, <span class="inline_code">-&gt;orwhere()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the where clause.</li>
+</ul>
+
+<h4>Methods that target the having clause :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;having()</span> : without parameters, returns the having clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the having clause.</li>
+  <li><span class="inline_code">-&gt;andhaving()</span>, <span class="inline_code">-&gt;orhaving()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the having clause.</li>
+</ul>
+
+<h4>Other methods that forward to aggregated builders :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;orderby()</span> : without parameters, returns the order by clause; otherwise forwards call to <span class="inline_code">-&gt;orderby()</span> function of the order by clause.</li>
+  <li><span class="inline_code">-&gt;groupby()</span> : without parameters, returns the group by clause; otherwise forwards call to <span class="inline_code">-&gt;groupby()</span> function of the group by clause.</li>
+  <li><span class="inline_code">-&gt;columns()</span> : without parameters, returns the select list; otherwise forwards call to <span class="inline_code">-&gt;columns()</span> function of the select list.</li>  
+</ul>
+
+<h4>Other methods :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;limit()</span> : limit getter/setter.</li>
+  <li><span class="inline_code">-&gt;offset()</span> : offset getter/setter.</li>
+  <li><span class="inline_code">-&gt;unique()</span> : uniqueness of rows getter/setter.</li>
+  <li><span class="inline_code">-&gt;distinct()</span> : same as calling <span class="inline_code">-&gt;unique(true)</span>.</li>
+</ul>
+
+<h3>Examples</h3>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  // Create fragment :
+  $f = db::insertlist(array('column1', 'column2'))->columns('column3', 'column4');
+  
+  // Output SQL :
+  echo db::cn()->compile( $f ); // Prints "column1", "column2", "column3", "column4"
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
