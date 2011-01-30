@@ -3,8 +3,107 @@ layout: base
 title: Guide
 ---
 
-<h2>Queries</h2>
+<h2>Select</h2>
 
-<p>Queries are fragments that represent a whole SQL statement : <a href="/Glue/guide/dbal/query_builder/queries/select.html">select</a>, <a href="/Glue/guide/dbal/query_builder/queries/delete.html">delete</a>, <a href="/Glue/guide/dbal/query_builder/queries/update.html">update</a> and <a href="/Glue/guide/dbal/query_builder/queries/insert.html">insert</a>. Each query object aggregates one or more of the builders described in the previous chapter. The API of a query object is mostly the union of the APIs of the builders it aggregates.</p>
+<p>Aggregates the following builders : <a href="/Glue/guide/dbal/query_builder/builders/boolean_expressions.html">boolean expressions</a> (where, having), <a href="/Glue/guide/dbal/query_builder/builders/join_expressions.html">join expression</a> (from), <a href="/Glue/guide/dbal/query_builder/builders/order_by.html">order by</a>, <a href="/Glue/guide/dbal/query_builder/builders/group_by.html">group by</a>, <a href="/Glue/guide/dbal/query_builder/builders/select_lists.html">select list</a>. The API is approximately the union of the APIs of the aggregated builders, with suffixes added to function names when they collide.</p>
 
-<p>There is no support for queries that alter the database schema such as create, drop or alter.</p>
+<h3>Methods</h3>
+
+<p>All methods return <span class="inline_code">$this</span> unless specified otherwise.</p>
+
+<h4>Methods that target the from clause :</h4>
+
+<ul>
+  <li><span class="inline_code">-&gt;from()</span> : without parameters, returns from clause; otherwise forwards call to <span class="inline_code">-&gt;init()</span> function of the from clause.</li>
+  <li><span class="inline_code">-&gt;inner()</span>, <span class="inline_code">-&gt;right()</span>, <span class="inline_code">-&gt;left()</span>, <span class="inline_code">-&gt;comma()</span> : forwards call to from clause.</li>
+</ul>
+
+<ul>  
+  <li><span class="inline_code">-&gt;on()</span> : without parameters, returns last ON clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the from clause.</li>
+  <li><span class="inline_code">-&gt;andon()</span>, <span class="inline_code">-&gt;oron()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the from clause.</li>
+</ul>
+
+<h4>Methods that target the where clause :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;where()</span> : without parameters, returns where clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the where clause.</li>
+  <li><span class="inline_code">-&gt;andwhere()</span>, <span class="inline_code">-&gt;orwhere()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the where clause.</li>
+</ul>
+
+<h4>Methods that target the having clause :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;having()</span> : without parameters, returns having clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the having clause.</li>
+  <li><span class="inline_code">-&gt;andhaving()</span>, <span class="inline_code">-&gt;orhaving()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the having clause.</li>
+</ul>
+
+<h4>Other methods that forward to aggregated builders :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;orderby()</span> : without parameters, returns order by clause; otherwise forwards call to <span class="inline_code">-&gt;orderby()</span> function of the order by clause.</li>
+  <li><span class="inline_code">-&gt;groupby()</span> : without parameters, returns group by clause; otherwise forwards call to <span class="inline_code">-&gt;groupby()</span> function of the group by clause.</li>
+  <li><span class="inline_code">-&gt;columns()</span> : without parameters, returns select list; otherwise forwards call to <span class="inline_code">-&gt;columns()</span> function of the select list.</li>  
+</ul>
+
+<h4>Other methods :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;limit()</span> : limit getter/setter.</li>
+  <li><span class="inline_code">-&gt;offset()</span> : offset getter/setter.</li>
+  <li><span class="inline_code">-&gt;unique()</span> : uniqueness of rows getter/setter.</li>
+  <li><span class="inline_code">-&gt;distinct()</span> : same as calling <span class="inline_code">-&gt;unique(true)</span>.</li>
+</ul>
+
+<h4>Factory :</h4>
+
+<p><span class="inline_code">DB::select()</span></p>
+
+<p>Calling the factory without parameters creates and returns a new select query object. Calling it with parameters is the same as calling <span class="inline_code">DB::select()->from(...)</span>.</p>
+
+<h3>Examples</h3>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  $f = db::select('users', $u)
+    ->left('profiles', $pr)->on("$pr->id = $u->id")
+    ->where("EXISTS ( ? )", db::select('posts', $ps)->where("$ps->user_id = $u->id"))
+    ->columns($u->login, $pr->email)
+    ->orderby($u->login);
+  
+  echo db::cn()->compile( $f );
+  
+  // SELECT (`users_0`.`login`) AS ```users_0``.``login```, (`profiles_0`.`email`) AS ```profiles_0``.``email``` FROM `users` AS `users_0` LEFT OUTER JOIN `profiles` AS `profiles_0` ON (`profiles_0`.`id` = `users_0`.`id`) WHERE (EXISTS ( SELECT 1 FROM `posts` AS `posts_0` WHERE (`posts_0`.`user_id` = `users_0`.`id`) )) ORDER BY (`users_0`.`login`) ASC
+?>
+{% endhighlight %}
+
+<p>The above can also be written like this :</p>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+
+  $f = db::select('users', $u)
+    ->left('profiles', $pr)->on("$pr->id = $u->id")
+    ->where("EXISTS ( ? )", $sub = db::select())
+    ->columns($u->login, $pr->email)
+    ->orderby($u->login);
+  
+  $sub->from('posts', $ps)->where("$ps->user_id = $u->id");
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
+
+
