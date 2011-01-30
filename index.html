@@ -14,9 +14,9 @@ title: Home
 <p>It is composed of three distinct parts, unified under a single API :</p>
 
 <ul>
-  <li>a query builder that creates database agnostic data structures representing queries,</li>
-  <li>one class extending PDO for each supported database, so that it can accept queries built with the query builder, in addition to standard SQL strings,</li>
-  <li>a database introspection library that provides a unified interface to access database schema meta-data.</li>
+  <li>a <b>query builder</b> that creates database agnostic data structures representing queries,</li>
+  <li>a <b>PDO extension</b> that can accept queries built with the query builder, in addition to standard SQL strings,</li>
+  <li>a <b>database introspection</b> library that provides a unified interface to access database schema meta-data.</li>
 </ul>
 
 <h3>Query builder</h2>
@@ -58,7 +58,7 @@ title: Home
 
 <h3>Database introspection</h2>
 
-<p>The API to get database schema mete-data is the same, and the following examples will give the same results, regardless which RDBMS is in use :</p>
+<p>The API to get database schema meta-data is the same, and the following examples will give the same results, regardless of which RDBMS is in use :</p>
 
 {% highlight php %}
 <?php
