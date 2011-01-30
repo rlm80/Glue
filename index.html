@@ -9,32 +9,77 @@ title: Home
 
 <h2>What it is</h2>
 
-<p>This is a combination of two projects :</p>
+<p>This is a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>.</p>
+
+<p>It is composed of three distinct parts, unified under a single API :</p>
 
 <ul>
-	<li>a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>,</li>
-	<li>an <a class="external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object relational mapping</a> library based on the <a class="external" href="http://martinfowler.com/eaaCatalog/dataMapper.html">data mapper pattern</a> (<i>in the works, not available yet</i>).
+  <li>a query builder that creates database agnostic data structures representing queries,</li>
+  <li>one class extending PDO for each supported database, so that it can accept queries built with the query builder, in addition to standard SQL strings,</li>
+  <li>a database introspection library that provides a unified interface to access database schema meta-data.</li>
 </ul>
 
-<h2>Database abstraction library</h2>
+<h3>Query builder</h2>
 
-<p>For the most part this is a <b>query builder</b> that makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
+<p>The query builder makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
 
 {% highlight php %}
 <?php
 	$stmt = db::select('users', $u)
-            ->columns($u->password, $u->email)
-            ->where("$u->login = ?", 'Mike');
+            ->where("$u->login = 'Mike'")
+            ->columns($u->password, $u->email);
 ?>
 {% endhighlight %}
 
 <p>There are two benefits in writing SQL queries this way :</p>
 
 <ul>
-  <li>queries are portable accross various database backends,</li>
-  <li>queries can be composed bits by bits, in no particular order.</li>
+  <li>queries are abstract data structures, not tied to a specific SQL dialect,</li>
+  <li>queries can be composed bits by bits, in no particular order, which is useful if they must be built dynamically according to some logic.</li>
 </ul>
 
-<h2>Object relational mapping library (not available yet)</h2>
+<h3>PDO extension</h2>
 
-<p>The <b>ORM</b> is built on top of the DBAL. It makes it possible to manipulate model objects only, never having to worry about the way they are stored into, and retrieved from, the database.</p>
+<p>The PDO functions <span class="inline_code">-&gt;exec()</span>, <span class="inline_code">-&gt;query()</span> and <span class="inline_code">-&gt;prepare()</span> are overridden to accept query objects built with the query builder as well as traditional SQL strings. The query objects are compiled into SQL strings compatible with the SQL dialect of the underlying database.</p>
+
+{% highlight php %}
+<?php
+  // 1. Querying the normal way (assuming a MySQL database) :
+  $stmt   = "SELECT `password`, `email` FROM `users` WHERE `login` = 'Mike'";
+  $result = db::cn()->query($stmt); // PDO accepts SQL strings.
+  
+  // 2. Querying using the query builder :
+  $stmt   = db::select('users', $u)->where("$u->login = 'Mike'")->columns($u->password, $u->email);
+  $result = db::cn()->query($stmt); // PDO accepts query objects as well.
+?>
+{% endhighlight %}
+
+<p>If you switch to PostgreSQL, the first method above won't work anymore because Postgre expect identifiers quoted with double-quotes. The second method, however, will still work.</p>
+
+<h3>Database introspection</h2>
+
+<p>The API to get database schema mete-data is the same, and the following examples will give the same results, regardless which RDBMS is in use :</p>
+
+{% highlight php %}
+<?php
+  // List tables of default connection :
+  $tables = DB::cn()->tables();
+  foreach($tables as $table) echo $table->name() . '<br>';
+    
+  // List columns of table users :
+  $columns = DB::cn()->table('users')->columns();
+  foreach($columns as $column) echo $column->name() . '<br>';
+    
+  // Get the most appropriate PHP type to represent values of column email of table 'profiles' :
+  $phptype = db::cn()->table('profiles')->column('email')->phptype();    
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
