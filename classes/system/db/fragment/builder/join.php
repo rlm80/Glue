@@ -102,7 +102,7 @@ class Fragment_Builder_Join extends \Glue\DB\Fragment_Builder {
 		if (is_string($table))
 			$operand = db::table($table);
 		elseif (is_array($table))
-			$operand = db::table($table[0], $table[1]);
+			$operand = db::table($table[0], isset($table[1]) ? $table[1] : null);
 		else
 			$operand = $table;
 

@@ -743,7 +743,7 @@ abstract class Connection extends PDO {
 		$offset		= $fragment->offset();
 
 		// Mandatory :
-		$sql = 'SELECT ' . ($unique ? 'DISTINCT ' : '') . (empty($selectsql) ? '*' : $selectsql) . ' FROM ' . $fromsql;
+		$sql = 'SELECT ' . ($unique ? 'DISTINCT ' : '') . (empty($selectsql) ? '1' : $selectsql) . ' FROM ' . $fromsql;
 
 		// Optional :
 		if ( ! empty($wheresql))	$sql .= ' WHERE '		. $wheresql;

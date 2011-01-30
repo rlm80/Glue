@@ -298,13 +298,13 @@ EOD;
 		$select1 = db::select(array('users','test'))->where("1=1")->andwhere("2=2")->orwhere("3=3")->distinct();
 		$tests['query select basic'] = array(
 			$select1,
-			"SELECT DISTINCT * FROM `users` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
+			"SELECT DISTINCT 1 FROM `users` AS `test` WHERE (1=1) AND (2=2) OR (3=3)"
 		);
 
 		$select2 = db::select(array('users','myusers'), $u)->where("$u->login = 'mylogin'");
 		$tests['query select alias'] = array(
 			$select2,
-			"SELECT * FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
+			"SELECT 1 FROM `users` AS `myusers` WHERE (`myusers`.`login` = 'mylogin')"
 		);
 
 		$select3 = db::select(array('users', null), $a)
@@ -312,13 +312,13 @@ EOD;
 						->on("$a->login = $b->login");
 		$tests['query select no alias'] = array(
 			$select3,
-			"SELECT * FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
+			"SELECT 1 FROM `users` LEFT OUTER JOIN `users` AS `myusers` ON (`users`.`login` = `myusers`.`login`)"
 		);
 
 		$select4 = db::select(array('users', 'myusers'), $a)->orderby($a->login)->limit(30)->offset(20);
 		$tests['query select limit offset'] = array(
 			$select4,
-			"SELECT * FROM `users` AS `myusers` ORDER BY (`myusers`.`login`) ASC LIMIT 30 OFFSET 20"
+			"SELECT 1 FROM `users` AS `myusers` ORDER BY (`myusers`.`login`) ASC LIMIT 30 OFFSET 20"
 		);
 
 		$select5 = db::select(array('users', 'myusers'), $a)->groupby($a->login, $a->password)->having("count(*) > 1")->orderby($a->login, $a->password)->columns($a->login, $a->password);
@@ -336,7 +336,7 @@ EOD;
 		$select6 = db::select(array('users', 'a'), $a)->left(array('users', 'b'), $b)->on("1=1")->andon("2=2")->right(array('users', 'c'), $c)->on("3=3")->oron("4=4");
 		$tests['query select andon oron'] = array(
 			$select6,
-			"SELECT * FROM `users` AS `a` LEFT OUTER JOIN `users` AS `b` ON (1=1) AND (2=2) RIGHT OUTER JOIN `users` AS `c` ON (3=3) OR (4=4)"
+			"SELECT 1 FROM `users` AS `a` LEFT OUTER JOIN `users` AS `b` ON (1=1) AND (2=2) RIGHT OUTER JOIN `users` AS `c` ON (3=3) OR (4=4)"
 		);
 
 		$delete1 = db::delete('users', $a)->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
@@ -422,18 +422,15 @@ EOD;
 		$stmt = db::cn()->query($query);
 
  
-  // Create fragment :
-  $f = db::values(1, 'test1')
-         ->values(array(2, 'test2'))
-         ->values(
-           array(
-             array(3, 'test3'),
-             array(4, 'test4'),
-           )
-         );
+  $f = db::select('users', $u)
+    ->left('profiles', $pr)->on("$pr->id = $u->id")
+    ->where("EXISTS ( ? )", $sub = db::select())
+    ->columns($u->login, $pr->email)
+    ->orderby($u->login);
   
-  // Output SQL :
-  echo db::cn()->compile( $f ); // (1,'test1'),(2,'test2'),(3,'test3'),(4,'test4')
+  $sub->from('posts', $ps)->where("$ps->user_id = $u->id");
+  
+  echo db::cn()->compile($f);
 
 		/*foreach($stmt as $row) {
 			var_dump($row);
