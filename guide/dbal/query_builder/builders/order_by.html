@@ -7,7 +7,7 @@ title: Guide
 
 <p>Factory : <span class="inline_code">DB::orderby()</span></p>
 
-<p>Represents a comma separated list of parentheses enclosed SQL expressions, followed by an ordering specification : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) ASC, ("mytable"."mycolumn3") DESC, ...</span></p>
+<p>Represents a comma separated list of SQL expressions, followed by an ordering specification : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) ASC, "mytable"."mycolumn3" DESC, ...</span></p>
 
 <h3>Item class</h3>
 
@@ -43,18 +43,18 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::orderby("`column1` + `column2` * 5")->orderby("`column2`", array("column3", db::DESC));
+  $f = db::orderby("(`column1` + `column2` * 5)")->orderby("`column2`", array("`column3`", db::DESC));
   
   // Output SQL :
-  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) ASC,  ("column2") ASC, (column3) DESC
+  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) ASC, "column2" ASC, "column3" DESC
   
   // Usage with table fragment :
   $t = db::table('mytable', 'myalias');
-  $f = db::orderby("$t->column1 + $t->column2 * 5")->orderby($t->column2, array($t->column3, db::DESC));
+  $f = db::orderby("($t->column1 + $t->column2 * 5)")->orderby($t->column2, array($t->column3, db::DESC));
   
   // Output SQL : 
   echo db::cn()->compile( $f );  
   
-  // ("myalias"."column1" + "myalias"."column2" * 5) ASC, ("myalias"."column2") ASC, ("myalias"."column3") DESC
+  // ("myalias"."column1" + "myalias"."column2" * 5) ASC, "myalias"."column2" ASC, "myalias"."column3" DESC
 ?>
 {% endhighlight %}

@@ -7,7 +7,7 @@ title: Guide
 
 <p>Factory : <span class="inline_code">DB::selectlist()</span></p>
 
-<p>Represents a comma separated list of parentheses enclosed SQL expressions, followed by an alias : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) AS "alias1", ("mytable"."mycolumn3") AS "alias2", ...</span></p>
+<p>Represents a comma separated list of SQL expressions, followed by an alias : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3) AS "alias1", "mytable"."mycolumn3" AS "alias2", ...</span></p>
 
 <h3>Item class</h3>
 
@@ -27,7 +27,7 @@ title: Guide
 <p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;columns()</span>. It adds a list of SQL expressions to the select list. It can take any number of parameters, each of them can be either :</p>
 
 <ul>
-  <li>a string of pseudo SQL (default alias = pseudo SQL quoted as an identifier),</li>
+  <li>a string of pseudo SQL (<b>default alias = pseudo SQL quoted as an identifier</b>),</li>
   <li>a fragment (default alias = none),</li>
   <li>an array (string of pseudo SQL, alias),</li>
   <li>an array (fragment, alias).</li>
@@ -43,18 +43,18 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::selectlist(array("`column1` + `column2` * 5", "alias1"))->columns("`column2`", "column3");
+  $f = db::selectlist(array("(`column1` + `column2` * 5)", "alias1"))->columns("`column2`", "`column3`");
   
   // Output SQL :
-  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) AS "alias1",  ("column2") AS "`column2`", (column3) AS "column3"
+  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) AS "alias1",  "column2" AS "`column2`", "column3" AS "`column3`"
   
   // Usage with table fragment :
   $t = db::table('mytable', 'myalias');
-  $f = db::selectlist(array("$t->column1 + $t->column2 * 5", "alias1"))->columns($t->column2, $t->column3);
+  $f = db::selectlist(array("($t->column1 + $t->column2 * 5)", "alias1"))->columns($t->column2, $t->column3);
   
   // Output SQL : 
   echo db::cn()->compile( $f );  
   
-  // ("myalias"."column1" + "myalias"."column2" * 5)  AS "alias1", ("myalias"."column2")  AS "`myalias`.`column2`", ("myalias"."column3") "`myalias`.`column3`"
+  // ("myalias"."column1" + "myalias"."column2" * 5)  AS "alias1", "myalias"."column2"  AS "`myalias`.`column2`", "myalias"."column3" AS "`myalias`.`column3`"
 ?>
 {% endhighlight %}

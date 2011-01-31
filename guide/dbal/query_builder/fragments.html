@@ -7,11 +7,11 @@ title: Guide
 
 <p>Queries are represented as <b>trees</b> of <b>fragments</b>.</p>
 
-<p>Fragments are objects that hold data about specific pieces of SQL. Boolean expressions, boolean operands, order by clauses, join expressions and even queries, all of these are represented as fragments. Fragment classes may be found in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment"><span class="inline_code">classes/system/db/fragment/</span></a> folder.</p>
+<p>Fragments are objects that represent specific pieces of an SQL query in a database agnostic way (i.e. in a way independent of the RDBMS in use). Boolean expressions, boolean operands, order by clauses, join expressions and even queries, all of these are represented as fragments. Fragment classes may be found in the <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment"><span class="inline_code">classes/system/db/fragment/</span></a> folder.</p>
 
 <h3>Compiling fragments</h3>
 
-<p>Fragments can be compiled into SQL strings according to the SQL dialect of a specific connection by passing them to the <span class="inline_code">-&gt;compile()</span> function of that connection :</p>
+<p>Fragments can be compiled into SQL strings according to the SQL dialect of some connection by passing them to the <span class="inline_code">-&gt;compile()</span> function of that connection :</p>
 
 {% highlight php %}
 <?php

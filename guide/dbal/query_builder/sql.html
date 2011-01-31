@@ -21,7 +21,7 @@ title: Guide
 
 <p>Factory method : <span class="inline_code">db::sql()</span></p>
 
-<p>An SQL fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When a template fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
+<p>An SQL fragment is a string of pseudo SQL with placeholders, and an array of replacements. Placeholders can be either '?' or '!' : the former reserves space for a value, and the latter for an identifier. Replacements can be either PHP scalar values, arrays, or fragments. When an SQL fragment is compiled, the pseudo SQL string is turned into proprietary SQL. Then, replacements are quoted according to the conventions of the underlying RDBMS and placeholders are replaced. Replacements that are fragments are compiled and included as-is.</p>
 
 <p>Thanks to replacements, explicitely quoting a value is almost never needed.</p>
 
@@ -31,13 +31,13 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::sql("1=? AND 'test'=? AND `myid`=! AND 'a' IN ?", 2, "my'test", "my`id", array('a','b'));
+  $f = db::sql("1 = ? AND 'test' = ? AND `myid` = ! AND 'a' IN ?", 2, "my'test", "my`id", array('a', 'b'));
   
   // Output SQL :
   echo db::cn()->compile($f);
   
   // Assuming a MySQL default connection, it prints :
-  // 1=2 AND 'test'='my\'test' AND `myid`=`my``id` AND 'a' IN ('a','b')
+  // 1 = 2 AND 'test' = 'my\'test' AND `myid` = `my``id` AND 'a' IN ('a','b')
 ?>
 {% endhighlight %}
 
