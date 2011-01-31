@@ -9,42 +9,38 @@ title: Home
 
 <h2>What it is</h2>
 
-<p>This is a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>.</p>
-
-<p>It is composed of three distinct parts, unified under a single API :</p>
+<p>This is a database abstraction library that extends <a class="external" href="http://php.net/manual/en/book.pdo.php">PDO</a>. It is composed of three parts :</p>
 
 <ul>
-  <li>a <b>query builder</b> that creates database agnostic data structures representing queries,</li>
-  <li>a <b>PDO extension</b> that can accept queries built with the query builder, in addition to standard SQL strings,</li>
+  <li>a <b>query builder</b> that creates database agnostic query objects,</li>
+  <li>a <b>PDO extension</b> that can accept query objects in addition to standard SQL strings,</li>
   <li>a <b>database introspection</b> library that provides a unified interface to access database schema meta-data.</li>
 </ul>
 
 <h3>Query builder</h2>
 
-<p>The query builder makes it possible to compose queries as a sequence of PHP function calls, rather than manipulating SQL code as strings :</p>
-
-{% highlight php %}
-<?php
-	$stmt = db::select('users', $u)
-            ->where("$u->login = 'Mike'")
-            ->columns($u->password, $u->email);
-?>
-{% endhighlight %}
-
-<p>There are two benefits in writing SQL queries this way :</p>
+<p>The query builder makes it possible to compose queries as a sequence of PHP function calls. There are two benefits in writing SQL queries this way :</p>
 
 <ul>
   <li>queries are abstract data structures, not tied to a specific SQL dialect,</li>
   <li>queries can be composed bits by bits, in no particular order, which is useful if they must be built dynamically according to some logic.</li>
 </ul>
 
+{% highlight php %}
+<?php
+  $stmt = db::select('users', $u)
+            ->where("$u->login = 'Mike'")
+            ->columns($u->password, $u->email);
+?>
+{% endhighlight %}
+
 <h3>PDO extension</h2>
 
-<p>The PDO functions <span class="inline_code">-&gt;exec()</span>, <span class="inline_code">-&gt;query()</span> and <span class="inline_code">-&gt;prepare()</span> are overridden to accept query objects built with the query builder as well as traditional SQL strings. The query objects are compiled into SQL strings compatible with the SQL dialect of the underlying database.</p>
+<p>PDO functions <span class="inline_code">-&gt;exec()</span>, <span class="inline_code">-&gt;query()</span> and <span class="inline_code">-&gt;prepare()</span> are overridden to accept query objects as well as traditional SQL strings. The query objects are compiled into SQL strings compatible with the SQL dialect of the underlying database.</p>
 
 {% highlight php %}
 <?php
-  // 1. Querying the normal way (assuming a MySQL database) :
+  // 1. Querying the normal way (MySQL only) :
   $stmt   = "SELECT `password`, `email` FROM `users` WHERE `login` = 'Mike'";
   $result = db::cn()->query($stmt); // PDO accepts SQL strings.
   
@@ -54,8 +50,6 @@ title: Home
 ?>
 {% endhighlight %}
 
-<p>If you switch to PostgreSQL, the first method above won't work anymore because Postgre expect identifiers quoted with double-quotes. The second method, however, will still work.</p>
-
 <h3>Database introspection</h2>
 
 <p>The API to get database schema meta-data is the same, and the following examples will give the same results, regardless of which RDBMS is in use :</p>
@@ -63,11 +57,11 @@ title: Home
 {% highlight php %}
 <?php
   // List tables of default connection :
-  $tables = DB::cn()->tables();
+  $tables = db::cn()->tables();
   foreach($tables as $table) echo $table->name() . '<br>';
     
   // List columns of table users :
-  $columns = DB::cn()->table('users')->columns();
+  $columns = db::cn()->table('users')->columns();
   foreach($columns as $column) echo $column->name() . '<br>';
     
   // Get the most appropriate PHP type to represent values of column email of table 'profiles' :
