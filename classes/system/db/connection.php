@@ -132,9 +132,9 @@ abstract class Connection extends PDO {
 		$this->exec('SET NAMES ' . $this->quote($this->charset));
 	}
 
-	/** 
+	/**
 	 * Overridden to accept fragments as well as SQL strings.
-	 * 
+	 *
 	 * @see PDO::prepare()
 	 */
 	public function prepare() {
@@ -143,22 +143,22 @@ abstract class Connection extends PDO {
 		return call_user_func_array('parent::prepare', $args);
 	}
 
-	/** 
+	/**
 	 * Overridden to accept fragments as well as SQL strings.
-	 * 
+	 *
 	 * @see PDO::query()
-	 */	
+	 */
 	public function query() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
 		return call_user_func_array('parent::query', $args);
 	}
 
-	/** 
+	/**
 	 * Overridden to accept fragments as well as SQL strings.
-	 * 
+	 *
 	 * @see PDO::exec()
-	 */	
+	 */
 	public function exec() {
 		$args = func_get_args();
 		$args[0] = is_string($args[0]) ? $args[0] : $this->compile($args[0]);
@@ -510,7 +510,10 @@ abstract class Connection extends PDO {
 		$order		= $fragment->order();
 
 		// Generate fragment SQL :
-		$sql = '(' . $this->compile($ordered) . ')';
+		if ($ordered instanceof \Glue\DB\Fragment_SQL || $ordered instanceof \Glue\DB\Fragment_Value)
+			$sql = $this->compile($ordered);
+		else
+			$sql = '(' . $this->compile($ordered) . ')';
 
 		// Add ordering :
 		if (isset($order)) {
@@ -537,7 +540,10 @@ abstract class Connection extends PDO {
 		$grouped = $fragment->grouped();
 
 		// Generate fragment SQL :
-		$sql = '(' . $this->compile($grouped) . ')';
+		if ($grouped instanceof \Glue\DB\Fragment_SQL || $grouped instanceof \Glue\DB\Fragment_Value)
+			$sql = $this->compile($grouped);
+		else
+			$sql = '(' . $this->compile($grouped) . ')';
 
 		// Return SQL :
 		return $sql;
@@ -556,7 +562,10 @@ abstract class Connection extends PDO {
 		$alias		= $fragment->alias();
 
 		// Generate fragment SQL :
-		$sql = '(' . $this->compile($selected) . ')';
+		if ($selected instanceof \Glue\DB\Fragment_SQL || $selected instanceof \Glue\DB\Fragment_Value)
+			$sql = $this->compile($selected);
+		else
+			$sql = '(' . $this->compile($selected) . ')';
 
 		// Add alias :
 		if ( ! empty($alias))
@@ -576,9 +585,15 @@ abstract class Connection extends PDO {
 	protected function compile_item_updatelist(\Glue\DB\Fragment_Item_UpdateList $fragment) {
 		// Get data from fragment :
 		$setsql	= $this->quote_identifier($fragment->set());
-		$tosql	= $this->compile($fragment->to());
+		$to		= $fragment->to();
 
-		return $setsql . ' = (' . $tosql . ')';
+		// Generate to SQL :
+		if ($to instanceof \Glue\DB\Fragment_SQL || $to instanceof \Glue\DB\Fragment_Value)
+			$sql = $this->compile($to);
+		else
+			$sql = '(' . $this->compile($to) . ')';
+
+		return $setsql . ' = ' . $sql;
 	}
 
 	/**
