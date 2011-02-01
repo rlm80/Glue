@@ -272,10 +272,10 @@ EOD;
 		$orderby = new \Glue\DB\Fragment_Builder_Orderby();
 		$orderby
 			->orderby($t->login, array($t->password, \Glue\DB\DB::DESC))
-			->orderby($t->email);
+			->orderby(array($t->email, \Glue\DB\DB::ASC));
 		$tests['orderby'] = array(
 			$orderby,
-			"`myalias`.`login` ASC, `myalias`.`password` DESC, `myalias`.`email` ASC"
+			"`myalias`.`login`, `myalias`.`password` DESC, `myalias`.`email` ASC"
 		);
 
 		$groupby = new \Glue\DB\Fragment_Builder_Groupby();
@@ -318,19 +318,19 @@ EOD;
 		$select4 = db::select(array('users', 'myusers'), $a)->orderby($a->login)->limit(30)->offset(20);
 		$tests['query select limit offset'] = array(
 			$select4,
-			"SELECT 1 FROM `users` AS `myusers` ORDER BY `myusers`.`login` ASC LIMIT 30 OFFSET 20"
+			"SELECT 1 FROM `users` AS `myusers` ORDER BY `myusers`.`login` LIMIT 30 OFFSET 20"
 		);
 
 		$select5 = db::select(array('users', 'myusers'), $a)->groupby($a->login, $a->password)->having("count(*) > 1")->orderby($a->login, $a->password)->columns($a->login, $a->password);
 		$tests['query select group by having'] = array(
 			$select5,
-			"SELECT `myusers`.`login` AS ```myusers``.``login```, `myusers`.`password` AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login` ASC, `myusers`.`password` ASC"
+			"SELECT `myusers`.`login` AS ```myusers``.``login```, `myusers`.`password` AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
 		);
 
 		$select5 = db::select(array('users', 'myusers'), $a)->groupby($a->login, $a->password)->having("count(*) > 1")->orderby($a->login, $a->password)->columns($a->login, $a->password);
 		$tests['query select group by having'] = array(
 			$select5,
-			"SELECT `myusers`.`login` AS ```myusers``.``login```, `myusers`.`password` AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login` ASC, `myusers`.`password` ASC"
+			"SELECT `myusers`.`login` AS ```myusers``.``login```, `myusers`.`password` AS ```myusers``.``password``` FROM `users` AS `myusers` GROUP BY `myusers`.`login`, `myusers`.`password` HAVING (count(*) > 1) ORDER BY `myusers`.`login`, `myusers`.`password`"
 		);
 
 		$select6 = db::select(array('users', 'a'), $a)->left(array('users', 'b'), $b)->on("1=1")->andon("2=2")->right(array('users', 'c'), $c)->on("3=3")->oron("4=4");
@@ -342,13 +342,13 @@ EOD;
 		$delete1 = db::delete('users', $a)->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query delete'] = array(
 			$delete1,
-			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` ASC LIMIT 30 OFFSET 20"
+			"DELETE FROM `users` WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` LIMIT 30 OFFSET 20"
 		);
 
 		$update1 = db::update('users', $a)->set('login', 'test')->set('password', \Glue\DB\DB::sql(':pass'))->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update'] = array(
 			$update1,
-			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` LIMIT 30 OFFSET 20"
 		);
 
 		$update2 = db::update('users', $a)
@@ -359,7 +359,7 @@ EOD;
 					->where("$a->login = 'test'")->orderby($a->login)->limit(30)->offset(20);
 		$tests['query update array'] = array(
 			$update2,
-			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` ASC LIMIT 30 OFFSET 20"
+			"UPDATE `users` SET `login` = 'test', `password` = :pass WHERE (`users`.`login` = 'test') ORDER BY `users`.`login` LIMIT 30 OFFSET 20"
 		);
 
 
@@ -421,16 +421,10 @@ EOD;
 					->limit(1)->offset(0);
 		$stmt = db::cn()->query($query);
 
-
-  $f = db::select('users', $u)
-    ->left('profiles', $pr)->on("$pr->id = $u->id")
-    ->where("EXISTS ( ? )", $sub = db::select())
-    ->columns($u->login, $pr->email)
-    ->orderby($u->login);
-
+  $query = db::delete('users', $u)->where("NOT EXISTS ( ? )", $sub = db::select() );
   $sub->from('posts', $ps)->where("$ps->user_id = $u->id");
 
-  echo db::cn()->compile($f);
+  echo db::cn()->compile($query);
 
 		/*foreach($stmt as $row) {
 			var_dump($row);
