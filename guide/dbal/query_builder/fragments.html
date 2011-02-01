@@ -19,7 +19,7 @@ title: Guide
   use Glue\DB\DB;
 
   // Build query :
-  $query = db::select('users', $u)->where("$u->login = ?", 'Mike')->columns($u->login);
+  $query = db::select('users', $u)->where("$u->login = 'Mike'")->columns($u->login);
   
   // Compile data structure against default connection to view generated SQL :
   echo db::cn()->compile($query);
