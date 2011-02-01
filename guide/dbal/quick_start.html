@@ -119,7 +119,7 @@ title: Guide
   // Build data stucture :
   $query = db::insert('users')
             ->columns('login', 'password')
-            ->values(array('Mike', 'qsdfazer'));
+            ->values('Mike', 'qsdfazer');
     
   // Pass query to PDO :
   $count          = db::cn()->exec($query);

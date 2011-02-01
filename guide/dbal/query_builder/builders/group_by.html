@@ -7,7 +7,7 @@ title: Guide
 
 <p>Factory : <span class="inline_code">DB::groupby()</span></p>
 
-<p>Represents a comma separated list of parentheses enclosed SQL expressions : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3), ("mytable"."mycolumn3"), ...</span></p>
+<p>Represents a comma separated list of SQL expressions : <span class="inline_code">("mytable"."mycolumn1" + "mytable"."mycolumn2" * 3), "mytable"."mycolumn3", ...</span></p>
 
 <h3>Item class</h3>
 
@@ -29,18 +29,18 @@ title: Guide
   use Glue\DB\DB;
 
   // Create fragment :
-  $f = db::groupby("`column1` + `column2` * 5")->groupby("`column2`", "column3");
+  $f = db::groupby("(`column1` + `column2` * 5)")->groupby("`column2`", "`column3`");
   
   // Output SQL :
-  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5),  ("column2"), (column3)
+  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5), "column2", "column3"
   
   // Usage with table fragment :
   $t = db::table('mytable', 'myalias');
-  $f = db::groupby("$t->column1 + $t->column2 * 5")->groupby($t->column2, $t->column3);
+  $f = db::groupby("($t->column1 + $t->column2 * 5)")->groupby($t->column2, $t->column3);
   
   // Output SQL : 
   echo db::cn()->compile( $f );  
   
-  // ("myalias"."column1" + "myalias"."column2" * 5), ("myalias"."column2"), ("myalias"."column3")
+  // ("myalias"."column1" + "myalias"."column2" * 5), "myalias"."column2", "myalias"."column3"
 ?>
 {% endhighlight %}
