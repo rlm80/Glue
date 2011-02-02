@@ -13,7 +13,7 @@ title: Guide
 
 <p>Item : <a class="external" href="https://github.com/rlm80/Glue/tree/master/classes/system/db/fragment/item/orderby.php"><span class="inline_code">Fragment_Item_Orderby</span></a></p>
 
-<p>The item is a fragment-order pair. The order can be either <span class="inline_code">DB::ASC</span> or <span class="inline_code">DB::DESC</span>. It has 4 methods :</p>
+<p>The item is a fragment-order pair. The order can be either <span class="inline_code">DB::ASC</span>, <span class="inline_code">DB::DESC</span> or null (which means it won't be specified in the compiled SQL string). It has 4 methods :</p>
 
 <ul>
   <li><span class="inline_code">-&gt;ordered()</span> : fragment getter/setter,</li>
@@ -29,8 +29,8 @@ title: Guide
 <p>The builder has only one method (returns <span class="inline_code">$this</span>) : <span class="inline_code">-&gt;orderby()</span>. It adds a list of SQL expressions to the order by. It can take any number of parameters, each of them can be either :</p>
 
 <ul>
-  <li>a string of pseudo SQL (DB::ASC is assumed),</li>
-  <li>a fragment (DB::ASC is assumed),</li>
+  <li>a string of pseudo SQL,</li>
+  <li>a fragment,</li>
   <li>an array (string of pseudo SQL, order),</li>
   <li>an array (fragment, order).</li>
 </ul>
@@ -46,7 +46,7 @@ title: Guide
   $f = db::orderby("(`column1` + `column2` * 5)")->orderby("`column2`", array("`column3`", db::DESC));
   
   // Output SQL :
-  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5) ASC, "column2" ASC, "column3" DESC
+  echo db::cn()->compile( $f ); // Prints ("column1" + "column2" * 5), "column2", "column3" DESC
   
   // Usage with table fragment :
   $t = db::table('mytable', 'myalias');
@@ -55,6 +55,16 @@ title: Guide
   // Output SQL : 
   echo db::cn()->compile( $f );  
   
-  // ("myalias"."column1" + "myalias"."column2" * 5) ASC, "myalias"."column2" ASC, "myalias"."column3" DESC
+  // ("myalias"."column1" + "myalias"."column2" * 5), "myalias"."column2", "myalias"."column3" DESC
 ?>
 {% endhighlight %}
+
+<p>Note that the ordering specification can be included directly in the pseudo SQL string, though in this case it won't be possible to set it programmatically if need be :</p>
+
+{% highlight php %}
+<?php
+  $f = db::orderby("($t->column1 + $t->column2 * 5)")->orderby($t->column2, "$t->column3 DESC");
+?>
+{% endhighlight %}
+
+

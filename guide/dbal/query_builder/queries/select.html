@@ -66,33 +66,29 @@ title: Guide
 <?php
 
   use Glue\DB\DB;
-
-  $f = db::select('users', $u)
+  
+  // Sub query example :
+  $query = db::select('users', $u)
     ->left('profiles', $pr)->on("$pr->id = $u->id")
     ->where("EXISTS ( ? )", db::select('posts', $ps)->where("$ps->user_id = $u->id"))
     ->columns($u->login, $pr->email)
     ->orderby($u->login);
   
-  echo db::cn()->compile( $f );
-  
-  // SELECT (`users_0`.`login`) AS ```users_0``.``login```, (`profiles_0`.`email`) AS ```profiles_0``.``email``` FROM `users` AS `users_0` LEFT OUTER JOIN `profiles` AS `profiles_0` ON (`profiles_0`.`id` = `users_0`.`id`) WHERE (EXISTS ( SELECT 1 FROM `posts` AS `posts_0` WHERE (`posts_0`.`user_id` = `users_0`.`id`) )) ORDER BY (`users_0`.`login`) ASC
-?>
-{% endhighlight %}
-
-<p>The above can also be written like this :</p>
-
-{% highlight php %}
-<?php
-
-  use Glue\DB\DB;
-
-  $f = db::select('users', $u)
+  // Can also be written in two steps like this :
+  $query = db::select('users', $u)
     ->left('profiles', $pr)->on("$pr->id = $u->id")
     ->where("EXISTS ( ? )", $sub = db::select())
     ->columns($u->login, $pr->email)
     ->orderby($u->login);
   
   $sub->from('posts', $ps)->where("$ps->user_id = $u->id");
+  
+  // Group by example :
+  $query = db::select('users', $u)
+    ->groupby("length($u->password)")
+    ->orderby("count(*) DESC")
+    ->limit(10)
+    ->columns("length($u->password)", "count(*)");
 ?>
 {% endhighlight %}
 
