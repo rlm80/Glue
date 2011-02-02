@@ -3,8 +3,70 @@ layout: base
 title: Guide
 ---
 
-<h2>Queries</h2>
+<h2>Update</h2>
 
-<p>Queries are fragments that represent a whole SQL statement : <a href="/Glue/guide/dbal/query_builder/queries/select.html">select</a>, <a href="/Glue/guide/dbal/query_builder/queries/delete.html">delete</a>, <a href="/Glue/guide/dbal/query_builder/queries/update.html">update</a> and <a href="/Glue/guide/dbal/query_builder/queries/insert.html">insert</a>. Each query object aggregates one or more of the builders described in the previous chapter. The API of a query object is mostly the union of the APIs of the builders it aggregates.</p>
+<p>Aggregates the following builders : <a href="/Glue/guide/dbal/query_builder/builders/boolean_expressions.html">boolean expressions</a> (where), <a href="/Glue/guide/dbal/query_builder/builders/order_by.html">order by</a>, <a href="/Glue/guide/dbal/query_builder/builders/updatelist.html">update list</a>.</p>
 
-<p>There is no support for queries that alter the database schema such as create, drop or alter.</p>
+<h3>Methods</h3>
+
+<p>All methods return <span class="inline_code">$this</span> unless specified otherwise.</p>
+
+<h4>Methods that target the where clause :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;where()</span> : without parameters, returns where clause; otherwise forwards call to <span class="inline_code">-&gt;and()</span> function of the where clause.</li>
+  <li><span class="inline_code">-&gt;andwhere()</span>, <span class="inline_code">-&gt;orwhere()</span> : forward call respectively to <span class="inline_code">-&gt;and()</span> and <span class="inline_code">-&gt;or()</span> function of the where clause.</li>
+</ul>
+
+<h4>Other methods that forward to aggregated builders :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;orderby()</span> : without parameters, returns order by clause; otherwise forwards call to <span class="inline_code">-&gt;orderby()</span> function of the order by clause.</li> 
+  <li><span class="inline_code">-&gt;set()</span> : without parameters, returns order by clause; otherwise forwards call to <span class="inline_code">-&gt;orderby()</span> function of the order by clause.</li> 
+</ul>
+
+<h4>Other methods :</h4>
+
+<ul>  
+  <li><span class="inline_code">-&gt;limit()</span> : limit getter/setter.</li>
+  <li><span class="inline_code">-&gt;offset()</span> : offset getter/setter.</li>
+  <li><span class="inline_code">-&gt;table()</span> : table getter/setter. First parameter is the table name, second parameter is a variable passed by reference to be set with a table fragment.</li>
+</ul>
+
+<h4>Factory :</h4>
+
+<p><span class="inline_code">DB::update()</span></p>
+
+<p>Calling the factory without parameters creates and returns a new update query object. Calling it with parameters is the same as calling <span class="inline_code">DB::update()->table(...)</span>.</p>
+
+<h3>Examples</h3>
+
+{% highlight php %}
+<?php
+
+  use Glue\DB\DB;
+  
+  // Sub query example :
+  $query = db::update('users', $u)
+    ->where("NOT EXISTS ( ? )", db::select('posts', $ps)->where("$ps->user_id = $u->id") );
+  
+  // Can also be written in two steps like this :
+  $query = db::update('users', $u)->where("NOT EXISTS ( ? )", $sub = db::select() );
+  $sub->from('posts', $ps)->where("$ps->user_id = $u->id")
+  
+  // Generates SQL (MySQL) :
+  // DELETE FROM `users` WHERE (NOT EXISTS ( SELECT 1 FROM `posts` AS `posts_0` WHERE (`posts_0`.`user_id` = `users`.`id`) ))
+?>
+{% endhighlight %}
+
+
+
+
+
+
+
+
+
+
+
+
